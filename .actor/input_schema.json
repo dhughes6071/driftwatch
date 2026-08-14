@@ -1,0 +1,69 @@
+{
+  "title": "Company Career Site Jobs",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "useCuratedList": {
+      "title": "Use the curated company list",
+      "type": "boolean",
+      "description": "Fetch every company in our verified registry (166+ companies, ~14,000 open roles). Turn this off if you want to name specific companies below.",
+      "default": true
+    },
+    "companies": {
+      "title": "Specific companies (optional)",
+      "type": "array",
+      "description": "Company job-board slugs, e.g. \"stripe\" or \"ramp\". Usually the company name in lowercase. Leave the ATS blank and we'll work out which system they use. Overrides the curated list.",
+      "editor": "json",
+      "prefill": [
+        {
+          "slug": "stripe"
+        },
+        {
+          "slug": "ramp",
+          "ats": "ashby"
+        }
+      ]
+    },
+    "maxJobs": {
+      "title": "Maximum jobs to return",
+      "type": "integer",
+      "description": "Hard cap on results. This is your main cost control \u2014 you are charged per job returned.",
+      "default": 1000,
+      "minimum": 1,
+      "maximum": 100000
+    },
+    "remoteOnly": {
+      "title": "Remote roles only",
+      "type": "boolean",
+      "description": "Only return roles that are remote or remote-eligible. Note: some ATSs (notably Ashby) flag most roles 'remote-eligible' while still listing an office location. Every record carries both `remote` (the location text actually says remote) and `remoteEligible` (the company's own flag), so you can filter more strictly yourself.",
+      "default": false
+    },
+    "titleKeywords": {
+      "title": "Title keywords",
+      "type": "array",
+      "description": "Only roles whose title contains one of these (case-insensitive). e.g. \"engineer\", \"designer\".",
+      "editor": "stringList",
+      "default": []
+    },
+    "locationKeywords": {
+      "title": "Location keywords",
+      "type": "array",
+      "description": "Only roles whose location contains one of these (case-insensitive). e.g. \"London\", \"New York\".",
+      "editor": "stringList",
+      "default": []
+    },
+    "postedWithinDays": {
+      "title": "Posted within (days)",
+      "type": "integer",
+      "description": "Only roles posted in the last N days. Roles with no posting date are kept.",
+      "minimum": 1,
+      "maximum": 365
+    },
+    "includeDescription": {
+      "title": "Include full job description",
+      "type": "boolean",
+      "description": "Turn off for a much smaller, faster dataset when you only need titles, locations, and links.",
+      "default": true
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "name": "driftwatch",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dependency migration intelligence for AI coding agents. Answers: library went A -> B, what broke and what edits does my code need?",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "START_SERVER=1 node --experimental-strip-types --watch src/api/server.ts",
+    "start": "START_SERVER=1 node --experimental-strip-types src/api/server.ts",
+    "mcp": "node --experimental-strip-types src/mcp/server.ts",
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "ingest": "node --experimental-strip-types scripts/ingest.ts",
+    "testclient": "node --experimental-strip-types scripts/test-agent.ts",
+    "wallet:new": "node --experimental-strip-types scripts/new-testnet-wallet.ts",
+    "jobs:smoke": "node --experimental-strip-types scripts/jobs-smoke-test.ts",
+    "jobs:coverage": "node --experimental-strip-types scripts/jobs-coverage-test.ts",
+    "jobs:discover": "node --experimental-strip-types scripts/discover-companies.ts",
+    "actor:local": "CRAWLEE_STORAGE_DIR=./.actor-storage ACTOR_TEST_PAY_PER_EVENT=1 node --experimental-strip-types src/jobs/main.ts",
+    "jobs:export": "sqlite3 -json data/companies.db \"SELECT ats, slug, jobCount FROM companies WHERE emptyStreak < 5 ORDER BY jobCount DESC;\" > src/jobs/companies.json && node -e \"const d=require('./src/jobs/companies.json');console.log('exported',d.length,'companies')\""
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.116.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@x402/core": "^2.21.0",
+    "@x402/evm": "^2.21.0",
+    "@x402/express": "^2.21.0",
+    "@x402/extensions": "^2.21.0",
+    "@x402/fetch": "^2.21.0",
+    "apify": "^3.7.2",
+    "better-sqlite3": "^13.0.3",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "viem": "^2.55.11",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,12 @@
+services:
+  driftwatch:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:4021:4021"   # localhost only; put a reverse proxy in front
+    env_file: .env
+    volumes:
+      - ./data:/app/data        # SQLite cache + ledger persist across restarts
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }

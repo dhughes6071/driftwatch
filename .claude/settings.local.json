@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:www.coindesk.com)",
+      "WebFetch(domain:www.chainalysis.com)",
+      "WebFetch(domain:x402-list.com)",
+      "WebFetch(domain:x402bazaar.xyz)",
+      "WebFetch(domain:docs.cdp.coinbase.com)",
+      "Bash(curl -s -m 30 \"https://api.cdp.coinbase.com/platform/v2/x402/discovery/resources?limit=5\")",
+      "Bash(curl -s -m 30 \"https://x402.org/facilitator/list\")"
+    ]
+  }
+}

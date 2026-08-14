@@ -1,0 +1,13 @@
+node_modules
+research
+.env
+.env.*
+.wallet-testnet.json
+*.log
+.git
+
+# Exclude runtime data, but KEEP the verified company registry -- the Apify
+# actor image ships with it, and without this exception the actor falls back
+# to un-verified seed guesses at runtime.
+data/*
+!data/companies.db

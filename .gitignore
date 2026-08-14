@@ -1,0 +1,28 @@
+# Secrets -- NEVER commit these
+.env
+.env.*
+!.env.example
+.wallet-testnet.json
+*.key
+*.pem
+
+# Data -- runtime SQLite only. The leading slash is load-bearing: a bare
+# "data/" matches at ANY depth and was silently excluding research/data/,
+# the evidence behind MARKET_RESEARCH.md and APIFY_RESEARCH.md.
+/data/
+*.db
+*.db-wal
+*.db-shm
+
+# Deps & build
+node_modules/
+dist/
+*.log
+
+# OS
+.DS_Store
+.actor-storage
+
+# Apify local run storage -- test-run output, regenerated on every run.
+# 7MB of job records that mean nothing outside the machine that made them.
+storage/

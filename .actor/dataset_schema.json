@@ -1,0 +1,54 @@
+{
+  "actorSpecification": 1,
+  "views": {
+    "overview": {
+      "title": "Jobs",
+      "transformation": {
+        "fields": [
+          "title",
+          "company",
+          "location",
+          "remote",
+          "remoteEligible",
+          "department",
+          "postedAt",
+          "url",
+          "ats"
+        ]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "title": {
+            "label": "Role"
+          },
+          "company": {
+            "label": "Company"
+          },
+          "location": {
+            "label": "Location"
+          },
+          "remote": {
+            "label": "Remote"
+          },
+          "department": {
+            "label": "Team"
+          },
+          "postedAt": {
+            "label": "Posted"
+          },
+          "url": {
+            "label": "Apply",
+            "format": "link"
+          },
+          "ats": {
+            "label": "Source"
+          },
+          "remoteEligible": {
+            "label": "Remote-eligible"
+          }
+        }
+      }
+    }
+  }
+}
