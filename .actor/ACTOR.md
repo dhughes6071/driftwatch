@@ -1,8 +1,11 @@
-# Company Career Site Jobs
+# Career Site Job Scraper — Greenhouse, Ashby, Lever
 
-Open roles pulled **directly from companies' own applicant tracking systems** —
-Greenhouse, Ashby, and Lever — through the public JSON job-board APIs those
-systems publish for syndication.
+Scrape open roles from **498 company career sites** running Greenhouse, Ashby,
+or Lever.
+
+Unlike other job scrapers, this one reads the **public JSON APIs** those
+systems publish for syndication rather than parsing HTML — so it does not
+break when a page changes.
 
 ## Why this one
 
