@@ -26,7 +26,7 @@
     "node": ">=22.6"
   },
   "bin": {
-    "driftwatch-mcp": "./dist/mcp/server.js"
+    "driftwatch-mcp": "dist/mcp/server.js"
   },
   "files": [
     "dist",
@@ -40,10 +40,6 @@
   "optionalDependencies": {
     "@anthropic-ai/sdk": "^0.116.0",
     "better-sqlite3": "^13.0.3"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/dhughes6071/driftwatch"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && node -e \"const f='dist/mcp/server.js',fs=require('fs');const s=fs.readFileSync(f,'utf8');if(!s.startsWith('#!'))fs.writeFileSync(f,'#!/usr/bin/env node\\n'+s);fs.chmodSync(f,0o755)\"",
