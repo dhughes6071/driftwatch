@@ -442,3 +442,27 @@ The nearest upcoming one is the **domain purchase (~$12/year) in Week 2**, and
 **enabling the LLM (up to $31/month, hard-capped)** whenever you decide answer
 quality is the constraint. Both are documented in [docs/COSTS.md](docs/COSTS.md)
 and neither has been done.
+
+---
+
+## Store listing completed (2026-08-16)
+
+All discoverability gaps closed. Verified live via the API:
+
+| Field | State |
+|---|---|
+| Title | Career Site Job Scraper — Greenhouse, Ashby, Lever |
+| Icon | set |
+| seoTitle / seoDescription | set |
+| Categories | JOBS, LEAD_GENERATION, AUTOMATION (3/3) |
+| README | live (verified on the public page) |
+| Input / output schema | both declared in build 0.3.1 |
+
+**Two things I nearly "fixed" that were not broken.** The API's basic GET
+returns `readme: null` and the console shows no checkmark against Output
+schema — but the README renders correctly on the public page, and the build's
+`actorDefinition.storages.dataset` is present with full view config. Checking
+before acting saved two pointless changes.
+
+**The listing is now maxed out.** Every field a competitor uses, we use.
+Remaining visibility levers are all outside the Apify Store.
