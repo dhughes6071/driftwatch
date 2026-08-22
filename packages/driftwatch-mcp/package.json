@@ -1,0 +1,55 @@
+{
+  "name": "driftwatch-mcp",
+  "version": "0.1.0",
+  "description": "MCP server that tells your coding agent exactly what broke between two versions of a dependency, with citations. Reads npm, PyPI, GitHub Releases and OSV.dev.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "cursor",
+    "windsurf",
+    "dependency",
+    "upgrade",
+    "migration",
+    "breaking-changes",
+    "semver",
+    "npm",
+    "pypi",
+    "changelog",
+    "release-notes",
+    "typosquat",
+    "slopsquatting"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.6"
+  },
+  "bin": {
+    "driftwatch-mcp": "./dist/mcp/server.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "dotenv": "^17.4.2",
+    "zod": "^4.4.3"
+  },
+  "optionalDependencies": {
+    "@anthropic-ai/sdk": "^0.116.0",
+    "better-sqlite3": "^13.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dhughes6071/driftwatch"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node -e \"const f='dist/mcp/server.js',fs=require('fs');const s=fs.readFileSync(f,'utf8');if(!s.startsWith('#!'))fs.writeFileSync(f,'#!/usr/bin/env node\\n'+s);fs.chmodSync(f,0o755)\"",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}
