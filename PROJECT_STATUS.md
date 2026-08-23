@@ -389,6 +389,43 @@ seed guesses in production. Now `data/*` with a `!data/companies.db` exception.
 
 ---
 
+## Known quality gap — found 23 Aug 2026, NOT fixed
+
+**Big-name majors can return near-empty answers when the project documents the
+release somewhere driftwatch does not read.**
+
+Caught spot-checking `zod 3.22.0 -> 4.0.0` against the published package. It
+returned **1 breaking change**. zod v4 was a substantial rewrite.
+
+The cause is not a bug in the engine -- it is a missing source:
+
+| Source | zod |
+|---|---|
+| GitHub Release for `v4.0.0` | **404 — never published** (v4.0.1 … v4.0.17 exist) |
+| `CHANGELOG.md` | **404 — zod does not ship one** |
+| Actual migration guide | `zod.dev/v4/changelog` — a docs site |
+
+This is the **third instance of one pattern**, and the pattern is the important
+part: vite documented its major in `CHANGELOG.md`, Django in
+`docs/releases/*.txt`, zod on a docs website. Projects routinely document the
+major release outside GitHub Releases -- and the major is precisely the upgrade
+users need help with.
+
+Two prior instances were fixed by adding a source. This one needs a decision
+rather than a patch, because a docs-site reader means per-project URL mapping,
+which does not generalize the way `CHANGELOG.md` did.
+
+**Why it matters commercially:** zod is a top-20 npm package. A user who tries
+their own dependency and gets one vague line will not try a second time.
+
+**Open question for the next session:** add a small curated map of
+`package -> release-notes URL` for the top ~50 packages, or accept the gap and
+say so honestly in the tool output when no authoritative source was found. The
+second is cheaper and arguably more useful -- "I could not find release notes
+for this version" is a better answer than a confident, thin one.
+
+---
+
 ## Blockers
 
 **None technical.** Everything works and everything is shipped.
