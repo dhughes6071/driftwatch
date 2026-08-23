@@ -406,13 +406,15 @@ cannot do alone.
 | npm package | ✅ **live** — `driftwatch-mcp@0.1.0`, published 00:18 UTC | none |
 | Apify actor | ✅ public, 9/9 daily tests green | not yet indexed in Store search |
 | Research post | ✅ written (`POST.md`, 1,126 words, all figures verified) | **unposted** — you pick the venue |
-| GitHub repo | ❌ **does not exist** | your call: public or stay local |
-| MCP directories | ❌ not submitted | needs the GitHub repo first |
+| GitHub repo | ✅ **public** — [dhughes6071/driftwatch](https://github.com/dhughes6071/driftwatch), MIT, 15 topics | none |
+| MCP directories | ❌ not submitted | now unblocked |
 
-**The GitHub repo is the bottleneck.** Most MCP directories require a public
-source URL to accept a listing, and most developers will not run an MCP server
-in their editor without reading the source. Publishing to npm without it means
-the package is installable but not trustworthy, and not discoverable.
+Repo published 23 Aug 2026 after a full audit: all 125 objects in git history
+scanned for secrets, `.env` confirmed never committed, no personal data. Added
+the missing MIT LICENSE (package.json claimed MIT with no file behind it) and
+rewrote the README to lead with the `npx` install block.
+
+**The bottleneck is now submission and posting**, both of which are quick.
 
 ---
 
