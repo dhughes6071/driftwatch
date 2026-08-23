@@ -459,14 +459,21 @@ cannot do alone.
 | Apify actor | ⚠️ public but **invisible** | absent from all 8 search queries and from the first 944 of 49,833 store actors, 7 days after the listing fixes. Six direct ATS competitors hold 34-602 users each. Ranking looks popularity-weighted — a cold-start trap. **Recommend leaving it running and stopping investment.** |
 | Research post | ✅ written (`POST.md`, 1,126 words, all figures verified) | **unposted** — you pick the venue |
 | GitHub repo | ✅ **public** — [dhughes6071/driftwatch](https://github.com/dhughes6071/driftwatch), MIT, 15 topics | none |
-| MCP directories | ❌ not submitted | now unblocked |
+| **Official MCP Registry** | ✅ **listed** — `io.github.dhughes6071/driftwatch`, status active | none |
+| Other MCP directories | glama auto-indexes from GitHub; mcp.so / smithery optional | low priority |
 
 Repo published 23 Aug 2026 after a full audit: all 125 objects in git history
 scanned for secrets, `.env` confirmed never committed, no personal data. Added
 the missing MIT LICENSE (package.json claimed MIT with no file behind it) and
 rewrote the README to lead with the `npx` install block.
 
-**The bottleneck is now submission and posting**, both of which are quick.
+**The bottleneck is now posting.** Everything else is shipped and listed.
+
+Registry submission took two rejections, both mine: `description` is capped at
+100 chars (ours was 176). Fixed and validated locally against the published
+schema afterwards, so the file is now known-good for future version bumps —
+each release needs `server.json` version bumped and `mcp-publisher publish`
+re-run.
 
 ---
 
