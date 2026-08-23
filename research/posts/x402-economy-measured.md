@@ -159,6 +159,35 @@ it.
 
 ---
 
+## Update: I re-measured 16 days later
+
+Before posting this I re-ran the same collector against the same API on
+**23 August 2026**, using the identical method (first `accepts[].amount`,
+prices capped at $500 to exclude misconfigured listings). The catalog grew.
+The economy did not.
+
+```
+                          7 Aug      23 Aug
+Registered services       14,128     15,309    +8.4%
+30-day GMV               $11,748    $10,200    -13.2%
+Services with real demand     32         16    -50%
+```
+
+Two individual services worth naming, because I named them above:
+
+- **Tavily**, the most widely adopted single service by unique payers, fell
+  from ~55,000 calls and ~$554/month to ~9,700 calls and **~$97/month** — an
+  82% decline in sixteen days.
+- **stableenrich** is now the largest independent operator at roughly
+  **$1,100/month** across 19 endpoints.
+
+So the catalog is growing about 8% a month while the money in it shrinks. If
+anything the original conclusion was too generous.
+
+Both snapshots are in the repo, so you can run the comparison yourself.
+
+---
+
 ## Data and method
 
 Everything is reproducible. Raw data, collectors and analysis are in the repo:
@@ -166,6 +195,7 @@ Everything is reproducible. Raw data, collectors and analysis are in the repo:
 
 - [`x402_bazaar_slim_2026-08-07.json`](https://github.com/dhughes6071/driftwatch/blob/main/research/data/x402_bazaar_slim_2026-08-07.json) — 14,128 services with call
   counts, unique payers, pricing
+- [`x402_bazaar_slim_2026-08-23.json`](https://github.com/dhughes6071/driftwatch/blob/main/research/data/x402_bazaar_slim_2026-08-23.json) — the 16-day re-measurement, 15,309 services
 - [`apify_store_2026-08-07.json`](https://github.com/dhughes6071/driftwatch/blob/main/research/data/apify_store_2026-08-07.json) — 11,348 actors with usage,
   ratings, pricing model
 - [`research/data/`](https://github.com/dhughes6071/driftwatch/blob/main/research/data) — the collectors, the analysis, and the endpoint probe
@@ -174,4 +204,5 @@ Both catalogs come from public, unauthenticated APIs:
 `api.cdp.coinbase.com/platform/v2/x402/discovery/resources` and
 `api.apify.com/v2/store`.
 
-Figures are a snapshot of 7 August 2026 and will drift.
+Figures are snapshots of 7 and 23 August 2026 and will keep drifting. The
+direction of travel over those sixteen days was down.
