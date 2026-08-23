@@ -67,6 +67,28 @@ export interface DeltaResult {
   /** Everything we relied on, so the caller can verify us. */
   citations: Citation[];
 
+  /**
+   * How well the sources actually covered this specific jump.
+   *
+   * A thin answer has two very different causes -- "nothing broke" and "the
+   * project documented this release somewhere we cannot read" -- and a caller
+   * acting on the first when the truth is the second will ship a broken
+   * upgrade. This field separates them. Measured on zod 3.22.0 -> 4.0.0, a
+   * major rewrite for which no GitHub Release and no CHANGELOG.md exist.
+   */
+  coverage: {
+    /** Release notes found in range, whatever their quality. */
+    notesFound: number;
+    /** Whether we found notes for the TARGET version itself. */
+    targetDocumented: boolean;
+    /**
+     * True when a major boundary was crossed with no notes for the target.
+     * The single most important document is the one we are missing, so any
+     * "no breaking changes" conclusion is unsafe.
+     */
+    majorUndocumented: boolean;
+  };
+
   meta: {
     computedAt: string;
     cacheHit: boolean;

@@ -293,3 +293,67 @@ describe("cache versioning", () => {
     assert.ok(k.includes("npm:react:18.2.0:19.0.0"));
   });
 });
+
+describe("coverage reporting", () => {
+  /*
+   * Regression guard for the zod 3.22.0 -> 4.0.0 case found on 2026-08-23.
+   *
+   * zod publishes no GitHub Release for v4.0.0 and ships no CHANGELOG.md, so
+   * the engine had 152 in-range 3.x notes and nothing describing the actual
+   * rewrite. It returned one thin breaking change, which reads like an
+   * all-clear. A caller acting on that ships a broken upgrade.
+   *
+   * These tests pin the distinction between "nothing broke" and "we could not
+   * see what broke". They exercise the renderer directly so they stay offline.
+   */
+  const base = {
+    schemaVersion: 1 as const,
+    ecosystem: "npm",
+    package: "zod",
+    from: "3.22.0",
+    to: "4.0.0",
+    jump: { kind: "major" as const, majorsCrossed: 1, releasesInRange: 417 },
+    tier: "evidence" as const,
+    breakingChanges: [],
+    advisories: [],
+    citations: [],
+    meta: { computedAt: "", cacheHit: false, warnings: [], computeCostUsd: 0 },
+  };
+
+  test("an undocumented major is flagged before the findings, not after", async () => {
+    const { renderDelta } = await import("../src/mcp/render.ts");
+    const out = renderDelta({
+      ...base,
+      coverage: { notesFound: 152, targetDocumented: false, majorUndocumented: true },
+    } as any);
+
+    assert.match(out, /INCOMPLETE/);
+    // Must appear before any findings section -- an agent that reads top-down
+    // has to hit the caveat first for it to change behaviour.
+    const warnAt = out.indexOf("INCOMPLETE");
+    const bodyAt = out.indexOf("No caller-visible breaking changes");
+    assert.ok(warnAt !== -1 && warnAt < bodyAt, "coverage warning must precede the findings");
+  });
+
+  test("a documented major says nothing extra", async () => {
+    const { renderDelta } = await import("../src/mcp/render.ts");
+    const out = renderDelta({
+      ...base,
+      coverage: { notesFound: 12, targetDocumented: true, majorUndocumented: false },
+    } as any);
+    assert.doesNotMatch(out, /INCOMPLETE/);
+  });
+
+  test("a thin answer with full coverage is not downgraded", async () => {
+    // Minor bumps genuinely often have nothing caller-visible. We must not cry
+    // wolf on those, or the warning stops meaning anything.
+    const { renderDelta } = await import("../src/mcp/render.ts");
+    const out = renderDelta({
+      ...base,
+      to: "3.23.0",
+      jump: { kind: "minor" as const, majorsCrossed: 0, releasesInRange: 4 },
+      coverage: { notesFound: 4, targetDocumented: true, majorUndocumented: false },
+    } as any);
+    assert.doesNotMatch(out, /INCOMPLETE/);
+  });
+});
