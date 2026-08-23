@@ -16,7 +16,7 @@
 | **Tests** | **32/32 passing** |
 | **Shipped** | [`driftwatch-mcp` on npm](https://www.npmjs.com/package/driftwatch-mcp) · [ATS jobs actor on Apify](https://apify.com/) |
 | **Users** | **0 organic.** Both products are live; nobody has found them yet. |
-| **Next action** | **You:** decide where to post `POST.md`, and whether the repo goes public |
+| **Next action** | **You:** submit the post to Hacker News (see below) |
 
 ---
 
@@ -457,7 +457,7 @@ cannot do alone.
 |---|---|---|
 | npm package | ✅ **live** — `driftwatch-mcp@0.1.0`, published 00:18 UTC | none |
 | Apify actor | ⚠️ public but **invisible** | absent from all 8 search queries and from the first 944 of 49,833 store actors, 7 days after the listing fixes. Six direct ATS competitors hold 34-602 users each. Ranking looks popularity-weighted — a cold-start trap. **Recommend leaving it running and stopping investment.** |
-| Research post | ✅ written (`POST.md`, 1,126 words, all figures verified) | **unposted** — you pick the venue |
+| Research post | ✅ [`research/posts/x402-economy-measured.md`](research/posts/x402-economy-measured.md) — 1,306 words, re-measured 23 Aug | **unposted** — HN, timing chosen |
 | GitHub repo | ✅ **public** — [dhughes6071/driftwatch](https://github.com/dhughes6071/driftwatch), MIT, 15 topics | none |
 | **Official MCP Registry** | ✅ **listed** — `io.github.dhughes6071/driftwatch`, status active | none |
 | Other MCP directories | glama auto-indexes from GitHub; mcp.so / smithery optional | low priority |
