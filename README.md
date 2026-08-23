@@ -1,5 +1,9 @@
 # driftwatch
 
+[![npm](https://img.shields.io/npm/v/driftwatch-mcp)](https://www.npmjs.com/package/driftwatch-mcp)
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![node](https://img.shields.io/badge/node-%3E%3D22.6-brightgreen)](https://nodejs.org)
+
 **Dependency migration intelligence for AI coding agents.**
 
 Answers one question, precisely and with citations:
@@ -8,6 +12,37 @@ Answers one question, precisely and with citations:
 > does my code need?*
 
 New here? Start with the [Beginner's Guide](BEGINNER_GUIDE.md).
+
+---
+
+## Install (30 seconds)
+
+Add it to Claude Desktop, Claude Code, Cursor, or any MCP client:
+
+```json
+{
+  "mcpServers": {
+    "driftwatch": {
+      "command": "npx",
+      "args": ["-y", "driftwatch-mcp"]
+    }
+  }
+}
+```
+
+That is the whole setup. **No API key, no account, no payment, no config.** The
+engine runs locally on your machine and reads only public data — npm, PyPI,
+GitHub Releases, and OSV.dev.
+
+Two tools appear in your agent:
+
+| Tool | What it does |
+|---|---|
+| `get_migration_delta` | What broke between version A and B, with a citation for every claim |
+| `check_package` | Does this package actually exist? Catches hallucinated and typosquatted names before you install them |
+
+Optionally set `ANTHROPIC_API_KEY` to add LLM-synthesized migration steps on top
+of the deterministic results. It works fully without one.
 
 ---
 
@@ -140,12 +175,17 @@ Ecosystems: **npm**, **PyPI**.
 
 The distribution channel. Two tools: `get_migration_delta` and `check_package`.
 
+Published as [`driftwatch-mcp`](https://www.npmjs.com/package/driftwatch-mcp) —
+see [Install](#install-30-seconds) above for the one-block setup.
+
+To run it from a clone instead of npm:
+
 ```json
 {
   "mcpServers": {
     "driftwatch": {
       "command": "node",
-      "args": ["--experimental-strip-types", "/path/to/X402/src/mcp/server.ts"]
+      "args": ["--experimental-strip-types", "/path/to/driftwatch/src/mcp/server.ts"]
     }
   }
 }
@@ -153,6 +193,11 @@ The distribution channel. Two tools: `get_migration_delta` and `check_package`.
 
 Runs the engine locally by default — no network calls to us, no payment. Set
 `DRIFTWATCH_REMOTE_URL` to point it at a hosted instance instead.
+
+**No native dependencies required.** `better-sqlite3` is optional; if it cannot
+build on your machine the server falls back to a plain JSON cache and works
+identically. A failed native build is the most common reason MCP servers die on
+install, and this one survives it.
 
 ---
 
@@ -180,6 +225,10 @@ Full detail: [docs/SECURITY.md](docs/SECURITY.md).
 ---
 
 ## Honest status
+
+**Shipped, and used by nobody yet.** As of 23 August 2026 the npm package is
+live and verified working from a cold install, and it has zero organic users.
+That is the honest state: the code works, the distribution has not started.
 
 **This is an unvalidated business.** The measured facts:
 

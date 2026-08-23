@@ -26,3 +26,6 @@ dist/
 # Apify local run storage -- test-run output, regenerated on every run.
 # 7MB of job records that mean nothing outside the machine that made them.
 storage/
+
+# machine-local Claude Code permissions
+.claude/settings.local.json
