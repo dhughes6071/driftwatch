@@ -1,11 +1,13 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.dhughes6071/driftwatch",
-  "description": "Tells your coding agent exactly what broke between two versions of a dependency, with a citation for every claim. Reads npm, PyPI, GitHub Releases and OSV.dev. No API key required.",
+  "title": "driftwatch",
+  "description": "What broke between two dependency versions, with a citation for every claim. No API key needed.",
   "repository": {
     "url": "https://github.com/dhughes6071/driftwatch",
     "source": "github"
   },
+  "websiteUrl": "https://github.com/dhughes6071/driftwatch#readme",
   "version": "0.1.2",
   "packages": [
     {
