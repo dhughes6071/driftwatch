@@ -161,15 +161,14 @@ it.
 
 ## Data and method
 
-Everything is reproducible:
+Everything is reproducible. Raw data, collectors and analysis are in the repo:
+**[github.com/dhughes6071/driftwatch](https://github.com/dhughes6071/driftwatch)**
 
-- `research/data/x402_bazaar_slim_2026-08-07.json` — 14,128 services with call
+- [`x402_bazaar_slim_2026-08-07.json`](https://github.com/dhughes6071/driftwatch/blob/main/research/data/x402_bazaar_slim_2026-08-07.json) — 14,128 services with call
   counts, unique payers, pricing
-- `research/data/apify_store_2026-08-07.json` — 11,348 actors with usage,
+- [`apify_store_2026-08-07.json`](https://github.com/dhughes6071/driftwatch/blob/main/research/data/apify_store_2026-08-07.json) — 11,348 actors with usage,
   ratings, pricing model
-- `research/data/analyze*.py`, `an*.py` — the analysis
-- `research/data/pull_all.py`, `pull_apify.py` — the collectors
-- `research/data/liveness.py` — the endpoint probe
+- [`research/data/`](https://github.com/dhughes6071/driftwatch/blob/main/research/data) — the collectors, the analysis, and the endpoint probe
 
 Both catalogs come from public, unauthenticated APIs:
 `api.cdp.coinbase.com/platform/v2/x402/discovery/resources` and
