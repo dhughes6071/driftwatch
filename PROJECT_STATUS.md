@@ -1,8 +1,8 @@
 # PROJECT STATUS
 
-**Last updated: 7 August 2026**
-**Phase: 3 of 5 — MVP built and verified ✅**
-**Next: your Day 1 session (see [DAY_1.md](DAY_1.md))**
+**Last updated: 23 August 2026**
+**Phase: 4 of 5 — shipped; waiting on distribution ✅**
+**Next: get it in front of people (see "Distribution" below)**
 
 ---
 
@@ -13,8 +13,10 @@
 | **Costs to date** | **$0.00** |
 | **Revenue to date** | **$0.00** |
 | **Money at risk** | **None.** No wallet exists. No mainnet. No paid services. No domain. |
-| **Tests** | **17/17 passing** |
-| **Next action** | **You:** run through [DAY_1.md](DAY_1.md) (~1 hour, free) |
+| **Tests** | **32/32 passing** |
+| **Shipped** | [`driftwatch-mcp` on npm](https://www.npmjs.com/package/driftwatch-mcp) · [ATS jobs actor on Apify](https://apify.com/) |
+| **Users** | **0 organic.** Both products are live; nobody has found them yet. |
+| **Next action** | **You:** decide where to post `POST.md`, and whether the repo goes public |
 
 ---
 
@@ -389,7 +391,28 @@ seed guesses in production. Now `data/*` with a `!data/companies.db` exception.
 
 ## Blockers
 
-**None.** Everything works. The next move is yours.
+**None technical.** Everything works and everything is shipped.
+
+The only thing standing between this and its first user is **distribution** —
+see below. That is a people problem, not a code problem, and it is the part I
+cannot do alone.
+
+---
+
+## Distribution status (23 August 2026)
+
+| Channel | State | Blocker |
+|---|---|---|
+| npm package | ✅ **live** — `driftwatch-mcp@0.1.0`, published 00:18 UTC | none |
+| Apify actor | ✅ public, 9/9 daily tests green | not yet indexed in Store search |
+| Research post | ✅ written (`POST.md`, 1,126 words, all figures verified) | **unposted** — you pick the venue |
+| GitHub repo | ❌ **does not exist** | your call: public or stay local |
+| MCP directories | ❌ not submitted | needs the GitHub repo first |
+
+**The GitHub repo is the bottleneck.** Most MCP directories require a public
+source URL to accept a listing, and most developers will not run an MCP server
+in their editor without reading the source. Publishing to npm without it means
+the package is installable but not trustworthy, and not discoverable.
 
 ---
 
@@ -442,6 +465,37 @@ The nearest upcoming one is the **domain purchase (~$12/year) in Week 2**, and
 **enabling the LLM (up to $31/month, hard-capped)** whenever you decide answer
 quality is the constraint. Both are documented in [docs/COSTS.md](docs/COSTS.md)
 and neither has been done.
+
+---
+
+## npm publish completed (2026-08-23)
+
+`driftwatch-mcp@0.1.0` is live on the public registry: 17 files, 31.2 kB
+packed, MIT, README rendering.
+
+Getting there took four rejections, none of them the package's fault:
+
+| Failure | Cause | Fix |
+|---|---|---|
+| `ENEEDAUTH` | no `~/.npmrc` — the browser login never completed | re-ran `npm login`, waited out the post-authorize hang |
+| placeholder token written | I wrote `YOUR_TOKEN_HERE` in a command and it was pasted literally | deleted the entry; my instruction was ambiguous, not the user's error |
+| `E403` | npm now **requires 2FA** to publish; the account had none | user enabled `auth-and-writes` 2FA |
+| `E429 rate limited otp` | expired OTP codes counted as failed attempts | waited ~10 min; entered a code immediately after it refreshed |
+
+**Verified after publish, from the public registry, in a sandbox with a fake
+`HOME`** — so none of the local `.env` or cache could contribute:
+
+- cold `npm i driftwatch-mcp` → binary present, MCP handshake returns
+  `driftwatch 0.1.0`, protocol `2025-06-18`
+- `get_migration_delta` for `express 4.18.2 → 5.0.0` returned **4 breaking
+  changes with real GitHub release citations plus 2 security advisories**
+- with `better-sqlite3` deleted (simulating a machine with no C++ toolchain)
+  the server still started and `check_package` still caught the `reqeusts`
+  typosquat — **the JSON fallback holds**
+
+Also removed the `repository` field: it pointed at
+`github.com/dhughes6071/driftwatch`, which 404s. A broken Repository button is
+worse than none. It goes back when the repo exists.
 
 ---
 
