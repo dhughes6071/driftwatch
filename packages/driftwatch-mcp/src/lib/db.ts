@@ -105,8 +105,12 @@ CREATE TABLE IF NOT EXISTS spend_daily (
  *
  * The version is part of the cache key, so a bump makes old entries
  * unreachable rather than deleting them: cheap, and trivially reversible.
+ *
+ * v4 (2026-08-23): results now carry a `coverage` block. Entries cached under
+ * v3 have no way to report that the target release was undocumented, so they
+ * would keep serving confident-looking thin answers.
  */
-export const ENGINE_VERSION = 3;
+export const ENGINE_VERSION = 4;
 
 export function deltaKey(ecosystem: string, name: string, from: string, to: string): string {
   return `v${ENGINE_VERSION}:${ecosystem}:${name}:${from}:${to}`.toLowerCase();

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.dhughes6071/driftwatch",
+  "description": "Tells your coding agent exactly what broke between two versions of a dependency, with a citation for every claim. Reads npm, PyPI, GitHub Releases and OSV.dev. No API key required.",
+  "repository": {
+    "url": "https://github.com/dhughes6071/driftwatch",
+    "source": "github"
+  },
+  "version": "0.1.2",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "driftwatch-mcp",
+      "version": "0.1.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "ANTHROPIC_API_KEY",
+          "description": "Optional. Adds LLM-synthesized migration steps on top of the deterministic results. The server works fully without it.",
+          "isRequired": false,
+          "isSecret": true,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}

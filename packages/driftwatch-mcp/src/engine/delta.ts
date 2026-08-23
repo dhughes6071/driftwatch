@@ -81,6 +81,33 @@ export async function computeDelta(args: {
     warnings.push("No source repository recorded in the registry; release notes unavailable.");
   }
 
+  /*
+   * Did we actually find the document that matters?
+   *
+   * Having notes in range is not the same as having notes for the TARGET. zod
+   * 3.22.0 -> 4.0.0 returns 152 in-range 3.x releases and one thin breaking
+   * change, because zod published no GitHub Release for v4.0.0 and ships no
+   * CHANGELOG.md -- the entire v4 rewrite is documented on their docs site,
+   * which we do not read. The answer looked confident and was nearly empty.
+   *
+   * Same shape as vite (CHANGELOG.md) and Django (docs/releases/*.txt), both
+   * of which we fixed by adding a source. This one we cannot fix that way, so
+   * we report it instead. Saying "the notes for this release do not exist" is
+   * strictly more useful than a thin answer that reads like an all-clear.
+   */
+  const targetDocumented = notes.some((n) => compareVersions(n.version, to) === 0);
+  const majorUndocumented = jump.kind === "major" && !targetDocumented;
+  if (majorUndocumented) {
+    warnings.push(
+      `No release notes were found for ${pkg.name} ${to} itself -- the major release that ` +
+        `documents most breaking changes. Projects often publish major-release notes outside ` +
+        `GitHub Releases (a docs site, a migration guide, a blog post). Treat this result as ` +
+        `incomplete and check the project's own upgrade guide before relying on it.`,
+    );
+  } else if (!targetDocumented && notes.length > 0) {
+    warnings.push(`No release notes found for ${to} itself; findings come from intermediate releases.`);
+  }
+
   // 3. Deterministic extraction -- always runs, always free.
   let breakingChanges = extractBreakingChanges(notes);
 
@@ -112,6 +139,11 @@ export async function computeDelta(args: {
     advisories,
     deprecated: pkg.deprecated,
     citations,
+    coverage: {
+      notesFound: notes.length,
+      targetDocumented,
+      majorUndocumented,
+    },
     meta: {
       computedAt: new Date().toISOString(),
       cacheHit: false,

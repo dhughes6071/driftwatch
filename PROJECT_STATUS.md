@@ -389,7 +389,7 @@ seed guesses in production. Now `data/*` with a `!data/companies.db` exception.
 
 ---
 
-## Known quality gap — found 23 Aug 2026, NOT fixed
+## Known quality gap — found AND fixed 23 Aug 2026
 
 **Big-name majors can return near-empty answers when the project documents the
 release somewhere driftwatch does not read.**
@@ -411,9 +411,24 @@ part: vite documented its major in `CHANGELOG.md`, Django in
 major release outside GitHub Releases -- and the major is precisely the upgrade
 users need help with.
 
-Two prior instances were fixed by adding a source. This one needs a decision
-rather than a patch, because a docs-site reader means per-project URL mapping,
-which does not generalize the way `CHANGELOG.md` did.
+Two prior instances were fixed by adding a source. This one cannot be, because
+a docs-site reader means per-project URL mapping, which does not generalize the
+way `CHANGELOG.md` did.
+
+**So it reports the gap instead.** Results now carry a `coverage` block
+separating "nothing broke" from "we could not see what broke", and the MCP
+output leads with an `INCOMPLETE` banner when a major boundary is crossed with
+no notes for the target version. Placement is deliberate: an agent reading
+top-down must hit the caveat before the findings.
+
+Verified it does not cry wolf — express 4.18.2 -> 5.0.0 has real v5.0.0 notes
+and stays silent. Tests 32 -> 35.
+
+**One correction to the original finding:** the "1 breaking change" was the
+no-API-key path. With the LLM tier enabled, zod returns 25 real breaking
+changes synthesized from the 88 in-range notes. The gap is narrower than first
+recorded — but the default install has no key, so it is still what most users
+would have seen.
 
 **Why it matters commercially:** zod is a top-20 npm package. A user who tries
 their own dependency and gets one vague line will not try a second time.
@@ -441,7 +456,7 @@ cannot do alone.
 | Channel | State | Blocker |
 |---|---|---|
 | npm package | ✅ **live** — `driftwatch-mcp@0.1.0`, published 00:18 UTC | none |
-| Apify actor | ✅ public, 9/9 daily tests green | not yet indexed in Store search |
+| Apify actor | ⚠️ public but **invisible** | absent from all 8 search queries and from the first 944 of 49,833 store actors, 7 days after the listing fixes. Six direct ATS competitors hold 34-602 users each. Ranking looks popularity-weighted — a cold-start trap. **Recommend leaving it running and stopping investment.** |
 | Research post | ✅ written (`POST.md`, 1,126 words, all figures verified) | **unposted** — you pick the venue |
 | GitHub repo | ✅ **public** — [dhughes6071/driftwatch](https://github.com/dhughes6071/driftwatch), MIT, 15 topics | none |
 | MCP directories | ❌ not submitted | now unblocked |
