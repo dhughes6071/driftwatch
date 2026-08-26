@@ -23,7 +23,7 @@
     "jobs:export": "sqlite3 -json data/companies.db \"SELECT ats, slug, jobCount FROM companies WHERE emptyStreak < 5 ORDER BY jobCount DESC;\" > src/jobs/companies.json && node -e \"const d=require('./src/jobs/companies.json');console.log('exported',d.length,'companies')\""
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.116.0",
+    "@anthropic-ai/sdk": "^0.121.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@x402/core": "^2.21.0",
     "@x402/evm": "^2.21.0",
