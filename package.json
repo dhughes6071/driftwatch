@@ -25,11 +25,11 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.121.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
-    "@x402/core": "^2.21.0",
-    "@x402/evm": "^2.21.0",
-    "@x402/express": "^2.21.0",
-    "@x402/extensions": "^2.21.0",
-    "@x402/fetch": "^2.21.0",
+    "@x402/core": "^2.23.0",
+    "@x402/evm": "^2.23.0",
+    "@x402/express": "^2.23.0",
+    "@x402/extensions": "^2.23.0",
+    "@x402/fetch": "^2.23.0",
     "apify": "^3.7.2",
     "better-sqlite3": "^13.0.3",
     "dotenv": "^17.4.2",
@@ -40,7 +40,7 @@
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",
     "@types/express": "^5.0.6",
-    "@types/node": "^26.2.0",
+    "@types/node": "^26.3.0",
     "typescript": "^7.0.2"
   }
 }
