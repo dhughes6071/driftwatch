@@ -1,9 +1,9 @@
 {
   "actorSpecification": 1,
   "name": "company-career-site-jobs",
-  "title": "Career Site Job Scraper \u2014 Greenhouse, Ashby, Lever",
-  "description": "Scrape jobs from 498 company career sites via Greenhouse, Ashby and Lever. Reads their public JSON APIs instead of HTML, so it doesn't break. 27,000+ open roles, remote and keyword filters.",
-  "version": "0.3",
+  "title": "Job Scraper — Greenhouse, Ashby, Lever ATS Career Sites",
+  "description": "Scrape jobs from 3,584 company career sites via Greenhouse, Ashby and Lever. Reads their public JSON APIs instead of HTML, so it doesn't break. 125,000+ open roles, remote and keyword filters.",
+  "version": "0.4",
   "buildTag": "latest",
   "dockerfile": "./Dockerfile",
   "readme": "./ACTOR.md",
