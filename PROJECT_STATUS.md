@@ -15,7 +15,7 @@
 | **Money at risk** | **None.** No wallet exists. No mainnet. No paid services. No domain. |
 | **Tests** | **32/32 passing** |
 | **Shipped** | [`driftwatch-mcp` on npm](https://www.npmjs.com/package/driftwatch-mcp) · [ATS jobs actor on Apify](https://apify.com/) |
-| **Users** | **0 organic.** Both products are live; nobody has found them yet. |
+| **Users** | **Apify: 8 organic users (7 in the last 7 days)** — first real adoption, 9 Sep. driftwatch MCP: still 0. |
 | **Next action** | **You:** submit the post to Hacker News (see below) |
 
 ---
@@ -438,6 +438,41 @@ their own dependency and gets one vague line will not try a second time.
 say so honestly in the tool output when no authoritative source was found. The
 second is cheaper and arguably more useful -- "I could not find release notes
 for this version" is a better answer than a confident, thin one.
+
+---
+
+## First organic users — 9 September 2026
+
+The Apify actor has **9 total users, 7 of them in the last 7 days**. Only 3 of
+its 59 runs belong to our own account, and the most recent of those was 28 Aug
+— so the traffic is other people. 50 of 51 runs in the last 30 days succeeded,
+1 aborted, 0 failed.
+
+The likely cause is the 28 Aug relisting, and the timing lines up exactly:
+
+| Store search | Before | Now |
+|---|---|---|
+| `greenhouse` | absent | rank 30 / 87 |
+| `ashby` | absent | rank 25 / 82 |
+| `lever` | absent | rank 24 / 85 |
+| `career site` | rank 33 | rank 12 / 91 |
+| `ats career sites` | — | rank 2 / 98 |
+
+Two changes shipped together that day, so their contributions cannot be
+separated: coverage went 498 -> 3,584 companies, and the title was rewritten to
+lead with the terms buyers actually search rather than with "Career Site". The
+ranking data says discovery was the binding constraint; the coverage may be
+what stopped people bouncing once they arrived. We cannot tell which from 8
+users, and should not pretend otherwise.
+
+**Caveat on the number.** 8 users is small enough that a few could be Apify's
+own tooling or curious browsing rather than intent. Zero reviews and zero
+bookmarks so far. The signal to watch is not the user count but whether anyone
+runs it a *second* time.
+
+**driftwatch (the MCP server) is unchanged at zero.** Still 0 stars, ~1 repo
+visitor a day, npm down to 20 downloads a week now that the publish-day crawler
+traffic has decayed. Whatever worked on Apify has not transferred.
 
 ---
 
