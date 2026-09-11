@@ -1,6 +1,6 @@
 # Job Scraper — Greenhouse, Ashby, Lever ATS Career Sites
 
-Scrape open roles from **3,584 company career sites** running Greenhouse, Ashby,
+Scrape open roles from **3,500+ company career sites** running Greenhouse, Ashby,
 or Lever.
 
 Unlike other job scrapers, this one reads the **public JSON APIs** those
@@ -17,8 +17,8 @@ arms race, and no proxy bill. When a company posts a role, it appears here.
 
 - **Straight from the source** — the company's own board, not a third-party aggregator
 - **One schema across three ATSs** — Greenhouse, Ashby, and Lever normalized identically
-- **Curated registry included** — 3,584 verified companies, 125,000+ open roles, or name your own
-- **You pay per job returned** — capped by `maxJobs`, and never charged past your budget
+- **Curated registry included** — 3,500+ verified companies, 120,000+ open roles, or name your own
+- **Free to run** — you pay only Apify platform usage; `maxJobs` caps the work per run
 
 ## Output
 
