@@ -1,6 +1,6 @@
 {
   "name": "driftwatch-mcp",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "mcpName": "io.github.dhughes6071/driftwatch",
   "description": "MCP server that tells your coding agent exactly what broke between two versions of a dependency, with citations. Reads npm, PyPI, GitHub Releases and OSV.dev.",
   "keywords": [

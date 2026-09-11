@@ -20,10 +20,16 @@ import { checkPackage } from "../engine/pkgcheck.ts";
 import type { Ecosystem } from "../sources/registry.ts";
 import type { DeltaResult, PackageCheck } from "../engine/types.ts";
 import { renderDelta, renderCheck } from "./render.ts";
+import { CHECK_PACKAGE_ANNOTATIONS, GET_MIGRATION_DELTA_ANNOTATIONS } from "./annotations.ts";
 
 const REMOTE = process.env.DRIFTWATCH_REMOTE_URL?.replace(/\/+$/, "");
 
-const server = new McpServer({ name: "driftwatch", version: "0.1.0" });
+/*
+ * Keep in step with packages/driftwatch-mcp/package.json -- a test asserts it.
+ * It silently drifted to 0.1.0 while the package shipped 0.1.3, so clients
+ * were told the wrong version for three releases.
+ */
+const server = new McpServer({ name: "driftwatch", version: "0.1.3" });
 
 const ecosystemSchema = z
   .enum(["npm", "pypi"])
@@ -42,6 +48,7 @@ server.registerTool(
       ecosystem: ecosystemSchema,
       name: z.string().min(1).max(214).describe("Package name exactly as it would be installed."),
     },
+    annotations: CHECK_PACKAGE_ANNOTATIONS,
   },
   async ({ ecosystem, name }) => {
     const result = REMOTE
@@ -64,6 +71,7 @@ server.registerTool(
       from: z.string().min(1).max(64).describe("The version currently installed, e.g. 18.2.0"),
       to: z.string().min(1).max(64).describe("The version being upgraded to, e.g. 19.0.0"),
     },
+    annotations: GET_MIGRATION_DELTA_ANNOTATIONS,
   },
   async ({ ecosystem, name, from, to }) => {
     try {

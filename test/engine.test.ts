@@ -357,3 +357,61 @@ describe("coverage reporting", () => {
     assert.doesNotMatch(out, /INCOMPLETE/);
   });
 });
+
+describe("MCP tool annotations", () => {
+  /*
+   * Guards the gap an external audit found on 2026-09-11: both tools shipped
+   * with no safety hints at all. That is not a neutral omission -- a client
+   * that cannot tell whether a tool is destructive has to prompt every time,
+   * so missing hints make a read-only tool harder to use, not safer.
+   */
+  const HINTS = ["readOnlyHint", "destructiveHint", "idempotentHint", "openWorldHint"] as const;
+
+  test("every tool declares all four hints explicitly", async () => {
+    const a = await import("../src/mcp/annotations.ts");
+    for (const [name, ann] of [
+      ["check_package", a.CHECK_PACKAGE_ANNOTATIONS],
+      ["get_migration_delta", a.GET_MIGRATION_DELTA_ANNOTATIONS],
+    ] as const) {
+      for (const h of HINTS) {
+        assert.equal(typeof ann[h], "boolean", `${name} must set ${h} to a literal boolean`);
+      }
+    }
+  });
+
+  test("check_package is genuinely read-only", async () => {
+    const { CHECK_PACKAGE_ANNOTATIONS: c } = await import("../src/mcp/annotations.ts");
+    assert.equal(c.readOnlyHint, true);
+    assert.equal(c.destructiveHint, false);
+  });
+
+  test("get_migration_delta is not marked read-only, because it can spend money", async () => {
+    // The LLM tier bills the user's Anthropic key. Annotations are static and
+    // cannot vary with configuration, so claiming read-only here would tell a
+    // client it is always safe to run unattended -- false for anyone with a
+    // key set. If the LLM tier is ever removed, flip this and the annotation.
+    const { GET_MIGRATION_DELTA_ANNOTATIONS: d } = await import("../src/mcp/annotations.ts");
+    assert.equal(d.readOnlyHint, false);
+    assert.equal(d.destructiveHint, false, "it has effects, but it destroys nothing");
+    assert.equal(d.idempotentHint, true, "results are cached permanently; repeats cost nothing");
+  });
+
+  test("both tools declare they reach the open internet", async () => {
+    const a = await import("../src/mcp/annotations.ts");
+    assert.equal(a.CHECK_PACKAGE_ANNOTATIONS.openWorldHint, true);
+    assert.equal(a.GET_MIGRATION_DELTA_ANNOTATIONS.openWorldHint, true);
+  });
+});
+
+describe("version reporting", () => {
+  test("the MCP server reports the version it actually ships as", async () => {
+    // Noticed 2026-09-11: serverInfo said 0.1.0 while the published package
+    // was 0.1.3. Clients use serverInfo.version to report and debug, so a
+    // stale literal sends people looking at the wrong source.
+    const { readFileSync } = await import("node:fs");
+    const pkg = JSON.parse(readFileSync("packages/driftwatch-mcp/package.json", "utf8"));
+    const src = readFileSync("src/mcp/server.ts", "utf8");
+    const declared = src.match(/new McpServer\(\{\s*name:\s*"driftwatch",\s*version:\s*"([^"]+)"/)?.[1];
+    assert.equal(declared, pkg.version, "server.ts version must match the package version");
+  });
+});
