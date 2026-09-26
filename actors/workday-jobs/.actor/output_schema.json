@@ -1,0 +1,19 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "Workday Jobs Scraper output",
+  "description": "One record per job in the default dataset, plus a SUMMARY record describing the run.",
+  "properties": {
+    "jobs": {
+      "type": "string",
+      "title": "Jobs",
+      "description": "Every job delivered, one record each: title, company, locations, category, posting date, apply URL, and (optionally) the description.",
+      "template": "{{links.apiDefaultDatasetUrl}}/items"
+    },
+    "summary": {
+      "type": "string",
+      "title": "Run summary",
+      "description": "Jobs returned, what happened on each career site, why the run stopped, and any coverage warnings.",
+      "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/SUMMARY"
+    }
+  }
+}
