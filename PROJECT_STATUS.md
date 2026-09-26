@@ -16,7 +16,7 @@
 | **Tests** | **40/40 passing** (root) · **11/11** (Workday actor) |
 | **Shipped** | [`driftwatch-mcp` on npm](https://www.npmjs.com/package/driftwatch-mcp) · [ATS jobs actor on Apify](https://apify.com/viridian_layout_ea2/company-career-site-jobs) |
 | **Users** | **Apify: 18 total, 13 in the last 30 days, 96 runs** (25 Sep). driftwatch MCP: 0 stars, 41 npm downloads/week, no evidence of real use. |
-| **Next action** | **You:** publish the Workday actor (`apify push` from `actors/workday-jobs/`, then set the $1.50/1k `job` event). **10 Oct:** remove the `apify-default-dataset-item` event and fix the `job` description (reminder scheduled). **You:** decide on the Hacker News post. |
+| **Next action** | **You:** in the Apify Console, set the Workday actor's $1.50/1k `job` event, then make it public (already pushed and tested). **10 Oct:** remove the `apify-default-dataset-item` event and fix the `job` description (reminder scheduled). **You:** decide on the Hacker News post. |
 
 ---
 
@@ -30,6 +30,8 @@ Chosen by measurement: see [NEXT_ACTOR_RESEARCH.md](NEXT_ACTOR_RESEARCH.md). Wor
 - **Registry: 4,113 verified career sites across 1,785 companies** (Common Crawl → each company's robots.txt →
   live check). 80 private/internal/confidential sites deliberately excluded by name. Rebuild: `npm run discover`.
 - **Pricing decided: $1.50 per 1,000 jobs**, same as the first actor. A new actor can charge from day one.
+- **Pushed to Apify 26 Sep**: actor `viridian_layout_ea2/workday-jobs-scraper` (ID `9YFhLqT6A7qTgxbzt`), build 0.1.1.
+  Cloud test run succeeded (20 NVIDIA jobs, ~6 s). **Still private and unpriced** — pricing + publishing are Console steps.
 
 **What testing found about Workday** (all live, 26 Sep):
 
