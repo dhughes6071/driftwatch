@@ -1,8 +1,8 @@
 # PROJECT STATUS
 
-**Last updated: 23 August 2026**
-**Phase: 4 of 5 — shipped; waiting on distribution ✅**
-**Next: get it in front of people (see "Distribution" below)**
+**Last updated: 26 September 2026**
+**Phase: 4 of 5 — shipped; Apify actor monetized from 10 Oct**
+**Next: watch whether Apify users keep running it once it costs money**
 
 ---
 
@@ -10,13 +10,32 @@
 
 | | |
 |---|---|
-| **Costs to date** | **$0.00** |
-| **Revenue to date** | **$0.00** |
-| **Money at risk** | **None.** No wallet exists. No mainnet. No paid services. No domain. |
-| **Tests** | **32/32 passing** |
-| **Shipped** | [`driftwatch-mcp` on npm](https://www.npmjs.com/package/driftwatch-mcp) · [ATS jobs actor on Apify](https://apify.com/) |
-| **Users** | **Apify: 8 organic users (7 in the last 7 days)** — first real adoption, 9 Sep. driftwatch MCP: still 0. |
-| **Next action** | **You:** submit the post to Hacker News (see below) |
+| **Costs to date** | **≈ $2.65** — Apify Creator plan $1/month (Aug, Sep) + $0.65 of LLM test calls on 8 Aug |
+| **Revenue to date** | **$0.00** — Apify pricing goes live **10 Oct 2026, 16:08 UTC** |
+| **Money at risk** | **None.** No wallet exists. No mainnet. No domain. |
+| **Tests** | **40/40 passing** |
+| **Shipped** | [`driftwatch-mcp` on npm](https://www.npmjs.com/package/driftwatch-mcp) · [ATS jobs actor on Apify](https://apify.com/viridian_layout_ea2/company-career-site-jobs) |
+| **Users** | **Apify: 18 total, 13 in the last 30 days, 96 runs** (25 Sep). driftwatch MCP: 0 stars, 41 npm downloads/week, no evidence of real use. |
+| **Next action** | **10 Oct:** remove the `apify-default-dataset-item` event and fix the `job` description (reminder scheduled). **You:** decide on the Hacker News post. |
+
+---
+
+## Apify monetization — set up 26 September 2026
+
+Pricing, confirmed live via the public API and in the Console:
+
+| Event | Price | Notes |
+|---|---|---|
+| `job` — "Job Returned" (primary) | **$0.0015** ($1.50 / 1,000) | charged by `Actor.pushData(record, "job")` in [src/jobs/main.ts](src/jobs/main.ts) |
+| `apify-actor-start` | $0.00005 | Apify default; keep it — deleting it loses users' free 5 s of compute |
+| `apify-default-dataset-item` | $0.00001 | **to remove** — the platform charges it on every dataset write, so each job is billed twice |
+
+- Apify keeps 20%; users do not pay platform usage separately (we do, and runs cost fractions of a cent).
+- Takes effect **10 Oct 2026, 16:08 UTC**; existing users were notified 26 Sep.
+- **Pricing is locked while a change is pending** — the Console's Change button is disabled. The two cleanups (remove the dataset-item event; change the `job` description from "Job Scraper" to "Charged for each job listing delivered") wait until 10 Oct. Deliberately *not* attempted via the API, which could restart the 14-day notice.
+- Price chosen against competitors on 26 Sep: bovi (closest copy, 99 users) $1.50/1k; fantastic-jobs $12 → $4/1k; its feed $2.50 → $0.80/1k; memo23 $4/1k + $0.03/run.
+- Realistic expectation: $50-150/month gross at current usage, and some free users will leave. **The signal is whether anyone keeps running it after 10 Oct.**
+- 2 of 72 runs in the last 30 days timed out — worth checking, since 3 consecutive failed daily auto-tests flags the actor "under maintenance".
 
 ---
 

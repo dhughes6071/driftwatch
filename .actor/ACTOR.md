@@ -18,7 +18,23 @@ arms race, and no proxy bill. When a company posts a role, it appears here.
 - **Straight from the source** — the company's own board, not a third-party aggregator
 - **One schema across three ATSs** — Greenhouse, Ashby, and Lever normalized identically
 - **Curated registry included** — 3,500+ verified companies, 120,000+ open roles, or name your own
-- **Free to run** — you pay only Apify platform usage; `maxJobs` caps the work per run
+- **Simple pricing** — $1.50 per 1,000 jobs delivered, no platform usage on top; `maxJobs` caps the cost per run
+
+## Pricing
+
+From **10 October 2026**: **$1.50 per 1,000 jobs** ($0.0015 per job), plus
+Apify's standard $0.00005 run-start fee. Platform usage is included — you are
+not billed for compute separately. Until then it is free.
+
+You pay only for jobs actually delivered to your dataset. Two ways to control
+spend:
+
+- **`maxJobs`** — hard cap on results per run. The default of 1,000 costs at most $1.50.
+- **Apify's maximum cost per run** — if your limit is reached mid-run, the
+  Actor stops cleanly and keeps everything delivered so far.
+
+Filters (`remoteOnly`, `titleKeywords`, `locationKeywords`, `postedWithinDays`)
+run before charging, so filtered-out roles are never billed.
 
 ## Output
 
