@@ -2,7 +2,7 @@
 
 **Last updated: 26 September 2026**
 **Phase: 4 of 5 — shipped; Apify actor monetized from 10 Oct**
-**Next: watch whether Apify users keep running it once it costs money**
+**Next: publish the Workday actor (built 26 Sep); watch whether jobs-actor users keep paying after 10 Oct**
 
 ---
 
@@ -13,10 +13,41 @@
 | **Costs to date** | **≈ $2.65** — Apify Creator plan $1/month (Aug, Sep) + $0.65 of LLM test calls on 8 Aug |
 | **Revenue to date** | **$0.00** — Apify pricing goes live **10 Oct 2026, 16:08 UTC** |
 | **Money at risk** | **None.** No wallet exists. No mainnet. No domain. |
-| **Tests** | **40/40 passing** |
+| **Tests** | **40/40 passing** (root) · **11/11** (Workday actor) |
 | **Shipped** | [`driftwatch-mcp` on npm](https://www.npmjs.com/package/driftwatch-mcp) · [ATS jobs actor on Apify](https://apify.com/viridian_layout_ea2/company-career-site-jobs) |
 | **Users** | **Apify: 18 total, 13 in the last 30 days, 96 runs** (25 Sep). driftwatch MCP: 0 stars, 41 npm downloads/week, no evidence of real use. |
-| **Next action** | **10 Oct:** remove the `apify-default-dataset-item` event and fix the `job` description (reminder scheduled). **You:** decide on the Hacker News post. |
+| **Next action** | **You:** publish the Workday actor (`apify push` from `actors/workday-jobs/`, then set the $1.50/1k `job` event). **10 Oct:** remove the `apify-default-dataset-item` event and fix the `job` description (reminder scheduled). **You:** decide on the Hacker News post. |
+
+---
+
+## Second actor: Workday Jobs Scraper — built 26 September 2026
+
+Chosen by measurement: see [NEXT_ACTOR_RESEARCH.md](NEXT_ACTOR_RESEARCH.md). Workday has 398 users/30d across
+24 actors, no dominant competitor, and it is the enterprise coverage our first actor lacks.
+
+- Lives in [`actors/workday-jobs/`](actors/workday-jobs/): self-contained package, its own `.actor/` config, README, and icon.
+- Reads Workday's public career-site JSON API (the one the site's own page calls). No browser, no proxy.
+- **Registry: 4,113 verified career sites across 1,785 companies** (Common Crawl → each company's robots.txt →
+  live check). 80 private/internal/confidential sites deliberately excluded by name. Rebuild: `npm run discover`.
+- **Pricing decided: $1.50 per 1,000 jobs**, same as the first actor. A new actor can charge from day one.
+
+**What testing found about Workday** (all live, 26 Sep):
+
+| Quirk | Consequence if ignored | Handling |
+|---|---|---|
+| `limit` > 20 → HTTP 400 | run fails | page size 20 |
+| `total` only on page 1 | paging stops early | read it once |
+| Some sites report exactly 2,000 and wrap back to page 1 past it (NVIDIA: really 2,650) | 650 jobs missed + duplicates, silently | split by job category, then location, until each slice is under the cap |
+| Other sites report the true count and page normally (Dollar Tree 23,636; TJX 11,357) | splitting wastes ~3,300 requests on TJX | only split when total is *exactly* 2,000 |
+| Locations facet is nested one level down | no way to split TJX's 8,000-job category | flatten nested facets |
+
+Results: NVIDIA 2,650/2,650 in 14 s; TJX 11,357/11,357 in 34 s; default auto-test input returns 1,000 jobs in 84 s.
+A test caught one real bug before shipping: early stop didn't cancel requests already queued.
+
+Known limits: `company` is the Workday id (e.g. `ms`, `jj`), not a display name; `department` is null when a
+site's categories don't cover every job (TJX: 11,356 of 11,357). Heavily filtered runs over the whole registry
+are slow (83 health-company sites took 5.4 min for 15 matches), because filters like location or date can only
+be checked after listing everything; `searchText` narrows at the source.
 
 ---
 

@@ -1,0 +1,25 @@
+{
+  "actorSpecification": 1,
+  "views": {
+    "overview": {
+      "title": "Jobs",
+      "transformation": {
+        "fields": ["title", "company", "location", "department", "workplaceType", "remote", "postedAt", "employmentType", "url"]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "title": { "label": "Role" },
+          "company": { "label": "Company" },
+          "location": { "label": "Location" },
+          "department": { "label": "Category" },
+          "workplaceType": { "label": "Workplace" },
+          "remote": { "label": "Remote" },
+          "postedAt": { "label": "Posted" },
+          "employmentType": { "label": "Type" },
+          "url": { "label": "Apply", "format": "link" }
+        }
+      }
+    }
+  }
+}

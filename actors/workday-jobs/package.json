@@ -1,0 +1,19 @@
+{
+  "name": "workday-jobs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Apify actor: open roles from any company's Workday career site, via the public JSON API the site itself uses.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node --experimental-strip-types src/main.ts",
+    "local": "CRAWLEE_STORAGE_DIR=./storage ACTOR_TEST_PAY_PER_EVENT=1 node --experimental-strip-types src/main.ts",
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "discover": "node --experimental-strip-types scripts/discover.ts"
+  },
+  "dependencies": {
+    "apify": "^3.7.2"
+  }
+}

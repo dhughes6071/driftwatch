@@ -1,0 +1,83 @@
+{
+  "title": "Workday Jobs Scraper",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "careerSiteUrls": {
+      "title": "Workday career site URLs",
+      "type": "array",
+      "description": "Paste any page from a company's Workday career site — the main jobs page or a single job. Both myworkdayjobs.com and myworkdaysite.com addresses work.",
+      "editor": "stringList",
+      "prefill": [
+        "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite",
+        "https://salesforce.wd12.myworkdayjobs.com/External_Career_Site"
+      ]
+    },
+    "useCuratedList": {
+      "title": "Use the built-in company list",
+      "type": "boolean",
+      "description": "Also fetch from our registry of verified Workday career sites, discovered from Common Crawl and checked against the live API. Combine with the filters below and a sensible Maximum jobs.",
+      "default": false
+    },
+    "companyKeywords": {
+      "title": "Companies from the list (optional)",
+      "type": "array",
+      "description": "Only use built-in list companies whose Workday id contains one of these, e.g. \"nvidia\", \"bank\". Ignored unless the built-in list is on.",
+      "editor": "stringList",
+      "default": []
+    },
+    "searchText": {
+      "title": "Workday search",
+      "type": "string",
+      "description": "Runs Workday's own search on each site, exactly like typing into the site's search box. The fastest way to narrow a big employer.",
+      "editor": "textfield"
+    },
+    "titleKeywords": {
+      "title": "Title keywords",
+      "type": "array",
+      "description": "Only roles whose title contains one of these (case-insensitive), e.g. \"engineer\", \"nurse\".",
+      "editor": "stringList",
+      "default": []
+    },
+    "locationKeywords": {
+      "title": "Location keywords",
+      "type": "array",
+      "description": "Only roles where any listed location contains one of these (case-insensitive), e.g. \"Texas\", \"London\". Multi-location roles are checked against every location.",
+      "editor": "stringList",
+      "default": []
+    },
+    "remoteOnly": {
+      "title": "Remote roles only",
+      "type": "boolean",
+      "description": "Only roles whose location or the company's workplace label says remote.",
+      "default": false
+    },
+    "postedWithinDays": {
+      "title": "Posted within (days)",
+      "type": "integer",
+      "description": "Only roles posted in the last N days.",
+      "minimum": 1,
+      "maximum": 365
+    },
+    "includeDescription": {
+      "title": "Include full job description",
+      "type": "boolean",
+      "description": "Adds the description, exact posting date, employment type, country and every location. Turn off for a faster run with titles, locations and links only.",
+      "default": true
+    },
+    "maxJobs": {
+      "title": "Maximum jobs",
+      "type": "integer",
+      "description": "Hard cap on results for the whole run. This is your main cost control — you are charged per job returned.",
+      "default": 1000,
+      "minimum": 1,
+      "maximum": 500000
+    },
+    "maxJobsPerCompany": {
+      "title": "Maximum jobs per career site",
+      "type": "integer",
+      "description": "Optional cap per career site, so one huge employer does not use up the whole run.",
+      "minimum": 1
+    }
+  }
+}
