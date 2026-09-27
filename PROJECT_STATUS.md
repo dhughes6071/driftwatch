@@ -39,7 +39,11 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   (whole-word match for keywords of 3 characters or fewer); live actors rebuilt (Workday 0.1.4, main 0.5.4).
 - **Decided 27 Sep:** price **$2 / 1,000 jobs**. Daily launchd job installed (`~/Library/LaunchAgents/com.x402.career-jobs.plist`,
   03:30, lock prevents overlapping runs; logs in `data/logs/`). Turn off: `launchctl unload ~/Library/LaunchAgents/com.x402.career-jobs.plist`.
-- **Waiting on the owner:** `APIFY_TOKEN` in `.env` (needed to publish the index).
+- `APIFY_TOKEN` added to `.env` by the owner 27 Sep (verified without displaying it).
+- **Pushed to Apify** as `viridian_layout_ea2/career-site-jobs-api` (ID `oDFG9ptBmIy6QjQDZ`), private. Cloud test on an
+  18k-job sample index passed (search ~1 s). The signed index link is an encrypted Actor secret (`careerManifestUrl`) and a
+  gitignored file (`data/career-manifest-url.txt`) — **never commit it: the repo is public and the link unlocks the index.**
+- **Next:** publish the full index when the first crawl finishes, fill in README totals, then the owner sets $2/1k + publishes.
 
 ---
 
