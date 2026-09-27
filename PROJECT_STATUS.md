@@ -14,13 +14,13 @@
 | **Revenue to date** | **$0.00** — Apify pricing goes live **10 Oct 2026, 16:08 UTC** |
 | **Money at risk** | **None.** No wallet exists. No mainnet. No domain. |
 | **Tests** | **40/40 passing** (root) · **11/11** (Workday actor) |
-| **Shipped** | [`driftwatch-mcp` on npm](https://www.npmjs.com/package/driftwatch-mcp) · [ATS jobs actor on Apify](https://apify.com/viridian_layout_ea2/company-career-site-jobs) · [Workday jobs actor](https://apify.com/viridian_layout_ea2/workday-jobs-scraper) |
+| **Shipped** | [`driftwatch-mcp` on npm](https://www.npmjs.com/package/driftwatch-mcp) · [ATS jobs actor on Apify](https://apify.com/viridian_layout_ea2/company-career-site-jobs) · [Workday jobs actor](https://apify.com/viridian_layout_ea2/workday-jobs-scraper) · [Career Site Jobs API](https://apify.com/viridian_layout_ea2/career-site-jobs-api) |
 | **Users** | **Apify: 18 total, 13 in the last 30 days, 96 runs** (25 Sep). driftwatch MCP: 0 stars, 41 npm downloads/week, no evidence of real use. |
 | **Next action** | Watch the Workday actor's first users (published 26 Sep, charging from day one). **10 Oct:** remove the `apify-default-dataset-item` event and fix the `job` description (reminder scheduled). **You:** decide on the Hacker News post. |
 
 ---
 
-## Third actor: Career Site Jobs API (daily index) — in progress, 27 September 2026
+## Third actor: Career Site Jobs API (daily index) — published 27 September 2026
 
 Chosen in [NEXT_ACTOR_RESEARCH.md](NEXT_ACTOR_RESEARCH.md) round 2: the "every company's career site in one API"
 market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k**. We own its two biggest sources.
@@ -50,7 +50,8 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   A 300-job search earns $0.60 at $2/1k.
 - **Pricing + icon set 27 Sep** (via the owner's Chrome, with permission): pay-per-event `job` = $0.002, primary; `apify-actor-start`
   $0.00005; dataset-item event removed. Icon uploaded; store description updated to the measured numbers.
-- **Next (owner):** click **Publish on Store**.
+- **Published on the Store 27 Sep:** https://apify.com/viridian_layout_ea2/career-site-jobs-api — live page verified:
+  "from $2.00 / 1,000 jobs", custom icon, 900,000+ description.
 
 ---
 
