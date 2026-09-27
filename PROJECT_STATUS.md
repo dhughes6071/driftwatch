@@ -50,6 +50,10 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   A 300-job search earns $0.60 at $2/1k.
 - **Pricing + icon set 27 Sep** (via the owner's Chrome, with permission): pay-per-event `job` = $0.002, primary; `apify-actor-start`
   $0.00005; dataset-item event removed. Icon uploaded; store description updated to the measured numbers.
+- **27 Sep (evening): Oracle Recruiting Cloud + SmartRecruiters added** (research round 3). Oracle: 1,090 sites on 868
+  companies (842 named by hand), ≤350k roles; excluded non-production pods, same-count aliases, and host `eubt` (78k
+  gibberish test postings). SmartRecruiters: 1,113 companies, ~223k roles, names from the API. First expanded crawl
+  started 16:19 local via `run-daily.sh` (holds the lock; publishes when done). README/actor numbers to update after.
 - **Published on the Store 27 Sep:** https://apify.com/viridian_layout_ea2/career-site-jobs-api — live page verified:
   "from $2.00 / 1,000 jobs", custom icon, 900,000+ description.
 
