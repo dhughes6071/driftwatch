@@ -19,7 +19,7 @@ import { writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { openDb } from "./crawl.ts";
-import { compareNewestFirst, DESC_CHUNK_SIZE, SHARD_SIZE, type IndexJob, type Manifest, type ShardRef } from "../src/format.ts";
+import { DESC_CHUNK_SIZE, SHARD_SIZE, type IndexJob, type Manifest, type ShardRef } from "../src/format.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
@@ -45,36 +45,35 @@ export async function publish() {
   const liveSince = new Date(Date.parse(lastRun.started_at) - 86_400_000).toISOString();
 
   // ---------------------------------------------------------- 1. new description chunks
+  // Batch by batch: ~900k descriptions are several GB, far more than fits in
+  // memory at once (the first full publish died exactly that way).
   const day = lastRun.started_at.slice(0, 10).replaceAll("-", "");
-  const existingToday = (
-    db.prepare("SELECT DISTINCT chunk FROM jobs WHERE chunk LIKE ?").all(`desc-${day}-%`) as Array<{ chunk: string }>
-  ).length;
-  const pending = db
-    .prepare("SELECT id, description FROM jobs WHERE chunk IS NULL AND description IS NOT NULL AND last_seen >= ?")
-    .all(liveSince) as Array<{ id: string; description: string }>;
+  let n = (db.prepare("SELECT DISTINCT chunk FROM jobs WHERE chunk LIKE ?").all(`desc-${day}-%`) as unknown[]).length;
+  const nextBatch = db.prepare(
+    "SELECT id, description FROM jobs WHERE chunk IS NULL AND description IS NOT NULL AND last_seen >= ? LIMIT ?",
+  );
   const setChunk = db.prepare("UPDATE jobs SET chunk = ? WHERE id = ?");
-  let n = existingToday;
-  for (let i = 0; i < pending.length; i += DESC_CHUNK_SIZE) {
-    const slice = pending.slice(i, i + DESC_CHUNK_SIZE);
+  for (;;) {
+    const slice = nextBatch.all(liveSince, DESC_CHUNK_SIZE) as Array<{ id: string; description: string }>;
+    if (slice.length === 0) break;
     const key = `desc-${day}-${String(n++).padStart(3, "0")}`;
     const body = gzipSync(JSON.stringify(Object.fromEntries(slice.map((r) => [r.id, r.description]))));
     await kv.setRecord({ key, value: body, contentType: "application/gzip" });
     db.transaction(() => slice.forEach((r) => setChunk.run(key, r.id)))();
-    log(`uploaded ${key}: ${slice.length} descriptions, ${(body.length / 1e6).toFixed(1)} MB`);
+    if (n % 25 === 0) log(`uploaded ${key}: ${slice.length} descriptions, ${(body.length / 1e6).toFixed(1)} MB`);
   }
 
-  // ---------------------------------------------------------- 2. shards
-  const rows = db.prepare("SELECT light, chunk FROM jobs WHERE last_seen >= ?").all(liveSince) as Array<{
-    light: string;
-    chunk: string | null;
-  }>;
-  const jobs: IndexJob[] = rows.map((r) => ({ ...(JSON.parse(r.light) as IndexJob), d: r.chunk }));
-  jobs.sort(compareNewestFirst);
-
+  // ---------------------------------------------------------- 2. shards (streamed, newest first)
   const stamp = lastRun.started_at.replace(/[-:.TZ]/g, "").slice(0, 12);
   const shards: ShardRef[] = [];
-  for (let i = 0; i < jobs.length; i += SHARD_SIZE) {
-    const part = jobs.slice(i, i + SHARD_SIZE);
+  const chunkKeys = new Set<string>();
+  const companies = new Set<string>();
+  const bySource: Record<string, number> = {};
+  let total = 0;
+  let part: IndexJob[] = [];
+
+  const flush = async () => {
+    if (!part.length) return;
     const key = `s-${stamp}-${String(shards.length).padStart(3, "0")}`;
     const body = gzipSync(part.map((j) => JSON.stringify(j)).join("\n"));
     await kv.setRecord({ key, value: body, contentType: "application/gzip" });
@@ -88,32 +87,45 @@ export async function publish() {
       undated: part.length - dated.length,
     });
     log(`uploaded ${key}: ${part.length} jobs, ${(body.length / 1e6).toFixed(1)} MB`);
+    part = [];
+  };
+
+  // SQL does the newest-first sort (same order as compareNewestFirst), so
+  // only one shard is ever in memory.
+  const rows = db
+    .prepare("SELECT light, chunk FROM jobs WHERE last_seen >= ? ORDER BY posted_at IS NULL, posted_at DESC")
+    .iterate(liveSince) as IterableIterator<{ light: string; chunk: string | null }>;
+  for (const row of rows) {
+    const j: IndexJob = { ...(JSON.parse(row.light) as IndexJob), d: row.chunk };
+    if (j.d) chunkKeys.add(j.d);
+    companies.add(`${j.ats}:${j.company}`);
+    bySource[j.ats] = (bySource[j.ats] ?? 0) + 1;
+    total++;
+    part.push(j);
+    if (part.length >= SHARD_SIZE) await flush();
   }
+  await flush();
 
   // ---------------------------------------------------------- 3. manifest
-  const chunkKeys = [...new Set(jobs.map((j) => j.d).filter((k): k is string => !!k))];
   const desc: Record<string, string> = {};
   for (const k of chunkKeys) desc[k] = await kv.getRecordPublicUrl(k);
-  const bySource: Record<string, number> = {};
-  for (const j of jobs) bySource[j.ats] = (bySource[j.ats] ?? 0) + 1;
 
   const manifest: Manifest = {
     version: 1,
     indexedAt: lastRun.started_at,
-    totalJobs: jobs.length,
-    companies: new Set(jobs.map((j) => `${j.ats}:${j.company}`)).size,
+    totalJobs: total,
+    companies: companies.size,
     bySource,
     shards,
     desc,
   };
   await kv.setRecord({ key: "MANIFEST", value: manifest, contentType: "application/json" });
   const manifestUrl = await kv.getRecordPublicUrl("MANIFEST");
-  // The Actor reads this one fixed URL; the signature is stable for a given key.
   // The Actor reads this one fixed link (its signature is stable for a given
   // key). It unlocks the whole index, so it lives in gitignored data/ and in
   // the Actor's encrypted secrets -- never in source, since the repo is public.
   if (!LOCAL_DIR) writeFileSync(resolve(ROOT, "data/career-manifest-url.txt"), manifestUrl + "\n");
-  log(`MANIFEST: ${jobs.length} jobs, ${manifest.companies} companies, ${shards.length} shards, ${chunkKeys.length} description chunks`);
+  log(`MANIFEST: ${total} jobs, ${manifest.companies} companies, ${shards.length} shards, ${chunkKeys.size} description chunks`);
 
   // ---------------------------------------------------------- 4. clean up
   const keep = new Set(["MANIFEST", ...shards.map((s) => s.key), ...chunkKeys]);
@@ -131,7 +143,7 @@ export async function publish() {
   } while (exclusiveStartKey);
   // Chunks no live job references any more will never be read again.
   db.prepare("UPDATE jobs SET chunk = NULL WHERE chunk IS NOT NULL AND chunk NOT IN (SELECT value FROM json_each(?))").run(
-    JSON.stringify(chunkKeys),
+    JSON.stringify([...chunkKeys]),
   );
   log(`removed ${removed} old records`);
   db.close();
