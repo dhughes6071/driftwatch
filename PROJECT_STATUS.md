@@ -43,7 +43,13 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
 - **Pushed to Apify** as `viridian_layout_ea2/career-site-jobs-api` (ID `oDFG9ptBmIy6QjQDZ`), private. Cloud test on an
   18k-job sample index passed (search ~1 s). The signed index link is an encrypted Actor secret (`careerManifestUrl`) and a
   gitignored file (`data/career-manifest-url.txt`) — **never commit it: the repo is public and the link unlocks the index.**
-- **Next:** publish the full index when the first crawl finishes, fill in README totals, then the owner sets $2/1k + publishes.
+- **First full index published 27 Sep:** **936,775 jobs from 5,248 companies** (Workday 811k, Greenhouse 90k, Ashby 33k,
+  Lever 3k); 24 shards (~65 MB) + 233 description chunks; publish took 8 min, 620 MB RAM. The first publish attempt ran out of
+  memory loading every description at once — fixed by batching and streaming (commit ca03935).
+- **Measured on Apify:** searches take 9–17 s and cost $0.0006–0.0018 each to serve (default memory now 1 GB; peak use 464 MB).
+  A 300-job search earns $0.60 at $2/1k.
+- **Next (owner, in Console):** set pay-per-event `job` = $0.002 (no `apify-default-dataset-item` event), upload the icon
+  (`actors/career-jobs/.actor/icon.png`), publish.
 
 ---
 

@@ -1,7 +1,7 @@
 # Career Site Jobs API — Workday, Greenhouse, Lever, Ashby
 
-Search **every open role on {{COMPANIES}} companies' own career sites** in seconds.
-That's {{JOBS}} jobs from Workday, Greenhouse, Ashby and Lever, collected fresh every day.
+Search **every open role on 5,200+ companies' own career sites** in seconds, not hours.
+That's more than 900,000 jobs from Workday, Greenhouse, Ashby and Lever, collected fresh every day.
 
 Most of the Fortune 500 hire through Workday (NVIDIA, Salesforce, CVS, Lowe's, Morgan
 Stanley). Startups and scale-ups use Greenhouse, Ashby and Lever. This Actor covers both,
@@ -9,8 +9,8 @@ with one set of output fields.
 
 ## Why this one
 
-- **Instant.** Every career site is collected once a day into an index, so a search
-  doesn't crawl thousands of sites while you wait. A typical run finishes in seconds.
+- **Fast.** Every career site is collected once a day into an index, so a search
+  doesn't crawl thousands of sites while you wait. A typical search finishes in 10–20 seconds.
 - **Straight from the source.** Every role comes from the company's own career site, not
   a third-party job board, and the `url` is the company's own apply link.
 - **Newest first.** Results are sorted by posting date, and `postedWithinDays` skips the
