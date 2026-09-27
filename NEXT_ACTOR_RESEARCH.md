@@ -57,3 +57,43 @@ new business.
 ---
 
 **Outcome (26 Sep):** built — see `actors/workday-jobs/` and the status entry in PROJECT_STATUS.md.
+
+---
+
+# Round 2 — 27 September 2026: what's next after Workday?
+
+Same snapshot (`research/data/apify_store_2026-09-26.json`), re-clustered by target site, then every
+candidate with a public or official data source checked against **its own terms**, not just its demand.
+
+## Recommendation: an all-in-one career-site jobs actor (pre-indexed)
+
+The biggest legitimate pool in the store is the "every company's career site in one API" market:
+
+| Actor | Users/30d | Price |
+|---|---:|---|
+| fantastic-jobs/career-site-job-listing-api | **1,473** (145,664 runs) | **$12 / 1k** + $0.01/run |
+| fantastic-jobs/career-site-job-listing-feed | 224 | $2.50 / 1k + $0.10/run |
+| jobo.world/ats-jobs-api | 152 | $4 / 1k |
+| memo23/career-site-ats-jobs-api | 73 | $4 / 1k |
+| **Pool** | **~1,970** | |
+
+That is ~5x the Workday niche, and we already own the two largest sources: Greenhouse/Ashby/Lever
+(3,584 companies) and Workday (1,785 companies, ~770k roles). SmartRecruiters has an official public
+posting API (verified: Bosch 4,802 roles), and Oracle/SuccessFactors follow the Workday pattern.
+
+The catch: the leader is a **database**, not a live crawler — "all data-engineer roles in Texas from the
+last 24 hours" returns in seconds. Competing needs a daily index (crawl everything once a day, fetch
+descriptions only for new roles), so a user query reads the index instead of crawling 6,000 sites. That is
+a bigger build than Workday, and it carries a small **recurring compute cost** (estimated a few dollars
+a month) — a project stop condition, so it needs the owner's approval first.
+
+## Checked and rejected
+
+| Candidate | Demand | Why not |
+|---|---:|---|
+| Remote job boards (Himalayas, RemoteOK, Remotive, WWR) | 396 users | Their API terms require link-back and forbid passing jobs to third-party sites; Remotive sells a paid commercial API. Reselling breaks the spirit of the terms. |
+| Apple App Store data / reviews | 888 users | Apple's Search API terms allow use **only to promote store content**, ~20 calls/min; leader prices at $0.10/1k. |
+| US Secretary of State business registries | 128 users (one actor: 29,531 runs) | Real, sticky demand — but 50 different state websites, several with CAPTCHAs or anti-automation terms. High maintenance. |
+| Congress stock-trade disclosures | 69 users | Clean public data, but small, and House filings are PDFs. |
+| Brazil CNPJ / French SIRENE / UK Companies House | 126 / 50 / 27 | Clean open-government licences, but mostly lead-gen use and small. |
+| Prediction markets, DEX/crypto, Bluesky, Hacker News, GitHub, arXiv, SAM.gov, FDA, patents | ≤135 each | Too small. |
