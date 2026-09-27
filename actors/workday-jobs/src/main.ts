@@ -17,6 +17,7 @@
 import { Actor, log } from "apify";
 import {
   WorkdayClient,
+  companyName,
   minAgeDays,
   normalize,
   parseCareerSiteUrl,
@@ -30,7 +31,7 @@ interface Input {
   careerSiteUrls?: string[];
   /** Use the built-in registry of verified Workday career sites. */
   useCuratedList?: boolean;
-  /** Only registry companies whose Workday id contains one of these, e.g. "nvidia". */
+  /** Only registry companies whose name or Workday id contains one of these, e.g. "nvidia", "bank". */
   companyKeywords?: string[];
   /** Workday's own full-text search, run server-side. Fastest way to narrow big employers. */
   searchText?: string;
@@ -83,7 +84,13 @@ try {
   if (useCuratedList) {
     const registry = await loadRegistry();
     const kw = companyKeywords.map((k) => k.toLowerCase());
-    const picked = kw.length ? registry.filter((s) => kw.some((k) => s.tenant.includes(k))) : registry;
+    // Match the Workday id ("ghr") or the real name ("Bank of America").
+    const picked = kw.length
+      ? registry.filter((s) => {
+          const name = companyName(s.tenant).toLowerCase();
+          return kw.some((k) => s.tenant.includes(k) || name.includes(k));
+        })
+      : registry;
     sites.push(...picked);
     log.info(`Registry: ${picked.length} of ${registry.length} career sites selected`);
   }

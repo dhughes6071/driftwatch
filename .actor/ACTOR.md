@@ -7,6 +7,12 @@ Unlike other job scrapers, this one reads the **public JSON APIs** those
 systems publish for syndication rather than parsing HTML — so it does not
 break when a page changes.
 
+> **Need big employers too?** Greenhouse, Ashby and Lever are mostly startups and
+> scale-ups. Most of the Fortune 500 (NVIDIA, Salesforce, CVS, Lowe's) hire through
+> Workday. Our [Workday Jobs Scraper](https://apify.com/viridian_layout_ea2/workday-jobs-scraper)
+> covers 1,785 of them, with the **same output fields**, so the two datasets combine
+> directly.
+
 ## Why this one
 
 Most job scrapers parse HTML from job boards. HTML changes, so they break — which

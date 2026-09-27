@@ -40,6 +40,14 @@ test("rejects URLs that are not a Workday career site", () => {
   assert.equal(parseCareerSiteUrl("not a url at all"), null);
 });
 
+test("known Workday ids get their real company name", async () => {
+  const { companyName } = await import("../src/workday.ts");
+  assert.equal(companyName("ms"), "Morgan Stanley");
+  assert.equal(companyName("ghr"), "Bank of America");
+  assert.equal(companyName("nvidia"), "NVIDIA");
+  assert.equal(companyName("not-a-tenant"), "not-a-tenant");
+});
+
 // ------------------------------------------------------------------ dates
 
 test("postedOn text becomes a date; '30+ days' stays unknown", () => {
@@ -178,6 +186,7 @@ test("normalize prefers the detail call and flags remote from the workplace labe
     },
   );
   assert.equal(job.id, "workday:acme:R1");
+  assert.equal(job.companyName, "acme", "unknown tenants fall back to their Workday id");
   assert.equal(job.remote, true);
   assert.equal(job.postedAt, "2026-09-20");
   assert.equal(job.department, "Engineering");

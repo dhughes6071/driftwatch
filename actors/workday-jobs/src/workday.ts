@@ -23,6 +23,18 @@
  * recursing if one category is itself capped. Any other total is trusted.
  */
 
+import NAMES from "./names.json" with { type: "json" };
+
+/**
+ * Display names for known Workday tenants ("ms" -> "Morgan Stanley").
+ * Workday publishes no name field: these were read from each career site's
+ * own description, one by one, for all 1,785 registry companies (26 Sep 2026).
+ */
+const COMPANY_NAMES: Record<string, string> = NAMES;
+
+/** The company's display name, or its Workday id when we have not named it. */
+export const companyName = (tenant: string): string => COMPANY_NAMES[tenant] ?? tenant;
+
 export const PAGE = 20;
 export const CAP = 2000;
 
@@ -77,8 +89,11 @@ export interface Job {
   /** Stable id: "workday:{tenant}:{jobReqId}" */
   id: string;
   ats: "workday";
+  /** Workday's id for the company, e.g. "ms". Stable; use it to join or filter. */
   company: string;
   companySlug: string;
+  /** Human-readable name, e.g. "Morgan Stanley". Falls back to the id for companies outside the registry. */
+  companyName: string;
   careerSite: string;
   title: string;
   location: string | null;
@@ -434,6 +449,7 @@ export function normalize(
     ats: "workday",
     company: site.tenant,
     companySlug: site.tenant,
+    companyName: companyName(site.tenant),
     careerSite: site.site,
     title: (d?.title ?? p.title).trim(),
     location,

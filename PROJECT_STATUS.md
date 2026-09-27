@@ -35,6 +35,11 @@ Chosen by measurement: see [NEXT_ACTOR_RESEARCH.md](NEXT_ACTOR_RESEARCH.md). Wor
 - **Published to the Store 26 Sep** at https://apify.com/viridian_layout_ea2/workday-jobs-scraper — "$1.50 / 1,000 jobs",
   tower icon, no `apify-default-dataset-item` event (no double charge). Categories are now auto-assigned by Apify
   (Job platforms, Job Listings). Store pages are cached ~30 min, so Console edits show up late.
+- **27 Sep:** the two actors' READMEs now link to each other (startups ↔ big employers, same fields). Added
+  `companyName` ("ms" → "Morgan Stanley") for all 1,785 registry companies, read by hand from each career site's
+  description into `actors/workday-jobs/src/names.json`; `companyKeywords` now matches names too. Build 0.1.3.
+- **Weekly check-in:** scheduled task `apify-weekly-user-check` runs Mondays 9am, appends both actors' stats to
+  `research/data/actor_stats.csv` and reports week-over-week change and failure rates. Read-only.
 
 **What testing found about Workday** (all live, 26 Sep):
 

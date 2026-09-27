@@ -8,6 +8,11 @@ Paste a career site URL, or use the built-in list of **4,100+ verified Workday c
 sites across 1,785 companies**, found through Common Crawl and each checked against the
 live site.
 
+> **Need startups too?** Most startups and scale-ups hire through Greenhouse, Ashby or
+> Lever rather than Workday. Our [Greenhouse / Ashby / Lever Job Scraper](https://apify.com/viridian_layout_ea2/company-career-site-jobs)
+> covers 3,500+ of them, with the **same output fields**, so the two datasets combine
+> directly.
+
 ## Why this one
 
 **It gets past Workday's hidden 2,000-job limit.** Many Workday sites never report more
@@ -65,7 +70,8 @@ You pay only for jobs actually delivered to your dataset:
 |---|---|
 | `id` | Stable id: `workday:{company}:{requisitionId}` |
 | `title` | Role title |
-| `company` / `companySlug` | The company's Workday id, e.g. `nvidia` |
+| `companyName` | The company's name, e.g. "Morgan Stanley" |
+| `company` / `companySlug` | The company's Workday id, e.g. `ms` (stable, good for filtering and joins) |
 | `careerSite` | Which of the company's career sites it came from |
 | `location` / `additionalLocations` | Primary location and every other listed location |
 | `country` | Country of the primary location |
@@ -109,4 +115,4 @@ so the two datasets can be combined.
   never sinks a run, and the run's `SUMMARY` record lists what happened to each site.
 - Some companies run several Workday career sites (Salesforce runs nine, including Slack
   and Tableau). A role listed on more than one of them is returned once.
-- `company` is the company's Workday id, which is usually the company name in lowercase.
+- `companyName` is filled in for all 1,785 companies in the built-in list. For a career site outside the list it falls back to the Workday id.

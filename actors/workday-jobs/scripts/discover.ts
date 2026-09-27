@@ -13,6 +13,10 @@
  *    resolve would be worse than a smaller one that does.
  *
  * Existing entries the crawl does not rediscover are kept if they still verify.
+ *
+ * Company display names live in src/names.json and are NOT generated here:
+ * they were read by hand from each site's description. A newly discovered
+ * company shows its Workday id until someone adds it to names.json.
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { WorkdayClient, type Site } from "../src/workday.ts";

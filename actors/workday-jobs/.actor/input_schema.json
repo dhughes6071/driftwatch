@@ -22,7 +22,7 @@
     "companyKeywords": {
       "title": "Companies from the list (optional)",
       "type": "array",
-      "description": "Only use built-in list companies whose Workday id contains one of these, e.g. \"nvidia\", \"bank\". Ignored unless the built-in list is on.",
+      "description": "Only use built-in list companies whose name contains one of these, e.g. \"Morgan Stanley\", \"bank\", \"health\". Ignored unless the built-in list is on.",
       "editor": "stringList",
       "default": []
     },

@@ -4,13 +4,13 @@
     "overview": {
       "title": "Jobs",
       "transformation": {
-        "fields": ["title", "company", "location", "department", "workplaceType", "remote", "postedAt", "employmentType", "url"]
+        "fields": ["title", "companyName", "location", "department", "workplaceType", "remote", "postedAt", "employmentType", "url"]
       },
       "display": {
         "component": "table",
         "properties": {
           "title": { "label": "Role" },
-          "company": { "label": "Company" },
+          "companyName": { "label": "Company" },
           "location": { "label": "Location" },
           "department": { "label": "Category" },
           "workplaceType": { "label": "Workplace" },
