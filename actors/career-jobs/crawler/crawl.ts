@@ -22,6 +22,8 @@ import { fileURLToPath } from "node:url";
 import { fetchCompany, type Ats, type Job as AtsJob } from "../../../src/jobs/ats.ts";
 import { WorkdayClient, companyName as workdayName, normalize, type Site } from "../../workday-jobs/src/workday.ts";
 import type { IndexJob, Source } from "../src/format.ts";
+import * as Oracle from "../sources/oracle.ts";
+import * as SmartR from "../sources/smartrecruiters.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
@@ -89,7 +91,12 @@ export async function crawl() {
     `INSERT INTO jobs (id, ats, company, posted_at, light, description, first_seen, last_seen)
      VALUES (@id, @ats, @company, @posted_at, @light, @description, @now, @now)`,
   );
-  const stats = { atsCompanies: 0, atsJobs: 0, workdaySites: 0, workdayJobs: 0, newJobs: 0, detailFetches: 0, errors: 0 };
+  const stats = {
+    atsCompanies: 0, atsJobs: 0, workdaySites: 0, workdayJobs: 0,
+    oracleSites: 0, oracleJobs: 0, srCompanies: 0, srJobs: 0,
+    newJobs: 0, detailFetches: 0, errors: 0,
+  };
+  const touchOnly = db.prepare("UPDATE jobs SET last_seen = ? WHERE id = ?");
 
   const save = (job: IndexJob, description: string | null) => {
     const light = JSON.stringify(job);
@@ -185,6 +192,49 @@ export async function crawl() {
     }
   });
 
+  // ---------------------------------------------------------- Oracle Recruiting Cloud
+  // Same shape as Workday: list everything, fetch a detail only for new roles.
+  const oracleSites = readRegistry<Oracle.OracleSite>("actors/career-jobs/sources/oracle-sites.json");
+  log(`Oracle: ${oracleSites.length} career sites`);
+  await pool(oracleSites, 6, async (site) => {
+    const postings = await Oracle.listAll(site);
+    if (!postings) return void stats.errors++;
+    stats.oracleSites++;
+    const fresh = postings.filter((p) => {
+      stats.oracleJobs++;
+      const id = Oracle.jobId(site, p);
+      if (exists.get(id)) return void touchOnly.run(startedAt, id), false;
+      return true;
+    });
+    await pool(fresh, PER_SITE, async (p) => {
+      const d = await Oracle.detail(site, p.Id);
+      stats.detailFetches++;
+      const { job, description } = Oracle.toIndexJob(site, p, d, startedAt);
+      save(job, description);
+    });
+  });
+
+  // ---------------------------------------------------------- SmartRecruiters
+  const srCompanies = readRegistry<{ id: string }>("actors/career-jobs/sources/smartrecruiters.json");
+  log(`SmartRecruiters: ${srCompanies.length} companies`);
+  await pool(srCompanies, 6, async ({ id: company }) => {
+    const postings = await SmartR.listAll(company);
+    if (!postings) return void stats.errors++;
+    stats.srCompanies++;
+    const fresh = postings.filter((p) => {
+      stats.srJobs++;
+      const id = SmartR.jobId(company, p);
+      if (exists.get(id)) return void touchOnly.run(startedAt, id), false;
+      return true;
+    });
+    await pool(fresh, PER_SITE, async (p) => {
+      const d = await SmartR.detail(company, p.id);
+      stats.detailFetches++;
+      const { job, description } = SmartR.toIndexJob(company, p, d, startedAt);
+      save(job, description);
+    });
+  });
+
   // Roles gone for 3+ days are closed. (A day or two of grace absorbs a site
   // that was briefly unreachable, so a flaky host does not empty and refill.)
   const cutoff = new Date(Date.now() - 3 * 86_400_000).toISOString();
@@ -200,6 +250,18 @@ export async function crawl() {
 }
 
 // ------------------------------------------------------------------ helpers
+
+/** A registry file, or [] if it has not been built yet. Trial runs take the smallest entries. */
+function readRegistry<T>(rel: string): T[] {
+  const path = resolve(ROOT, rel);
+  let rows: T[] = [];
+  try {
+    rows = JSON.parse(readFileSync(path, "utf8")) as T[];
+  } catch {
+    return [];
+  }
+  return Number.isFinite(LIMIT) ? rows.slice(-LIMIT) : rows;
+}
 
 function fromAtsJob(j: AtsJob, companyName: string, now: string): IndexJob {
   return {

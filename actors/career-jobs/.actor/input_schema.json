@@ -8,7 +8,9 @@
       "type": "array",
       "description": "Only roles whose title contains one of these (case-insensitive), e.g. \"data engineer\", \"nurse\".",
       "editor": "stringList",
-      "prefill": ["data engineer"]
+      "prefill": [
+        "data engineer"
+      ]
     },
     "titleExcludeKeywords": {
       "title": "Exclude title keywords",
@@ -50,7 +52,25 @@
       "type": "array",
       "description": "Limit to some systems. Leave empty for all.",
       "editor": "select",
-      "items": { "type": "string", "enum": ["workday", "greenhouse", "ashby", "lever"], "enumTitles": ["Workday", "Greenhouse", "Ashby", "Lever"] },
+      "items": {
+        "type": "string",
+        "enum": [
+          "workday",
+          "oracle",
+          "smartrecruiters",
+          "greenhouse",
+          "ashby",
+          "lever"
+        ],
+        "enumTitles": [
+          "Workday",
+          "Oracle Recruiting Cloud",
+          "SmartRecruiters",
+          "Greenhouse",
+          "Ashby",
+          "Lever"
+        ]
+      },
       "default": []
     },
     "includeDescription": {
