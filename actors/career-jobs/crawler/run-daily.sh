@@ -6,6 +6,14 @@ ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$ROOT"
 mkdir -p data/logs
 LOG="data/logs/career-jobs-$(date +%Y-%m-%d).log"
+
+# One crawl at a time: a run that overlaps the previous one would double the load on every site.
+LOCK="data/career-jobs.lock"
+if ! mkdir "$LOCK" 2>/dev/null; then
+  echo "$(date) previous run still in progress; skipping" >> "$LOG"
+  exit 0
+fi
+trap 'rmdir "$LOCK"' EXIT
 NODE="$(command -v node || echo /opt/homebrew/bin/node)"
 
 {

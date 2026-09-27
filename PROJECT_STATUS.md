@@ -37,8 +37,9 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   Daily runs afterwards only fetch new roles.
 - Found while testing: short location keywords ("NY") matched inside words ("Germany"). Fixed in all three actors
   (whole-word match for keywords of 3 characters or fewer); live actors rebuilt (Workday 0.1.4, main 0.5.4).
-- **Waiting on the owner:** (1) `APIFY_TOKEN` in `.env`, (2) price, (3) OK to install the daily 03:30 launchd job
-  (`crawler/com.x402.career-jobs.plist`).
+- **Decided 27 Sep:** price **$2 / 1,000 jobs**. Daily launchd job installed (`~/Library/LaunchAgents/com.x402.career-jobs.plist`,
+  03:30, lock prevents overlapping runs; logs in `data/logs/`). Turn off: `launchctl unload ~/Library/LaunchAgents/com.x402.career-jobs.plist`.
+- **Waiting on the owner:** `APIFY_TOKEN` in `.env` (needed to publish the index).
 
 ---
 

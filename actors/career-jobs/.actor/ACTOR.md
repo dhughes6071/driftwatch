@@ -23,7 +23,7 @@ with one set of output fields.
 
 ## Pricing
 
-**{{PRICE}} per 1,000 jobs**, plus Apify's standard run-start fee. Platform usage is
+**$2 per 1,000 jobs**, plus Apify's standard run-start fee. Platform usage is
 included, so you are not billed for compute separately.
 
 - **`maxJobs`** is a hard cap per run.
