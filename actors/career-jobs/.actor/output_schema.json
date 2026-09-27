@@ -1,0 +1,19 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "Career Site Jobs API output",
+  "description": "One record per matching job in the default dataset, plus a SUMMARY record describing the run and the index it read.",
+  "properties": {
+    "jobs": {
+      "type": "string",
+      "title": "Jobs",
+      "description": "Every job delivered, newest first: title, company, locations, posting date, apply URL, and (optionally) the description.",
+      "template": "{{links.apiDefaultDatasetUrl}}/items"
+    },
+    "summary": {
+      "type": "string",
+      "title": "Run summary",
+      "description": "Jobs returned, why the run stopped, and when the index was built.",
+      "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/SUMMARY"
+    }
+  }
+}

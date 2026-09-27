@@ -1,0 +1,15 @@
+{
+  "actorSpecification": 1,
+  "name": "career-site-jobs-api",
+  "title": "Career Site Jobs API — Workday, Greenhouse, Lever, Ashby",
+  "description": "Search every open role on 5,000+ companies' own career sites in seconds: Workday, Greenhouse, Ashby and Lever, refreshed daily. Filter by title, location, company, remote and posting date.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "dockerfile": "./Dockerfile",
+  "readme": "./ACTOR.md",
+  "input": "./input_schema.json",
+  "storages": { "dataset": "./dataset_schema.json" },
+  "output": "./output_schema.json",
+  "minMemoryMbytes": 512,
+  "maxMemoryMbytes": 2048
+}

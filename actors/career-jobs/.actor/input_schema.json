@@ -1,0 +1,77 @@
+{
+  "title": "Career Site Jobs API",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "titleKeywords": {
+      "title": "Title keywords",
+      "type": "array",
+      "description": "Only roles whose title contains one of these (case-insensitive), e.g. \"data engineer\", \"nurse\".",
+      "editor": "stringList",
+      "prefill": ["data engineer"]
+    },
+    "titleExcludeKeywords": {
+      "title": "Exclude title keywords",
+      "type": "array",
+      "description": "Drop roles whose title contains any of these, e.g. \"intern\", \"senior\".",
+      "editor": "stringList",
+      "default": []
+    },
+    "locationKeywords": {
+      "title": "Location keywords",
+      "type": "array",
+      "description": "Only roles where any listed location (or the country) contains one of these, e.g. \"Texas\", \"London\", \"Germany\". Multi-location roles match on every location.",
+      "editor": "stringList",
+      "default": []
+    },
+    "companyKeywords": {
+      "title": "Companies",
+      "type": "array",
+      "description": "Only these companies — matches the company name or its career-site id, e.g. \"Morgan Stanley\", \"stripe\".",
+      "editor": "stringList",
+      "default": []
+    },
+    "postedWithinDays": {
+      "title": "Posted within (days)",
+      "type": "integer",
+      "description": "Only roles posted in the last N days. Roles without a posting date count from the day our index first saw them.",
+      "minimum": 1,
+      "maximum": 365,
+      "prefill": 7
+    },
+    "remoteOnly": {
+      "title": "Remote roles only",
+      "type": "boolean",
+      "description": "Only roles whose location or workplace label says remote.",
+      "default": false
+    },
+    "sources": {
+      "title": "Career-site systems",
+      "type": "array",
+      "description": "Limit to some systems. Leave empty for all.",
+      "editor": "select",
+      "items": { "type": "string", "enum": ["workday", "greenhouse", "ashby", "lever"], "enumTitles": ["Workday", "Greenhouse", "Ashby", "Lever"] },
+      "default": []
+    },
+    "includeDescription": {
+      "title": "Include full job description",
+      "type": "boolean",
+      "description": "Turn off for a smaller, faster dataset with titles, locations and links only.",
+      "default": true
+    },
+    "maxJobs": {
+      "title": "Maximum jobs",
+      "type": "integer",
+      "description": "Hard cap on results, and your main cost control — you are charged per job returned. Newest roles come first.",
+      "default": 1000,
+      "minimum": 1,
+      "maximum": 1000000
+    },
+    "maxJobsPerCompany": {
+      "title": "Maximum jobs per company",
+      "type": "integer",
+      "description": "Optional cap per company, so one big employer does not fill the whole result.",
+      "minimum": 1
+    }
+  }
+}

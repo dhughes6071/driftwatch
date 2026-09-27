@@ -206,3 +206,9 @@ test("normalize without detail: no fake location from 'N Locations', URL built f
   assert.equal(job.url, "https://acme.wd1.myworkdayjobs.com/External/job/Y/An_R2");
   assert.equal(job.description, undefined);
 });
+
+test("short location codes match whole words only", async () => {
+  const { locationMatcher } = await import("../src/workday.ts");
+  assert.equal(locationMatcher(["TX"])("US, TX, Austin"), true);
+  assert.equal(locationMatcher(["NY"])("Munich, Germany"), false);
+});

@@ -18,6 +18,7 @@ import { Actor, log } from "apify";
 import {
   WorkdayClient,
   companyName,
+  locationMatcher,
   minAgeDays,
   normalize,
   parseCareerSiteUrl,
@@ -107,6 +108,7 @@ try {
   const now = new Date();
   const titleKw = titleKeywords.map((k) => k.toLowerCase()).filter(Boolean);
   const locKw = locationKeywords.map((k) => k.toLowerCase()).filter(Boolean);
+  const locMatch = locationMatcher(locKw);
   const cutoff = postedWithinDays ? now.getTime() - postedWithinDays * 86_400_000 : null;
 
   /** Decide from the list row alone. "maybe" means the detail call must settle it. */
@@ -122,7 +124,7 @@ try {
       const loc = (p.locationsText ?? "").toLowerCase();
       // "5 Locations" hides the list -- only the detail call has it.
       if (/^\d+ locations?$/.test(loc)) verdict = "maybe";
-      else if (!locKw.some((k) => loc.includes(k))) return "no";
+      else if (!locMatch(loc)) return "no";
     }
     if (remoteOnly) verdict = "maybe";
     return verdict;
@@ -132,7 +134,7 @@ try {
     if (remoteOnly && !j.remote) return false;
     if (locKw.length) {
       const all = [j.location ?? "", ...j.additionalLocations].join(" | ").toLowerCase();
-      if (!locKw.some((k) => all.includes(k))) return false;
+      if (!locMatch(all)) return false;
     }
     if (cutoff && j.postedAt) {
       const ts = Date.parse(j.postedAt);

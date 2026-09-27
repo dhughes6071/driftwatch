@@ -378,6 +378,26 @@ function semaphore(n: number) {
   };
 }
 
+/**
+ * Location keyword test. Short keywords (state/country codes like "NY", "TX",
+ * "UK") must match as whole words: as substrings, "NY" matches "Germany" and
+ * "Albany", "CA" matches "Jamaica". Longer keywords match anywhere.
+ */
+export function locationMatcher(keywords: string[]): (text: string) => boolean {
+  const tests = keywords
+    .map((k) => k.trim().toLowerCase())
+    .filter(Boolean)
+    .map((k) => {
+      if (k.length > 3) return (t: string) => t.includes(k);
+      const re = new RegExp(`(^|[^a-z0-9])${k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}($|[^a-z0-9])`);
+      return (t: string) => re.test(t);
+    });
+  return (text) => {
+    const t = text.toLowerCase();
+    return tests.some((f) => f(t));
+  };
+}
+
 // ------------------------------------------------------------------ normalize
 
 const REMOTE_RE = /\bremote\b|\bwork from home\b|\bwfh\b|\bvirtual\b|\banywhere\b/i;

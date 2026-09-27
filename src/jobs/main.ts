@@ -185,7 +185,7 @@ function matches(
 
   if (f.locationKeywords.length) {
     const l = (job.location ?? "").toLowerCase();
-    if (!f.locationKeywords.some((k) => l.includes(k.toLowerCase()))) return false;
+    if (!locationMatcher(f.locationKeywords)(l)) return false;
   }
 
   if (f.cutoff && job.postedAt) {
@@ -226,4 +226,24 @@ async function loadCuratedTargets(): Promise<Array<{ ats: Ats; slug: string }>> 
   return SEED_COMPANIES.flatMap((name) =>
     VERIFIED_ATS.map((ats) => ({ ats, slug: name.toLowerCase().replace(/[^a-z0-9]/g, "") })),
   );
+}
+
+/**
+ * Location keyword test. Short keywords (state/country codes like "NY", "TX",
+ * "UK") must match as whole words: as substrings, "NY" matches "Germany" and
+ * "Albany", "CA" matches "Jamaica". Longer keywords match anywhere.
+ */
+export function locationMatcher(keywords: string[]): (text: string) => boolean {
+  const tests = keywords
+    .map((k) => k.trim().toLowerCase())
+    .filter(Boolean)
+    .map((k) => {
+      if (k.length > 3) return (t: string) => t.includes(k);
+      const re = new RegExp(`(^|[^a-z0-9])${k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}($|[^a-z0-9])`);
+      return (t: string) => re.test(t);
+    });
+  return (text) => {
+    const t = text.toLowerCase();
+    return tests.some((f) => f(t));
+  };
 }
