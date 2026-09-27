@@ -48,8 +48,9 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   memory loading every description at once — fixed by batching and streaming (commit ca03935).
 - **Measured on Apify:** searches take 9–17 s and cost $0.0006–0.0018 each to serve (default memory now 1 GB; peak use 464 MB).
   A 300-job search earns $0.60 at $2/1k.
-- **Next (owner, in Console):** set pay-per-event `job` = $0.002 (no `apify-default-dataset-item` event), upload the icon
-  (`actors/career-jobs/.actor/icon.png`), publish.
+- **Pricing + icon set 27 Sep** (via the owner's Chrome, with permission): pay-per-event `job` = $0.002, primary; `apify-actor-start`
+  $0.00005; dataset-item event removed. Icon uploaded; store description updated to the measured numbers.
+- **Next (owner):** click **Publish on Store**.
 
 ---
 
