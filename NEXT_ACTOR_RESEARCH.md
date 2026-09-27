@@ -97,3 +97,57 @@ a month) — a project stop condition, so it needs the owner's approval first.
 | Congress stock-trade disclosures | 69 users | Clean public data, but small, and House filings are PDFs. |
 | Brazil CNPJ / French SIRENE / UK Companies House | 126 / 50 / 27 | Clean open-government licences, but mostly lead-gen use and small. |
 | Prediction markets, DEX/crypto, Bluesky, Hacker News, GitHub, arXiv, SAM.gov, FDA, patents | ≤135 each | Too small. |
+
+---
+
+# Round 3 — 27 September 2026: after the Career Site Jobs API
+
+## Finding: no new standalone niche meets the bar
+
+A third sweep of the 26 Sep snapshot found nothing Workday-sized that is also clean:
+
+| Checked | Users/30d | Verdict |
+|---|---:|---|
+| Salary data (standalone) | ~1,870, but it's all job-board scrapers (Naukri, Indeed, Bayt…) | Those boards forbid scraping |
+| Hiring-signal / "who's hiring" actors | 38 | Too small |
+| Rental listings from property-manager systems (RentCafe, AppFolio…) | 49 | Too small |
+| Apartments / rentals overall | 520 | Mostly Apartments.com, StreetEasy, Facebook — terms |
+| Shopify products | ~150 on the product side | Crowded; most demand is email-lead harvesting |
+| Food delivery / menus | 402 | Uber Eats, DoorDash — terms |
+| Car marketplaces | 215 | Marketplace terms |
+| Ticketing / events | 273 | Eventbrite, Ticketmaster — terms |
+| Courses, grants, nonprofits | ≤82 | Too small |
+
+The legitimate, sizeable demand on Apify is concentrated in jobs, and we now serve it three ways.
+
+## Recommendation: make the Career Site Jobs API the most complete one
+
+The leader covers 54 hiring systems and ~175k career sites; we cover 4 and 5,248 companies. Coverage is
+the gap, and more systems with public feeds exist than we use.
+
+**Verified public job feeds (27 Sep):**
+
+| System | Feed | Test | Company pool (Common Crawl, first index page only) |
+|---|---|---|---|
+| **Oracle Recruiting Cloud** | JSON (`/hcmRestApi/.../recruitingCEJobRequisitions`) | JPMorgan Chase: **7,495 jobs** | 160+ enterprise tenants (3 index pages) |
+| **SmartRecruiters** | Official public Posting API | Bosch: 4,802 jobs | not sized (index timed out) |
+| BambooHR | JSON (`/careers/list`) | 3–4 jobs per company | **3,281** |
+| Breezy HR | JSON (`/json`) | works | 1,257 |
+| UKG / UltiPro | JSON (POST) | not yet tested | 949 |
+| Personio | XML (`/xml`) | works | 765 |
+| JazzHR, Jobvite | feeds exist | not yet tested | 560 / 472 |
+| Paylocity | JSON feed answers | returned no jobs for samples — needs work | 6,128 |
+| Rippling, Teamtailor | JSON / RSS | work | not sized |
+
+Standalone demand for each of these is tiny (≤26 users), so they belong **inside the index**, not as
+separate listings.
+
+**Second lever — salary data.** Measured on a 23,334-job sample of our own index: **16.5% of descriptions
+state a pay range (~155,000 jobs)**; 24% of US Workday roles. That is an undercount: Greenhouse
+descriptions are truncated at 4,000 characters and pay ranges usually sit at the end, and Ashby's
+structured compensation field is requested but not stored. Deterministic extraction into
+`salaryMin / salaryMax / salaryCurrency / salaryPeriod`, plus a minimum-salary filter, matches the leader's
+headline "enriched" feature without any AI cost.
+
+**Suggested order:** (1) Oracle + SmartRecruiters — biggest job volume per company, enterprise, same
+pattern as Workday; (2) salary extraction; (3) the small-company systems (BambooHR, Breezy, Personio, UKG).
