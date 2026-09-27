@@ -16,7 +16,7 @@ const PAGE = 100;
 
 export interface SrPosting {
   id: string;
-  name: string;
+  name: string | null;
   releasedDate?: string;
   company?: { identifier?: string; name?: string };
   location?: {
@@ -87,7 +87,7 @@ export function toIndexJob(
       ats: "smartrecruiters",
       company: company.toLowerCase(),
       companyName: p.company?.name?.trim() || company,
-      title: p.name.trim(),
+      title: (p.name ?? "").trim(),
       location,
       additionalLocations: [],
       country: loc.country ? loc.country.toUpperCase() : null,

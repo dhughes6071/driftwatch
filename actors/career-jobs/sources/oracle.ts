@@ -26,7 +26,7 @@ export interface OracleSite {
 
 export interface OraclePosting {
   Id: string;
-  Title: string;
+  Title: string | null;
   PostedDate?: string;
   PrimaryLocation?: string;
   PrimaryLocationCountry?: string;
@@ -111,7 +111,7 @@ export function toIndexJob(
       ats: "oracle",
       company: tenantOf(s),
       companyName: s.name ?? tenantOf(s),
-      title: p.Title.trim(),
+      title: (p.Title ?? "").trim(),
       location,
       additionalLocations: additional,
       country: p.PrimaryLocationCountry ?? null,

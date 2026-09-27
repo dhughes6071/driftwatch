@@ -56,3 +56,9 @@ test("SmartRecruiters posting -> index job: company name, hybrid flag, country c
   assert.equal(job.department, "Sales");
   assert.equal(description, "Do things");
 });
+
+test("a posting with no title does not throw", () => {
+  const site = { host: "x.fa.oraclecloud.com", site: "CX" };
+  assert.doesNotThrow(() => O.toIndexJob(site, { Id: "1", Title: null }, null, NOW));
+  assert.doesNotThrow(() => S.toIndexJob("acme", { id: "1", name: null }, null, NOW));
+});

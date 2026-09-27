@@ -197,42 +197,61 @@ export async function crawl() {
   const oracleSites = readRegistry<Oracle.OracleSite>("actors/career-jobs/sources/oracle-sites.json");
   log(`Oracle: ${oracleSites.length} career sites`);
   await pool(oracleSites, 6, async (site) => {
-    const postings = await Oracle.listAll(site);
-    if (!postings) return void stats.errors++;
-    stats.oracleSites++;
-    const fresh = postings.filter((p) => {
-      stats.oracleJobs++;
-      const id = Oracle.jobId(site, p);
-      if (exists.get(id)) return void touchOnly.run(startedAt, id), false;
-      return true;
-    });
-    await pool(fresh, PER_SITE, async (p) => {
-      const d = await Oracle.detail(site, p.Id);
-      stats.detailFetches++;
-      const { job, description } = Oracle.toIndexJob(site, p, d, startedAt);
-      save(job, description);
-    });
+    // One bad site or posting must never stop the run (a null title did, 27 Sep).
+    try {
+      const postings = await Oracle.listAll(site);
+      if (!postings) return void stats.errors++;
+      stats.oracleSites++;
+      const fresh = postings.filter((p) => {
+        stats.oracleJobs++;
+        const id = Oracle.jobId(site, p);
+        if (exists.get(id)) return void touchOnly.run(startedAt, id), false;
+        return true;
+      });
+      await pool(fresh, PER_SITE, async (p) => {
+        if (!p.Title?.trim()) return;
+        try {
+          const d = await Oracle.detail(site, p.Id);
+          stats.detailFetches++;
+          const { job, description } = Oracle.toIndexJob(site, p, d, startedAt);
+          save(job, description);
+        } catch {
+          stats.errors++;
+        }
+      });
+    } catch {
+      stats.errors++;
+    }
   });
 
   // ---------------------------------------------------------- SmartRecruiters
   const srCompanies = readRegistry<{ id: string }>("actors/career-jobs/sources/smartrecruiters.json");
   log(`SmartRecruiters: ${srCompanies.length} companies`);
   await pool(srCompanies, 6, async ({ id: company }) => {
-    const postings = await SmartR.listAll(company);
-    if (!postings) return void stats.errors++;
-    stats.srCompanies++;
-    const fresh = postings.filter((p) => {
-      stats.srJobs++;
-      const id = SmartR.jobId(company, p);
-      if (exists.get(id)) return void touchOnly.run(startedAt, id), false;
-      return true;
-    });
-    await pool(fresh, PER_SITE, async (p) => {
-      const d = await SmartR.detail(company, p.id);
-      stats.detailFetches++;
-      const { job, description } = SmartR.toIndexJob(company, p, d, startedAt);
-      save(job, description);
-    });
+    try {
+      const postings = await SmartR.listAll(company);
+      if (!postings) return void stats.errors++;
+      stats.srCompanies++;
+      const fresh = postings.filter((p) => {
+        stats.srJobs++;
+        const id = SmartR.jobId(company, p);
+        if (exists.get(id)) return void touchOnly.run(startedAt, id), false;
+        return true;
+      });
+      await pool(fresh, PER_SITE, async (p) => {
+        if (!p.name?.trim()) return;
+        try {
+          const d = await SmartR.detail(company, p.id);
+          stats.detailFetches++;
+          const { job, description } = SmartR.toIndexJob(company, p, d, startedAt);
+          save(job, description);
+        } catch {
+          stats.errors++;
+        }
+      });
+    } catch {
+      stats.errors++;
+    }
   });
 
   // Roles gone for 3+ days are closed. (A day or two of grace absorbs a site
