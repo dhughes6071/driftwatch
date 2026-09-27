@@ -12,6 +12,10 @@ live site.
 > Lever rather than Workday. Our [Greenhouse / Ashby / Lever Job Scraper](https://apify.com/viridian_layout_ea2/company-career-site-jobs)
 > covers 3,500+ of them, with the **same output fields**, so the two datasets combine
 > directly.
+>
+> **Want everything in one search?** Our [Career Site Jobs API](https://apify.com/viridian_layout_ea2/career-site-jobs-api)
+> searches 900,000+ roles across Workday, Greenhouse, Ashby and Lever at once. The jobs
+> are collected daily, so results come back in 10–20 seconds.
 
 ## Why this one
 

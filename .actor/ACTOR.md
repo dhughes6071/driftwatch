@@ -12,6 +12,10 @@ break when a page changes.
 > Workday. Our [Workday Jobs Scraper](https://apify.com/viridian_layout_ea2/workday-jobs-scraper)
 > covers 1,785 of them, with the **same output fields**, so the two datasets combine
 > directly.
+>
+> **Want everything in one search?** Our [Career Site Jobs API](https://apify.com/viridian_layout_ea2/career-site-jobs-api)
+> searches 900,000+ roles across Workday, Greenhouse, Ashby and Lever at once. The jobs
+> are collected daily, so results come back in 10–20 seconds.
 
 ## Why this one
 
