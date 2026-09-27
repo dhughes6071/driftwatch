@@ -8,8 +8,13 @@
   "dockerfile": "./Dockerfile",
   "readme": "./ACTOR.md",
   "input": "./input_schema.json",
-  "storages": { "dataset": "./dataset_schema.json" },
+  "storages": {
+    "dataset": "./dataset_schema.json"
+  },
   "output": "./output_schema.json",
   "minMemoryMbytes": 512,
-  "maxMemoryMbytes": 2048
+  "maxMemoryMbytes": 2048,
+  "environmentVariables": {
+    "CAREER_MANIFEST_URL": "@careerManifestUrl"
+  }
 }

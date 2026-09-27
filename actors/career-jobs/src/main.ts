@@ -11,7 +11,6 @@
  */
 import { Actor, log } from "apify";
 import type { IndexJob, Manifest } from "./format.ts";
-import { MANIFEST_URL } from "./manifest-url.ts";
 import { descriptionsFor, httpFetcher, search, type Query } from "./search.ts";
 
 interface Input extends Partial<Query> {
@@ -37,10 +36,11 @@ try {
   };
   const includeDescription = input.includeDescription ?? true;
 
-  // CAREER_MANIFEST_URL overrides for local end-to-end tests.
-  const manifest = JSON.parse(
-    new TextDecoder().decode(await httpFetcher(process.env.CAREER_MANIFEST_URL || MANIFEST_URL)),
-  ) as Manifest;
+  // Signed read-only link to the index, injected as an encrypted Actor secret
+  // (never in source: this repository is public, and the link unlocks the index).
+  const manifestUrl = process.env.CAREER_MANIFEST_URL;
+  if (!manifestUrl) throw new Error("CAREER_MANIFEST_URL is not configured.");
+  const manifest = JSON.parse(new TextDecoder().decode(await httpFetcher(manifestUrl))) as Manifest;
   const ageHours = (Date.now() - Date.parse(manifest.indexedAt)) / 3_600_000;
   log.info(
     `Index: ${manifest.totalJobs.toLocaleString()} jobs from ${manifest.companies.toLocaleString()} companies, ` +

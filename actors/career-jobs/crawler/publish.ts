@@ -109,10 +109,10 @@ export async function publish() {
   await kv.setRecord({ key: "MANIFEST", value: manifest, contentType: "application/json" });
   const manifestUrl = await kv.getRecordPublicUrl("MANIFEST");
   // The Actor reads this one fixed URL; the signature is stable for a given key.
-  if (!LOCAL_DIR) writeFileSync(
-    resolve(HERE, "../src/manifest-url.ts"),
-    `// Written by crawler/publish.ts. Signed read-only link to the index MANIFEST.\nexport const MANIFEST_URL = ${JSON.stringify(manifestUrl)};\n`,
-  );
+  // The Actor reads this one fixed link (its signature is stable for a given
+  // key). It unlocks the whole index, so it lives in gitignored data/ and in
+  // the Actor's encrypted secrets -- never in source, since the repo is public.
+  if (!LOCAL_DIR) writeFileSync(resolve(ROOT, "data/career-manifest-url.txt"), manifestUrl + "\n");
   log(`MANIFEST: ${jobs.length} jobs, ${manifest.companies} companies, ${shards.length} shards, ${chunkKeys.length} description chunks`);
 
   // ---------------------------------------------------------- 4. clean up
