@@ -55,6 +55,16 @@ export function locationMatcher(keywords: string[]): (text: string) => boolean {
   };
 }
 
+/**
+ * Gunzip if the bytes are gzip (magic 1f 8b), else pass through. The store
+ * holds gzip files, but an HTTP layer that transparently decodes them would
+ * hand us plain text -- either way the caller gets text.
+ */
+export function unzipText(bytes: Uint8Array): string {
+  const gz = bytes.length > 2 && bytes[0] === 0x1f && bytes[1] === 0x8b;
+  return new TextDecoder().decode(gz ? gunzipSync(bytes) : bytes);
+}
+
 /** Lowercased, trimmed, empty entries dropped. */
 const norm = (a?: string[]) => (a ?? []).map((s) => s.trim().toLowerCase()).filter(Boolean);
 
@@ -113,7 +123,7 @@ export async function search(
     // (Skip, not stop: the undated jobs sit in the last shards.)
     if (cutoff && shard.undated === 0 && shard.newest && shard.newest < cutoff) continue;
 
-    const text = new TextDecoder().decode(gunzipSync(await fetcher(shard.url)));
+    const text = unzipText(await fetcher(shard.url));
     shardsRead++;
     for (const line of text.split("\n")) {
       if (!line) continue;
@@ -145,7 +155,7 @@ export async function descriptionsFor(
   }
   const out = new Map<string, string>();
   for (const [chunk, ids] of byChunk) {
-    const all = JSON.parse(new TextDecoder().decode(gunzipSync(await fetcher(manifest.desc[chunk])))) as Record<string, string>;
+    const all = JSON.parse(unzipText(await fetcher(manifest.desc[chunk]))) as Record<string, string>;
     for (const id of ids) if (all[id]) out.set(id, all[id]);
   }
   return out;

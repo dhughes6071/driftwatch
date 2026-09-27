@@ -136,3 +136,9 @@ test("short location codes match whole words only (NY must not match Germany)", 
   assert.equal(locationMatcher(["york"])("New York City"), true, "longer keywords still match anywhere");
   assert.equal(locationMatcher(["u.s."])("Remote, U.S."), true, "regex characters are escaped");
 });
+
+test("reader accepts gzip or already-decoded bytes", async () => {
+  const { unzipText } = await import("../src/search.ts");
+  assert.equal(unzipText(gzipSync("hello")), "hello");
+  assert.equal(unzipText(new TextEncoder().encode("hello")), "hello");
+});

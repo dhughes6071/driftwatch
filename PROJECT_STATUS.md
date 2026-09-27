@@ -20,6 +20,28 @@
 
 ---
 
+## Third actor: Career Site Jobs API (daily index) — in progress, 27 September 2026
+
+Chosen in [NEXT_ACTOR_RESEARCH.md](NEXT_ACTOR_RESEARCH.md) round 2: the "every company's career site in one API"
+market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k**. We own its two biggest sources.
+
+- Lives in [`actors/career-jobs/`](actors/career-jobs/). Three parts:
+  - `crawler/crawl.ts` — runs **on the Mac mini (free)**: Greenhouse/Ashby/Lever (3,584 companies) + Workday
+    (4,113 sites), into `data/career-index.db`. Workday descriptions fetched only for roles not seen before.
+  - `crawler/publish.ts` — uploads gzip shards (newest first, 40k jobs each) and write-once description chunks to the
+    Apify key-value store `career-jobs-index` behind **signed read-only links**. Needs `APIFY_TOKEN` in `.env`.
+  - `src/` — the paid Actor: reads the index, filters, charges per job. A search takes seconds.
+- **Cost:** crawl on the Mac mini = $0. Apify storage + ~25 writes/day estimated **under $1/month** (plan: $0.20/CU,
+  $1/month credit, $85 cap). Each paid search costs us a fraction of a cent to serve.
+- First full crawl started 27 Sep ~11:15 local; one-time Workday description backfill (~700k) takes several hours.
+  Daily runs afterwards only fetch new roles.
+- Found while testing: short location keywords ("NY") matched inside words ("Germany"). Fixed in all three actors
+  (whole-word match for keywords of 3 characters or fewer); live actors rebuilt (Workday 0.1.4, main 0.5.4).
+- **Waiting on the owner:** (1) `APIFY_TOKEN` in `.env`, (2) price, (3) OK to install the daily 03:30 launchd job
+  (`crawler/com.x402.career-jobs.plist`).
+
+---
+
 ## Second actor: Workday Jobs Scraper — built 26 September 2026
 
 Chosen by measurement: see [NEXT_ACTOR_RESEARCH.md](NEXT_ACTOR_RESEARCH.md). Workday has 398 users/30d across
