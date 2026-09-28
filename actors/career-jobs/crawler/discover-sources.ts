@@ -50,6 +50,13 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   // the identical job count are the same job list published twice.
   const NONPROD = /-(dev|test|tst|stg|stage|staging|uat|sit|qa|pre|preprod|demo|sandbox|trn|train)\d*$/i;
   const TEST_DATA_HOSTS = new Set(["eubt.fa.oraclecloud.com"]); // gibberish postings, 27 Sep 2026
+  // Known sites Common Crawl misses. JPMorgan Chase (7,496 roles) was absent from every crawl checked.
+  for (const known of [{ host: "jpmc.fa.oraclecloud.com", site: "CX_1001" }]) {
+    if (!oracleSites.some((s) => s.host === known.host)) {
+      const r = await O.listPage(known, 0, 1);
+      if (r && r.total > 0) oracleSites.push({ ...known, name: prev.get(`${known.host}|${known.site}`.toLowerCase()), jobCount: r.total });
+    }
+  }
   const seenCount = new Set<string>();
   const kept = oracleSites.filter((s) => {
     if (NONPROD.test(s.host.split(".")[0]) || TEST_DATA_HOSTS.has(s.host)) return false;

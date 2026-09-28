@@ -50,10 +50,13 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   A 300-job search earns $0.60 at $2/1k.
 - **Pricing + icon set 27 Sep** (via the owner's Chrome, with permission): pay-per-event `job` = $0.002, primary; `apify-actor-start`
   $0.00005; dataset-item event removed. Icon uploaded; store description updated to the measured numbers.
-- **27 Sep (evening): Oracle Recruiting Cloud + SmartRecruiters added** (research round 3). Oracle: 1,090 sites on 868
-  companies (842 named by hand), ≤350k roles; excluded non-production pods, same-count aliases, and host `eubt` (78k
-  gibberish test postings). SmartRecruiters: 1,113 companies, ~223k roles, names from the API. First expanded crawl
-  started 16:19 local via `run-daily.sh` (holds the lock; publishes when done). README/actor numbers to update after.
+- **27 Sep (evening): Oracle Recruiting Cloud + SmartRecruiters added and live.** Index now **1,473,057 jobs from
+  7,230 companies** (Workday 841,695 · Oracle 282,975 · SmartRecruiters 222,635 · Greenhouse 89,786 · Ashby 32,968 ·
+  Lever 2,998); 37 shards, 364 description chunks. Oracle: 868 companies (842 named by hand); excluded non-production
+  pods, same-count aliases, and host `eubt` (78k gibberish test postings). JPMorgan Chase was missing from Common Crawl —
+  added by hand (collected from the 28 Sep run). First expanded crawl crashed on an Oracle posting with a null title;
+  fixed so one bad posting/site can't stop a run (commit 2619448); rerun: 21 errors in ~316k detail fetches.
+  Worst-case search (reads all 37 shards) still completes. Store title/description updated via API (title limit: 63 chars).
 - **Published on the Store 27 Sep:** https://apify.com/viridian_layout_ea2/career-site-jobs-api — live page verified:
   "from $2.00 / 1,000 jobs", custom icon, 900,000+ description.
 

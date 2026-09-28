@@ -1,11 +1,24 @@
-# Career Site Jobs API — Workday, Greenhouse, Lever, Ashby
+# Career Site Jobs API — Workday, Oracle, SmartRecruiters, Greenhouse, Lever, Ashby
 
-Search **every open role on 5,200+ companies' own career sites** in seconds, not hours.
-That's more than 900,000 jobs from Workday, Greenhouse, Ashby and Lever, collected fresh every day.
+Search **every open role on 7,200+ companies' own career sites** in seconds, not hours.
+That's more than 1.4 million jobs from Workday, Oracle Recruiting Cloud, SmartRecruiters,
+Greenhouse, Ashby and Lever, collected fresh every day.
 
-Most of the Fortune 500 hire through Workday (NVIDIA, Salesforce, CVS, Lowe's, Morgan
-Stanley). Startups and scale-ups use Greenhouse, Ashby and Lever. This Actor covers both,
-with one set of output fields.
+Most large employers hire through Workday (NVIDIA, Salesforce, CVS, Lowe's, Morgan Stanley)
+or Oracle Recruiting Cloud (JPMorgan Chase, Marriott, Kroger, Hilton, Macy's). Mid-size and
+global companies use SmartRecruiters (Bosch, Domino's, Accor, AECOM); startups and scale-ups
+use Greenhouse, Ashby and Lever. This Actor covers all six with one set of output fields.
+
+| System | Jobs |
+|---|---:|
+| Workday | 841,000+ |
+| Oracle Recruiting Cloud | 283,000+ |
+| SmartRecruiters | 222,000+ |
+| Greenhouse | 89,000+ |
+| Ashby | 32,000+ |
+| Lever | 2,900+ |
+
+*Counts from the 27 Sep 2026 index; they change daily.*
 
 ## Why this one
 
@@ -39,7 +52,7 @@ included, so you are not billed for compute separately.
 | `companyKeywords` | Matches the company name or its career-site id. |
 | `postedWithinDays` | Only recent roles. Undated roles count from the day the index first saw them. |
 | `remoteOnly` | Only roles whose location or workplace label says remote. |
-| `sources` | Limit to Workday, Greenhouse, Ashby and/or Lever. |
+| `sources` | Limit to Workday, Oracle, SmartRecruiters, Greenhouse, Ashby and/or Lever. |
 | `includeDescription` | Adds the full description as plain text. |
 | `maxJobs` / `maxJobsPerCompany` | Caps on results, and your cost control. |
 
@@ -58,7 +71,7 @@ included, so you are not billed for compute separately.
 | `employmentType` | Full time, part time, contract… where published |
 | `url` | Apply link on the company's own career site |
 | `description` | Plain-text description (optional) |
-| `ats` | Workday, Greenhouse, Ashby or Lever |
+| `ats` | `workday`, `oracle`, `smartrecruiters`, `greenhouse`, `ashby` or `lever` |
 | `indexedAt` | When the index this run read was built |
 
 The field names match our [Workday](https://apify.com/viridian_layout_ea2/workday-jobs-scraper)

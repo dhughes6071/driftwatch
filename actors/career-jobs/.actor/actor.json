@@ -1,8 +1,8 @@
 {
   "actorSpecification": 1,
   "name": "career-site-jobs-api",
-  "title": "Career Site Jobs API — Workday, Greenhouse, Lever, Ashby",
-  "description": "Search 900,000+ open roles on 5,200+ companies' own career sites in seconds: Workday, Greenhouse, Ashby and Lever, refreshed daily. Filter by title, location, company, remote and posting date.",
+  "title": "Career Site Jobs API — Workday, Oracle, Greenhouse & more",
+  "description": "Search 1.4M+ open roles on 7,200+ companies' own career sites in seconds: Workday, Oracle, SmartRecruiters, Greenhouse, Ashby and Lever, refreshed daily. Filter by title, location, company, remote and date.",
   "version": "0.1",
   "buildTag": "latest",
   "dockerfile": "./Dockerfile",
