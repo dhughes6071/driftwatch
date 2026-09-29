@@ -28,6 +28,75 @@ export function cleanLegalName(n: string): string {
     .trim();
 }
 
+/** Decode the entities names arrive with ("Ollie&#x27;s", "Lawn \\u0026 Pest"). */
+export function decodeName(n: string): string {
+  return n
+    .replace(/\\u0026/g, "&")
+    .replace(/&amp;/g, "&")
+    .replace(/&#x27;|&#39;|&apos;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Hand-assigned names for large UKG tenants with no usable logo or board name
+ * (identified 28 Sep 2026 from a sample posting). Applied after discovery.
+ */
+export const UKG_NAMES: Record<string, string> = {
+  BUC1007BUCC: "Buc-ee's", CON1029CHEC: "Conrad Hotels", ULT1005UCH: "Ultra Clean Holdings", RUN1001RUNN: "Running Warehouse",
+  SIG1005SIGM: "Sigma Funeral Services", BOI1001BOIS: "Boise Cascade", LAS1004LAMC: "LaSalle Corrections", ROS1002RHN: "Rosecrance",
+  HEL1006HELI: "Helix Electric", pre1019prsd: "Presidio", PRI1017PRIMA: "Primanti Bros.", JAN1000JANI: "Janicki Industries",
+  PEO1000PEOP: "PeopleCare", JUS1001JUSTM: "Justrite Safety Group", DUN1002DUNN: "Dunn-Edwards", VAL1016VALTI: "ValidaTek",
+  WDL1000: "Allstate Peterbilt Group", ALL1029AECR: "ALL Crane & Equipment Rental", PAR1035PPTL: "Curvature", ROY1010ROYO: "Royal Oak Enterprises",
+};
+
+/** Board labels that are not company names (seen across 2,448 UKG boards, 28 Sep). */
+export const GENERIC_BOARD =
+  /^(default|all|current|current opportunities|careers?|career opportunities|career site|opportunities|jobs|job board|job opportunities|job openings|current openings|all openings|all jobs|search jobs|external|external careers|internal|corporate|stores?|retail|hourly|salaried|field|english|spanish|apply|join (?:us|our team)|en|us|usa)$/i;
+
+/**
+ * UKG publishes no company-name field. Best clue first: the logo's alt text
+ * (but not the "Chrome/Firefox logo" images of the unsupported-browser notice,
+ * which named two companies "Firefox" on 28 Sep), then the board's own name
+ * minus generic words, else null.
+ */
+export function ukgNameFromPage(html: string, board: string): string | null {
+  const alts = [...html.matchAll(/alt="([^"]+)"/g)].map((m) => m[1]);
+  const logo = alts.find((a) => !/\b(chrome|firefox|internet explorer|safari|edge|opera)\b/i.test(a));
+  const fromLogo = logo?.replace(/\b(brand|logo|image|img|header|banner)\b/gi, "").replace(/\s+/g, " ").trim();
+  if (fromLogo && fromLogo.length > 1 && !GENERIC_BOARD.test(fromLogo)) return tidy(fromLogo);
+  const m = html.match(new RegExp(`"Id":"${board}","BrandId":"[^"]*","Name":"([^"]*)"`));
+  const boardName = m
+    ? decodeName(m[1])
+        .replace(/\b(career opportunities|job opportunities|opportunities|careers?|jobs)\b/gi, "")
+        .replace(/\s+/g, " ")
+        .trim()
+    : "";
+  if (boardName.length > 1 && !GENERIC_BOARD.test(m![1]) && !GENERIC_BOARD.test(boardName)) return tidy(boardName);
+  return null;
+}
+
+/** "Big 5 Sporting Goods Opt 1" -> "Big 5 Sporting Goods". */
+const tidy = (n: string) => cleanLegalName(decodeName(n).replace(/\s+opt(?:ion)?\s*\d+$/i, "").trim());
+
+/**
+ * One company, several UKG boards: give every board of a tenant the best
+ * name found on any of them; tenant code only when none has a real name.
+ */
+export function shareUkgNames(reg: Array<{ id: string; name: string }>): void {
+  const best = new Map<string, string>();
+  for (const c of reg) {
+    const tenant = c.id.split("|").at(-2)!;
+    if (c.name !== tenant && !GENERIC_BOARD.test(c.name) && !best.has(tenant)) best.set(tenant, c.name);
+  }
+  for (const c of reg) {
+    const tenant = c.id.split("|").at(-2)!;
+    if (UKG_NAMES[tenant]) c.name = UKG_NAMES[tenant];
+    else if (c.name === tenant || GENERIC_BOARD.test(c.name)) c.name = best.get(tenant) ?? tenant;
+  }
+}
+
 async function nameFor(ats: string, co: string, rows: unknown[]): Promise<string> {
   const first = rows[0] as Record<string, unknown>;
   try {
@@ -54,10 +123,7 @@ async function nameFor(ats: string, co: string, rows: unknown[]): Promise<string
           headers: { "user-agent": "Mozilla/5.0" },
           signal: AbortSignal.timeout(20_000),
         });
-        // UKG publishes no name field; the board's logo alt text ("AAM Brand") is the best clue.
-        const alt = r.ok ? (await r.text()).match(/alt="([^"]+)"/)?.[1] : null;
-        const n = alt?.replace(/\b(brand|logo|image|img|header|banner)\b/gi, "").replace(/\s+/g, " ").trim();
-        return n && n.length > 1 ? n : tenant;
+        return (r.ok && ukgNameFromPage(await r.text(), board)) || tenant;
       }
       case "bamboohr": {
         const r = await fetch(`https://${co}.bamboohr.com/careers`, { signal: AbortSignal.timeout(20_000) });
@@ -92,7 +158,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
           }
         }
         if (rows && rows.length > 0) {
-          const name = await nameFor(src.ats, co, rows);
+          const name = cleanLegalName(decodeName(await nameFor(src.ats, co, rows)));
           if (!NOT_REAL.test(name) && !NOT_REAL.test(co)) out.push({ id: co, name, jobCount: rows.length });
         }
       } catch {
@@ -101,6 +167,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       if (++done % 500 === 0) console.log(`  ${src.ats} ${done}/${slugs.length}, ${out.length} live`);
     });
     out.sort((a, b) => b.jobCount - a.jobCount);
+    if (src.ats === "ukg") shareUkgNames(out);
     writeFileSync(registryPath(src.ats), JSON.stringify(out));
     console.log(`${src.ats}: ${out.length} live companies of ${slugs.length} candidates, ${out.reduce((a, c) => a + c.jobCount, 0).toLocaleString()} roles`);
   }

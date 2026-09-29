@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { SMALL_SOURCES, parsePersonio, parseTeamtailor, smallJobId } from "../sources/small.ts";
-import { cleanLegalName } from "../crawler/discover-small.ts";
+import { cleanLegalName, decodeName, shareUkgNames, ukgNameFromPage } from "../crawler/discover-small.ts";
 
 test("Personio XML: fields, extra offices, description sections", () => {
   const rows = parsePersonio(`<?xml version="1.0"?><workzag-jobs><position>
@@ -63,4 +63,26 @@ test("the crawl's pre-build id matches the id build() produces, for every small 
       globalThis.fetch = realFetch;
     }
   }
+});
+
+test("UKG names: skip browser logos, fall back to the board name, decode entities", () => {
+  const browserOnly = `<img alt="Chrome logo"><img alt="Firefox logo"> "Id":"b1","BrandId":"x","Name":"The High Companies"`;
+  assert.equal(ukgNameFromPage(browserOnly, "b1"), "The High Companies");
+  assert.equal(ukgNameFromPage(`<img alt="AAM Brand">`, "b1"), "AAM");
+  assert.equal(ukgNameFromPage(`"Id":"b1","BrandId":"x","Name":"Careers"`, "b1"), null);
+  assert.equal(ukgNameFromPage(`"Id":"b1","BrandId":"x","Name":"JRayl Transport Opportunities"`, "b1"), "JRayl Transport");
+  assert.equal(decodeName("Ollie&#x27;s Bargain Outlet"), "Ollie's Bargain Outlet");
+  assert.equal(decodeName("All Green Lawn \\u0026 Pest"), "All Green Lawn & Pest");
+});
+
+test("UKG: generic board labels are not names; a tenant's boards share its best name", () => {
+  assert.equal(ukgNameFromPage(`"Id":"b1","BrandId":"x","Name":"Default"`, "b1"), null);
+  assert.equal(ukgNameFromPage(`"Id":"b1","BrandId":"x","Name":"Big 5 Sporting Goods Opt 1"`, "b1"), "Big 5 Sporting Goods");
+  const reg = [
+    { id: "h|BIG1000|b1", name: "Big 5 Sporting Goods" },
+    { id: "h|BIG1000|b2", name: "Stores" },
+    { id: "h|ZZZ1000|b3", name: "Default" },
+  ];
+  shareUkgNames(reg);
+  assert.deepEqual(reg.map((r) => r.name), ["Big 5 Sporting Goods", "Big 5 Sporting Goods", "ZZZ1000"]);
 });
