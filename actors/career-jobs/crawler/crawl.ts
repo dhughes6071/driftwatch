@@ -21,7 +21,8 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { fetchCompany, type Ats, type Job as AtsJob } from "../../../src/jobs/ats.ts";
 import { WorkdayClient, companyName as workdayName, normalize, type Site } from "../../workday-jobs/src/workday.ts";
-import type { IndexJob, Source } from "../src/format.ts";
+import { salaryFields, type IndexJob, type Source } from "../src/format.ts";
+import { fromAshbyCompensation } from "../src/salary.ts";
 import * as Oracle from "../sources/oracle.ts";
 import * as SmartR from "../sources/smartrecruiters.ts";
 
@@ -98,6 +99,19 @@ export async function crawl() {
   };
   const touchOnly = db.prepare("UPDATE jobs SET last_seen = ? WHERE id = ?");
 
+  const getDesc = db.prepare("SELECT description FROM jobs WHERE id = ?");
+  const setDesc = db.prepare("UPDATE jobs SET description = ?, chunk = NULL WHERE id = ?");
+  /**
+   * Greenhouse/Ashby/Lever return the full description in every list call, so
+   * keep it current -- the 8,000-char cap (was 4,000) recovers pay ranges that
+   * sat past the old cut. A changed description is re-chunked at publish.
+   */
+  const refreshDescription = (id: string, description: string | null) => {
+    if (!description) return;
+    const prev = getDesc.get(id) as { description: string | null } | undefined;
+    if (prev && prev.description !== description) setDesc.run(description, id);
+  };
+
   const save = (job: IndexJob, description: string | null) => {
     const light = JSON.stringify(job);
     if (exists.get(job.id)) {
@@ -119,6 +133,7 @@ export async function crawl() {
       for (const j of jobs) {
         stats.atsJobs++;
         save(fromAtsJob(j, names.get(`${ats}:${slug}`) ?? slug, startedAt), j.description || null);
+        refreshDescription(j.id, j.description || null);
       }
     } catch {
       stats.errors++;
@@ -301,6 +316,8 @@ function fromAtsJob(j: AtsJob, companyName: string, now: string): IndexJob {
     url: j.url,
     employmentType: j.employmentType,
     d: null,
+    // Ashby publishes pay as data; everything else is read from the text at publish.
+    ...salaryFields(fromAshbyCompensation(j.compensation)),
   };
 }
 

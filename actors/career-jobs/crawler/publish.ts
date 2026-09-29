@@ -19,7 +19,8 @@ import { writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { openDb } from "./crawl.ts";
-import { DESC_CHUNK_SIZE, SHARD_SIZE, type IndexJob, type Manifest, type ShardRef } from "../src/format.ts";
+import { extractSalary } from "../src/salary.ts";
+import { salaryFields, DESC_CHUNK_SIZE, SHARD_SIZE, type IndexJob, type Manifest, type ShardRef } from "../src/format.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
@@ -93,10 +94,14 @@ export async function publish() {
   // SQL does the newest-first sort (same order as compareNewestFirst), so
   // only one shard is ever in memory.
   const rows = db
-    .prepare("SELECT light, chunk FROM jobs WHERE last_seen >= ? ORDER BY posted_at IS NULL, posted_at DESC")
-    .iterate(liveSince) as IterableIterator<{ light: string; chunk: string | null }>;
+    .prepare("SELECT light, chunk, description FROM jobs WHERE last_seen >= ? ORDER BY posted_at IS NULL, posted_at DESC")
+    .iterate(liveSince) as IterableIterator<{ light: string; chunk: string | null; description: string | null }>;
+  let withSalary = 0;
   for (const row of rows) {
     const j: IndexJob = { ...(JSON.parse(row.light) as IndexJob), d: row.chunk };
+    // Structured pay (Ashby) wins; otherwise read it from the description.
+    if (j.salarySource !== "structured") Object.assign(j, salaryFields(extractSalary(row.description, j.country)));
+    if (j.salaryMin != null) withSalary++;
     if (j.d) chunkKeys.add(j.d);
     companies.add(`${j.ats}:${j.company}`);
     bySource[j.ats] = (bySource[j.ats] ?? 0) + 1;
@@ -125,6 +130,7 @@ export async function publish() {
   // key). It unlocks the whole index, so it lives in gitignored data/ and in
   // the Actor's encrypted secrets -- never in source, since the repo is public.
   if (!LOCAL_DIR) writeFileSync(resolve(ROOT, "data/career-manifest-url.txt"), manifestUrl + "\n");
+  log(`salary: ${withSalary} of ${total} jobs (${((withSalary / Math.max(total, 1)) * 100).toFixed(1)}%)`);
   log(`MANIFEST: ${total} jobs, ${manifest.companies} companies, ${shards.length} shards, ${chunkKeys.size} description chunks`);
 
   // ---------------------------------------------------------- 4. clean up

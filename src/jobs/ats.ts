@@ -67,10 +67,17 @@ export interface Job {
   /** Plain-text description, truncated. Empty when the ATS omits it from list responses. */
   description: string;
   employmentType: string | null;
+  /**
+   * Ashby's structured pay data, raw (`compensation` from the job board API).
+   * Internal: read by the Career Site Jobs API index, not part of this Actor's output.
+   */
+  compensation?: unknown;
 }
 
 const UA = "driftwatch-jobs/0.1 (+ATS public job board aggregator)";
-const MAX_DESC = 4_000;
+// 8,000, not 4,000: pay-transparency ranges usually sit at the END of a
+// description, and the old cap cut them off (measured 28 Sep 2026).
+const MAX_DESC = 8_000;
 
 async function getJson<T>(url: string): Promise<T | null> {
   try {
@@ -200,6 +207,7 @@ async function fetchLever(slug: string): Promise<Job[]> {
 // ------------------------------------------------------------------ ashby
 
 interface AshbyJob {
+  compensation?: unknown;
   id: string;
   title: string;
   location?: string;
@@ -234,6 +242,7 @@ async function fetchAshby(slug: string): Promise<Job[]> {
     url: j.jobUrl ?? j.applyUrl ?? "",
     description: j.descriptionPlain?.slice(0, MAX_DESC) ?? toText(j.descriptionHtml),
     employmentType: j.employmentType ?? null,
+    compensation: j.compensation,
   }));
 }
 

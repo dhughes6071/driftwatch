@@ -47,6 +47,35 @@ export interface IndexJob {
   employmentType: string | null;
   /** Key of the description chunk holding this job's description, or null. */
   d: string | null;
+  // Pay, when the posting states it (see src/salary.ts). All null otherwise.
+  salaryMin?: number | null;
+  salaryMax?: number | null;
+  /** ISO 4217, e.g. "USD". */
+  salaryCurrency?: string | null;
+  salaryPeriod?: "hour" | "day" | "week" | "month" | "year" | null;
+  /** Annualised in the same currency (hour x 2,080, month x 12, ...). */
+  salaryAnnualMin?: number | null;
+  salaryAnnualMax?: number | null;
+  /** The text it was read from ("$120,000 - $150,000"). */
+  salaryText?: string | null;
+  /** "structured" = the ATS published it as data (Ashby); "description" = read from the text. */
+  salarySource?: "structured" | "description" | null;
+}
+
+/** Salary fields from an extraction result (or all-null). */
+export function salaryFields(s: {
+  min: number; max: number; currency: string; period: IndexJob["salaryPeriod"]; annualMin: number; annualMax: number; text: string; source: "structured" | "description";
+} | null): Pick<IndexJob, "salaryMin" | "salaryMax" | "salaryCurrency" | "salaryPeriod" | "salaryAnnualMin" | "salaryAnnualMax" | "salaryText" | "salarySource"> {
+  return {
+    salaryMin: s?.min ?? null,
+    salaryMax: s?.max ?? null,
+    salaryCurrency: s?.currency ?? null,
+    salaryPeriod: s?.period ?? null,
+    salaryAnnualMin: s?.annualMin ?? null,
+    salaryAnnualMax: s?.annualMax ?? null,
+    salaryText: s?.text ?? null,
+    salarySource: s?.source ?? null,
+  };
 }
 
 export interface ShardRef {

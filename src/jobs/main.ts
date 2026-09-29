@@ -118,7 +118,8 @@ try {
 
         if (!matches(job, { remoteOnly, titleKeywords, locationKeywords, cutoff })) continue;
 
-        const record = includeDescription ? job : { ...job, description: undefined };
+        const { compensation: _internal, ...pub } = job;
+        const record = includeDescription ? pub : { ...pub, description: undefined };
 
         /*
          * Charge and push together. pushData(item, eventName) charges for the

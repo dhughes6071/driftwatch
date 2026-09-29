@@ -13,6 +13,12 @@ export interface Query {
   sources?: string[];
   remoteOnly?: boolean;
   postedWithinDays?: number;
+  /** Only jobs whose posting states pay. */
+  onlyWithSalary?: boolean;
+  /** Only jobs whose annualised top of range reaches this, in the job's own currency. */
+  minAnnualSalary?: number;
+  /** Only jobs paying in these currencies, e.g. ["USD"]. */
+  salaryCurrencies?: string[];
   maxJobs: number;
   maxJobsPerCompany?: number;
 }
@@ -76,8 +82,15 @@ export function makeMatcher(q: Query, now = Date.now()) {
   const comp = norm(q.companyKeywords);
   const sources = new Set(norm(q.sources));
   const cutoff = q.postedWithinDays ? new Date(now - q.postedWithinDays * 86_400_000).toISOString() : null;
+  const currencies = new Set((q.salaryCurrencies ?? []).map((c) => c.trim().toUpperCase()).filter(Boolean));
+  const needSalary = !!q.onlyWithSalary || !!q.minAnnualSalary || currencies.size > 0;
 
   return (j: IndexJob): boolean => {
+    if (needSalary) {
+      if (j.salaryAnnualMax == null) return false;
+      if (q.minAnnualSalary && j.salaryAnnualMax < q.minAnnualSalary) return false;
+      if (currencies.size && !currencies.has(j.salaryCurrency ?? "")) return false;
+    }
     if (sources.size && !sources.has(j.ats)) return false;
     const t = j.title.toLowerCase();
     if (title.length && !title.some((k) => t.includes(k))) return false;

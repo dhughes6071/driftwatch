@@ -142,3 +142,15 @@ test("reader accepts gzip or already-decoded bytes", async () => {
   assert.equal(unzipText(gzipSync("hello")), "hello");
   assert.equal(unzipText(new TextEncoder().encode("hello")), "hello");
 });
+
+test("salary filters", () => {
+  const withPay = job({ id: "p", salaryAnnualMin: 90000, salaryAnnualMax: 120000, salaryCurrency: "USD", salaryMin: 90000, salaryMax: 120000 });
+  const gbp = job({ id: "g", salaryAnnualMin: 50000, salaryAnnualMax: 60000, salaryCurrency: "GBP", salaryMin: 50000, salaryMax: 60000 });
+  const noPay = job({ id: "n" });
+  const only = makeMatcher({ onlyWithSalary: true, maxJobs: 10 }, NOW);
+  assert.deepEqual([withPay, gbp, noPay].filter(only).map((j) => j.id), ["p", "g"]);
+  const min = makeMatcher({ minAnnualSalary: 100000, maxJobs: 10 }, NOW);
+  assert.deepEqual([withPay, gbp, noPay].filter(min).map((j) => j.id), ["p"], "top of range reaches 100k");
+  const cur = makeMatcher({ salaryCurrencies: ["gbp"], maxJobs: 10 }, NOW);
+  assert.deepEqual([withPay, gbp, noPay].filter(cur).map((j) => j.id), ["g"]);
+});

@@ -47,6 +47,25 @@
       "description": "Only roles whose location or workplace label says remote.",
       "default": false
     },
+    "onlyWithSalary": {
+      "title": "Only jobs that state pay",
+      "type": "boolean",
+      "description": "Only roles whose posting states a pay range or rate. About a quarter of all roles do; in the US, pay-transparency laws make it far more common.",
+      "default": false
+    },
+    "minAnnualSalary": {
+      "title": "Minimum yearly pay",
+      "type": "integer",
+      "description": "Only roles whose pay range reaches at least this much per year, in the job's own currency. Hourly and monthly pay are converted (hour × 2,080, month × 12). Implies 'only jobs that state pay'.",
+      "minimum": 0
+    },
+    "salaryCurrencies": {
+      "title": "Pay currencies",
+      "type": "array",
+      "description": "Only roles paying in these currencies, e.g. \"USD\", \"GBP\", \"EUR\". Implies 'only jobs that state pay'.",
+      "editor": "stringList",
+      "default": []
+    },
     "sources": {
       "title": "Career-site systems",
       "type": "array",

@@ -31,6 +31,11 @@ use Greenhouse, Ashby and Lever. This Actor covers all six with one set of outpu
 - **Nothing silently missing.** Workday hides everything past its first 2,000 results; the
   daily collection gets past that, so big employers like Dollar Tree (23,000+ roles) are
   complete.
+- **Pay ranges as data.** About a quarter of all roles — far more in the US, where
+  pay-transparency laws apply — state a salary or hourly rate. It's extracted into
+  `salaryMin` / `salaryMax` / `salaryCurrency` / `salaryPeriod`, annualised into
+  `salaryAnnualMin` / `salaryAnnualMax`, and filterable. Ashby's own structured pay data is
+  used where it exists.
 - **Real company names** (`companyName`), plus the career-site id (`company`) for joins.
 - **Pay only for what you get.** Filters run before charging.
 
@@ -52,6 +57,9 @@ included, so you are not billed for compute separately.
 | `companyKeywords` | Matches the company name or its career-site id. |
 | `postedWithinDays` | Only recent roles. Undated roles count from the day the index first saw them. |
 | `remoteOnly` | Only roles whose location or workplace label says remote. |
+| `onlyWithSalary` | Only roles whose posting states pay. |
+| `minAnnualSalary` | Only roles whose pay range reaches at least this per year, in the job's own currency (hourly × 2,080, monthly × 12). |
+| `salaryCurrencies` | Only roles paying in these currencies, e.g. `USD`, `GBP`. |
 | `sources` | Limit to Workday, Oracle, SmartRecruiters, Greenhouse, Ashby and/or Lever. |
 | `includeDescription` | Adds the full description as plain text. |
 | `maxJobs` / `maxJobsPerCompany` | Caps on results, and your cost control. |
@@ -69,6 +77,9 @@ included, so you are not billed for compute separately.
 | `postedAt` | When the company posted the role |
 | `firstSeenAt` | When the index first saw it. A reliable "new since" signal, even for undated roles |
 | `employmentType` | Full time, part time, contract… where published |
+| `salaryMin` / `salaryMax` / `salaryCurrency` / `salaryPeriod` | Stated pay: e.g. 120000 / 150000 / USD / year, or 18.5 / 22 / USD / hour. Null when the posting states none |
+| `salaryAnnualMin` / `salaryAnnualMax` | The same range per year, for comparing hourly and salaried roles |
+| `salaryText` / `salarySource` | The text it came from ("$120,000 - $150,000"), and whether it was published as data (`structured`) or read from the description |
 | `url` | Apply link on the company's own career site |
 | `description` | Plain-text description (optional) |
 | `ats` | `workday`, `oracle`, `smartrecruiters`, `greenhouse`, `ashby` or `lever` |
@@ -90,12 +101,21 @@ Actors, which fetch a company's jobs live when you need the very latest.
 { "remoteOnly": true, "postedWithinDays": 1, "includeDescription": false, "maxJobs": 20000 }
 ```
 
+**Software engineers in the US paying $150k+**
+```json
+{ "titleKeywords": ["software engineer"], "salaryCurrencies": ["USD"], "minAnnualSalary": 150000, "maxJobs": 2000 }
+```
+
 **Everything two companies have open**
 ```json
 { "companyKeywords": ["Morgan Stanley", "Stripe"], "maxJobs": 10000 }
 ```
 
 ## Notes
+
+- Pay is read from each posting's own text, so it is as accurate as the posting. When a
+  posting lists several ranges (one per state, say), the first is used. `salaryText` shows
+  exactly what was read.
 
 - The index is rebuilt once a day. The run's `SUMMARY` record and every job's `indexedAt`
   say exactly when. For a single company's roles to the minute, use the live Actors

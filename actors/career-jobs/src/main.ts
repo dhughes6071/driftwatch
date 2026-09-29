@@ -31,6 +31,9 @@ try {
     sources: input.sources ?? [],
     remoteOnly: input.remoteOnly ?? false,
     postedWithinDays: input.postedWithinDays,
+    onlyWithSalary: input.onlyWithSalary ?? false,
+    minAnnualSalary: input.minAnnualSalary,
+    salaryCurrencies: input.salaryCurrencies ?? [],
     maxJobs: input.maxJobs ?? 1000,
     maxJobsPerCompany: input.maxJobsPerCompany,
   };
