@@ -12,7 +12,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { SMALL_SOURCES, parseTeamtailor, type SmallSource } from "../sources/small.ts";
+import { SMALL_SOURCES, parseTeamtailor, ukgParts, type SmallSource } from "../sources/small.ts";
 import { pool } from "./crawl.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -49,8 +49,8 @@ async function nameFor(ats: string, co: string, rows: unknown[]): Promise<string
         return (r.ok && ((await r.json()) as { companyName?: string }).companyName?.trim()) || co;
       }
       case "ukg": {
-        const [tenant, board] = co.split("|");
-        const r = await fetch(`https://recruiting.ultipro.com/${tenant}/JobBoard/${board}/`, {
+        const { host, tenant, board } = ukgParts(co);
+        const r = await fetch(`https://${host}/${tenant}/JobBoard/${board}/`, {
           headers: { "user-agent": "Mozilla/5.0" },
           signal: AbortSignal.timeout(20_000),
         });
@@ -79,9 +79,18 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     );
     const out: Array<{ id: string; name: string; jobCount: number }> = [];
     let done = 0;
-    await pool(slugs, 10, async (co) => {
+    await pool(slugs, 10, async (cand) => {
       try {
-        const rows = await src.list(co);
+        // UKG candidates are "tenant|board"; find which host serves them.
+        let co = cand;
+        let rows = src.ats === "ukg" ? null : await src.list(co);
+        if (src.ats === "ukg") {
+          for (const host of ["recruiting.ultipro.com", "recruiting2.ultipro.com"]) {
+            co = `${host}|${cand}`;
+            rows = await src.list(co);
+            if (rows?.length) break;
+          }
+        }
         if (rows && rows.length > 0) {
           const name = await nameFor(src.ats, co, rows);
           if (!NOT_REAL.test(name) && !NOT_REAL.test(co)) out.push({ id: co, name, jobCount: rows.length });

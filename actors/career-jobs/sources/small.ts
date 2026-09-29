@@ -475,14 +475,19 @@ interface UkgRow {
   Locations?: Array<{ LocalizedName?: string | null; Address?: { City?: string; State?: { Code?: string }; Country?: { Code?: string; Name?: string } } }>;
 }
 
+/** Registry id: "host|tenant|board" (UKG runs recruiting. and recruiting2. hosts; a tenant answers on one only). */
+const ukgParts = (co: string) => {
+  const p = co.split("|");
+  return p.length === 3 ? { host: p[0], tenant: p[1], board: p[2] } : { host: "recruiting.ultipro.com", tenant: p[0], board: p[1] };
+};
 const ukgBase = (co: string) => {
-  const [tenant, board] = co.split("|");
-  return `https://recruiting.ultipro.com/${tenant}/JobBoard/${board}`;
+  const { host, tenant, board } = ukgParts(co);
+  return `https://${host}/${tenant}/JobBoard/${board}`;
 };
 
 export const ukg: SmallSource<UkgRow> = {
   ats: "ukg",
-  companyKey: (co) => co.split("|")[0],
+  companyKey: (co) => ukgParts(co).tenant,
   async list(co) {
     const out: UkgRow[] = [];
     for (let skip = 0; skip < 20_000; skip += 50) {
@@ -523,7 +528,7 @@ export const ukg: SmallSource<UkgRow> = {
         : cur && (hMin || hMax)
           ? extractSalary(`Pay: ${cur} ${hMin ?? hMax} - ${cur} ${hMax ?? hMin} per hour`, country)
           : null;
-    const j = job("ukg", co.split("|")[0], name, {
+    const j = job("ukg", ukgParts(co).tenant, name, {
       id: p.Id,
       title: p.Title,
       location: locs[0] ?? null,
@@ -546,4 +551,5 @@ export const ukg: SmallSource<UkgRow> = {
 export const smallJobId = <P>(src: SmallSource<P>, co: string, p: P) =>
   `${src.ats}:${(src.companyKey?.(co) ?? co).toLowerCase()}:${src.id(co, p)}`;
 
+export { ukgParts };
 export const SMALL_SOURCES = [bamboohr, breezy, personio, rippling, teamtailor, recruitee, ukg] as SmallSource<unknown>[];

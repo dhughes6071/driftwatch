@@ -49,7 +49,7 @@ test("the crawl's pre-build id matches the id build() produces, for every small 
     personio: ["acme", { id: "1", name: "Engineer", subcompany: null, office: null, additionalOffices: [], department: null, schedule: null, employmentType: null, createdAt: null, description: "" }],
     teamtailor: ["acme", { guid: "g1", title: "Engineer", link: "x", pubDate: null, remoteStatus: null, department: null, locations: [], description: "" }],
     recruitee: ["acme", { id: 7, title: "Engineer" }],
-    ukg: ["AAM1000AAM|c5a88c41", { Id: "6f0e", Title: "Engineer" }],
+    ukg: ["recruiting2.ultipro.com|AAM1000AAM|c5a88c41", { Id: "6f0e", Title: "Engineer" }],
   };
   for (const src of SMALL_SOURCES) {
     const s = samples[src.ats];
