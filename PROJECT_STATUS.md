@@ -64,6 +64,13 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   match reviewed. New fields salaryMin/Max/Currency/Period/AnnualMin/AnnualMax/Text/Source; filters onlyWithSalary,
   minAnnualSalary, salaryCurrencies. Greenhouse/Ashby/Lever description cap 4,000 → 8,000 chars (pay sits at the end),
   refreshed nightly. Builds: career API 0.1.6, main actor 0.5.6. 23 salary/search/source tests.
+- **29 Sep: seven small-company systems added and live** — BambooHR, Breezy, Personio, Rippling, Teamtailor, Recruitee,
+  UKG Pro (`sources/small.ts`, one interface + one crawl loop; `crawler/discover-small.ts`). Skipped: JazzHR, Jobvite
+  (HTML only), Workable (feed 404), Paylocity (feed empty). Index now **1,726,532 jobs from 17,002 companies, 13 systems;
+  487,762 (28.3%) with pay**. Caught before shipping: UKG job-id mismatch (would have refetched every UKG job nightly),
+  UKG's second host (recruiting2), two UKG boards named "Firefox" from the browser-warning logo; 20 large UKG tenants
+  hand-named (e.g. BUC1007BUCC = Buc-ee's). Teamtailor RSS caps at 100 roles/company. Store title "Career Site Jobs API —
+  1.7M jobs, 13 hiring systems"; build 0.1.7. 29 tests.
 - **Published on the Store 27 Sep:** https://apify.com/viridian_layout_ea2/career-site-jobs-api — live page verified:
   "from $2.00 / 1,000 jobs", custom icon, 900,000+ description.
 

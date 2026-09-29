@@ -1,24 +1,33 @@
-# Career Site Jobs API — Workday, Oracle, SmartRecruiters, Greenhouse, Lever, Ashby
+# Career Site Jobs API — 13 hiring systems, 1.7 million jobs
 
-Search **every open role on 7,200+ companies' own career sites** in seconds, not hours.
-That's more than 1.4 million jobs from Workday, Oracle Recruiting Cloud, SmartRecruiters,
-Greenhouse, Ashby and Lever, collected fresh every day.
+Search **every open role on 17,000+ companies' own career sites** in seconds, not hours.
+That's more than 1.7 million jobs from 13 applicant-tracking systems, collected fresh every
+day, with the stated pay range extracted for more than 480,000 of them.
 
-Most large employers hire through Workday (NVIDIA, Salesforce, CVS, Lowe's, Morgan Stanley)
-or Oracle Recruiting Cloud (JPMorgan Chase, Marriott, Kroger, Hilton, Macy's). Mid-size and
-global companies use SmartRecruiters (Bosch, Domino's, Accor, AECOM); startups and scale-ups
-use Greenhouse, Ashby and Lever. This Actor covers all six with one set of output fields.
+Large employers hire through Workday (NVIDIA, Salesforce, CVS, Lowe's, Morgan Stanley) or
+Oracle Recruiting Cloud (JPMorgan Chase, Marriott, Kroger, Hilton, Macy's); mid-size and global
+companies through SmartRecruiters (Bosch, Domino's, Accor) or UKG (Buc-ee's, Big 5 Sporting
+Goods, Ollie's); startups and small businesses through Greenhouse, Ashby, Lever, BambooHR,
+Rippling, Breezy, Personio, Teamtailor and Recruitee. This Actor covers all of them with one
+set of output fields.
 
 | System | Jobs |
 |---|---:|
-| Workday | 841,000+ |
-| Oracle Recruiting Cloud | 283,000+ |
-| SmartRecruiters | 222,000+ |
-| Greenhouse | 89,000+ |
-| Ashby | 32,000+ |
-| Lever | 2,900+ |
+| Workday | 863,000+ |
+| Oracle Recruiting Cloud | 306,000+ |
+| SmartRecruiters | 227,000+ |
+| UKG Pro (UltiPro) | 107,000+ |
+| Greenhouse | 91,000+ |
+| Ashby | 33,000+ |
+| BambooHR | 28,000+ |
+| Breezy HR | 19,000+ |
+| Personio | 12,000+ |
+| Recruitee | 12,000+ |
+| Teamtailor | 10,000+ |
+| Rippling | 9,500+ |
+| Lever | 3,000+ |
 
-*Counts from the 27 Sep 2026 index; they change daily.*
+*Counts from the 29 Sep 2026 index; they change daily.*
 
 ## Why this one
 
@@ -35,7 +44,7 @@ use Greenhouse, Ashby and Lever. This Actor covers all six with one set of outpu
   pay-transparency laws apply — state a salary or hourly rate. It's extracted into
   `salaryMin` / `salaryMax` / `salaryCurrency` / `salaryPeriod`, annualised into
   `salaryAnnualMin` / `salaryAnnualMax`, and filterable. Ashby's own structured pay data is
-  used where it exists.
+  used where they exist (Ashby, Rippling, UKG, Recruitee, and the pay fields of Breezy and BambooHR).
 - **Real company names** (`companyName`), plus the career-site id (`company`) for joins.
 - **Pay only for what you get.** Filters run before charging.
 
@@ -60,7 +69,7 @@ included, so you are not billed for compute separately.
 | `onlyWithSalary` | Only roles whose posting states pay. |
 | `minAnnualSalary` | Only roles whose pay range reaches at least this per year, in the job's own currency (hourly × 2,080, monthly × 12). |
 | `salaryCurrencies` | Only roles paying in these currencies, e.g. `USD`, `GBP`. |
-| `sources` | Limit to Workday, Oracle, SmartRecruiters, Greenhouse, Ashby and/or Lever. |
+| `sources` | Limit to any of the 13 systems (`workday`, `oracle`, `smartrecruiters`, `ukg`, `greenhouse`, `ashby`, `lever`, `bamboohr`, `breezy`, `personio`, `rippling`, `teamtailor`, `recruitee`). |
 | `includeDescription` | Adds the full description as plain text. |
 | `maxJobs` / `maxJobsPerCompany` | Caps on results, and your cost control. |
 
@@ -82,7 +91,7 @@ included, so you are not billed for compute separately.
 | `salaryText` / `salarySource` | The text it came from ("$120,000 - $150,000"), and whether it was published as data (`structured`) or read from the description |
 | `url` | Apply link on the company's own career site |
 | `description` | Plain-text description (optional) |
-| `ats` | `workday`, `oracle`, `smartrecruiters`, `greenhouse`, `ashby` or `lever` |
+| `ats` | Which of the 13 systems the role came from |
 | `indexedAt` | When the index this run read was built |
 
 The field names match our [Workday](https://apify.com/viridian_layout_ea2/workday-jobs-scraper)
@@ -121,3 +130,5 @@ Actors, which fetch a company's jobs live when you need the very latest.
   say exactly when. For a single company's roles to the minute, use the live Actors
   linked above.
 - Roles disappear from the index within a few days of the company closing them.
+- Teamtailor's feed lists at most 100 roles per company, so its very largest employers are
+  partially covered.
