@@ -25,6 +25,7 @@ import { salaryFields, type IndexJob, type Source } from "../src/format.ts";
 import { fromAshbyCompensation } from "../src/salary.ts";
 import * as Oracle from "../sources/oracle.ts";
 import * as SmartR from "../sources/smartrecruiters.ts";
+import { SMALL_SOURCES, smallJobId } from "../sources/small.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
@@ -269,6 +270,41 @@ export async function crawl() {
     }
   });
 
+  // ---------------------------------------------------------- small-company systems
+  // BambooHR, Breezy, Personio, Rippling, Teamtailor, Recruitee: one loop, one
+  // registry each. `build` (which may fetch a detail) runs only for new roles.
+  const small: Record<string, { companies: number; jobs: number }> = {};
+  for (const src of SMALL_SOURCES) {
+    const companies = readRegistry<{ id: string; name: string }>(`actors/career-jobs/sources/${src.ats}.json`);
+    if (!companies.length) continue;
+    small[src.ats] = { companies: 0, jobs: 0 };
+    log(`${src.ats}: ${companies.length} companies`);
+    await pool(companies, 8, async ({ id: co, name }) => {
+      try {
+        const rows = await src.list(co);
+        if (!rows) return void stats.errors++;
+        small[src.ats].companies++;
+        const fresh = rows.filter((p) => {
+          small[src.ats].jobs++;
+          const id = smallJobId(src, co, p);
+          if (exists.get(id)) return void touchOnly.run(startedAt, id), false;
+          return true;
+        });
+        await pool(fresh, PER_SITE, async (p) => {
+          try {
+            const built = await src.build(co, name, p, startedAt);
+            stats.detailFetches++;
+            if (built) save(built.job, built.description);
+          } catch {
+            stats.errors++;
+          }
+        });
+      } catch {
+        stats.errors++;
+      }
+    });
+  }
+
   // Roles gone for 3+ days are closed. (A day or two of grace absorbs a site
   // that was briefly unreachable, so a flaky host does not empty and refill.)
   const cutoff = new Date(Date.now() - 3 * 86_400_000).toISOString();
@@ -276,10 +312,10 @@ export async function crawl() {
 
   db.prepare("UPDATE runs SET finished_at = ?, stats = ? WHERE started_at = ?").run(
     new Date().toISOString(),
-    JSON.stringify({ ...stats, purged }),
+    JSON.stringify({ ...stats, small, purged }),
     startedAt,
   );
-  log(`Done: ${JSON.stringify({ ...stats, purged })}`);
+  log(`Done: ${JSON.stringify({ ...stats, small, purged })}`);
   db.close();
 }
 

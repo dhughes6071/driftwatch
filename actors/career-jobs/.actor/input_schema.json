@@ -79,7 +79,14 @@
           "smartrecruiters",
           "greenhouse",
           "ashby",
-          "lever"
+          "lever",
+          "bamboohr",
+          "breezy",
+          "personio",
+          "rippling",
+          "teamtailor",
+          "recruitee",
+          "ukg"
         ],
         "enumTitles": [
           "Workday",
@@ -87,7 +94,14 @@
           "SmartRecruiters",
           "Greenhouse",
           "Ashby",
-          "Lever"
+          "Lever",
+          "BambooHR",
+          "Breezy HR",
+          "Personio",
+          "Rippling",
+          "Teamtailor",
+          "Recruitee",
+          "UKG Pro (UltiPro)"
         ]
       },
       "default": []
