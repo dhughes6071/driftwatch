@@ -57,6 +57,13 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   added by hand (collected from the 28 Sep run). First expanded crawl crashed on an Oracle posting with a null title;
   fixed so one bad posting/site can't stop a run (commit 2619448); rerun: 21 errors in ~316k detail fetches.
   Worst-case search (reads all 37 shards) still completes. Store title/description updated via API (title limit: 63 chars).
+- **28 Sep: salary extraction** (`actors/career-jobs/src/salary.ts`). Precision-first: every rule traces to a real false
+  positive in our index (revenue, funding, insurance limits, bonuses, "40 hours per week" next to a yearly range, "per
+  month" commission next to a yearly salary). Ashby's structured pay used directly (Ramp: 150 of 157 roles). Measured
+  on ~10k indexed jobs: **25.5% with pay** (Workday 35%, Greenhouse 20%, Oracle 14%, SmartRecruiters 9%); every sampled
+  match reviewed. New fields salaryMin/Max/Currency/Period/AnnualMin/AnnualMax/Text/Source; filters onlyWithSalary,
+  minAnnualSalary, salaryCurrencies. Greenhouse/Ashby/Lever description cap 4,000 → 8,000 chars (pay sits at the end),
+  refreshed nightly. Builds: career API 0.1.6, main actor 0.5.6. 23 salary/search/source tests.
 - **Published on the Store 27 Sep:** https://apify.com/viridian_layout_ea2/career-site-jobs-api — live page verified:
   "from $2.00 / 1,000 jobs", custom icon, 900,000+ description.
 
