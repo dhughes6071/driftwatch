@@ -16,6 +16,7 @@
  */
 import { Actor, log } from "apify";
 import { fetchCompany, VERIFIED_ATS, type Ats, type Job } from "./ats.ts";
+import { payFor, type PayFields } from "./pay.ts";
 
 interface Input {
   /** Explicit companies to fetch. Takes precedence over `useCuratedList`. */
@@ -34,6 +35,12 @@ interface Input {
   postedWithinDays?: number;
   /** Include the full job description. Off keeps datasets small and fast. */
   includeDescription?: boolean;
+  /** Only roles that state pay. */
+  onlyWithSalary?: boolean;
+  /** Only roles whose annualised top of range reaches this, in the job's own currency. */
+  minAnnualSalary?: number;
+  /** Only roles paying in these currencies, e.g. ["USD"]. */
+  salaryCurrencies?: string[];
 }
 
 /** Charged once per job we deliver. Must match the event configured in Apify. */
@@ -53,7 +60,12 @@ try {
     locationKeywords = [],
     postedWithinDays,
     includeDescription = true,
+    onlyWithSalary = false,
+    minAnnualSalary,
+    salaryCurrencies = [],
   } = input;
+  const currencies = new Set(salaryCurrencies.map((c) => c.trim().toUpperCase()).filter(Boolean));
+  const needSalary = onlyWithSalary || !!minAnnualSalary || currencies.size > 0;
 
   // ---------------------------------------------------------------- targets
 
@@ -118,8 +130,12 @@ try {
 
         if (!matches(job, { remoteOnly, titleKeywords, locationKeywords, cutoff })) continue;
 
+        // Pay is read from the list response (description + Ashby's pay data), so it costs no extra request.
+        const pay = payFor(job);
+        if (needSalary && !payMatches(pay, minAnnualSalary, currencies)) continue;
+
         const { compensation: _internal, ...pub } = job;
-        const record = includeDescription ? pub : { ...pub, description: undefined };
+        const record = includeDescription ? { ...pub, ...pay } : { ...pub, description: undefined, ...pay };
 
         /*
          * Charge and push together. pushData(item, eventName) charges for the
@@ -148,7 +164,7 @@ try {
     companiesWithJobs: companiesOk,
     companiesEmptyOrUnreachable: companiesFailed,
     stoppedBecause: budgetReached ? "charging_limit" : pushed >= maxJobs ? "maxJobs" : "completed",
-    filters: { remoteOnly, titleKeywords, locationKeywords, postedWithinDays },
+    filters: { remoteOnly, titleKeywords, locationKeywords, postedWithinDays, onlyWithSalary, minAnnualSalary, salaryCurrencies },
     finishedAt: new Date().toISOString(),
   });
 
@@ -195,6 +211,13 @@ function matches(
     if (Number.isFinite(ts) && ts < f.cutoff) return false;
   }
 
+  return true;
+}
+
+function payMatches(pay: PayFields, minAnnual: number | undefined, currencies: Set<string>): boolean {
+  if (pay.salaryAnnualMax == null) return false;
+  if (minAnnual && pay.salaryAnnualMax < minAnnual) return false;
+  if (currencies.size && !currencies.has(pay.salaryCurrency ?? "")) return false;
   return true;
 }
 

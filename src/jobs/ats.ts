@@ -68,8 +68,9 @@ export interface Job {
   description: string;
   employmentType: string | null;
   /**
-   * Ashby's structured pay data, raw (`compensation` from the job board API).
-   * Internal: read by the Career Site Jobs API index, not part of this Actor's output.
+   * The company's structured pay data, raw: Ashby's `compensation` object, or
+   * `{ payInputRanges }` from Greenhouse, or `{ leverSalaryRange }` from Lever. Internal: turned into the salary
+   * fields by pay.ts and the Career Site Jobs API index, never output as is.
    */
   compensation?: unknown;
 }
@@ -126,11 +127,13 @@ interface GhJob {
   location?: { name?: string };
   departments?: Array<{ name?: string }>;
   metadata?: unknown;
+  /** Present with ?pay_transparency=true. */
+  pay_input_ranges?: unknown[];
 }
 
 async function fetchGreenhouse(slug: string): Promise<Job[]> {
   const data = await getJson<{ jobs?: GhJob[] }>(
-    `https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(slug)}/jobs?content=true`,
+    `https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(slug)}/jobs?content=true&pay_transparency=true`,
   );
   if (!data?.jobs) return [];
 
@@ -152,6 +155,7 @@ async function fetchGreenhouse(slug: string): Promise<Job[]> {
       // needs decoding twice: once for the entities, once for the tags.
       description: toText(decodeEntities(j.content ?? "")),
       employmentType: null,
+      ...(j.pay_input_ranges?.length ? { compensation: { payInputRanges: j.pay_input_ranges } } : {}),
     };
   });
 }
@@ -174,8 +178,33 @@ interface LeverJob {
   hostedUrl: string;
   createdAt?: number;
   descriptionPlain?: string;
+  /** Titled sections ("Requirements", "Compensation"...), HTML content. */
+  lists?: Array<{ text?: string; content?: string }>;
+  additionalPlain?: string;
+  /** Structured pay, when the company publishes it. */
+  salaryRange?: { min?: number; max?: number; currency?: string; interval?: string } | null;
+  salaryDescriptionPlain?: string;
   categories?: { location?: string; team?: string; commitment?: string };
   workplaceType?: string;
+}
+
+/**
+ * Lever's `descriptionPlain` is only the opening paragraph; requirements,
+ * benefits and often the pay ("Compensation: Base pay $95,000 - $140,000")
+ * are in `lists` and `additionalPlain` (Veeva, 30 Sep). Join them all.
+ */
+export function leverDescription(j: Pick<LeverJob, "descriptionPlain" | "lists" | "additionalPlain" | "salaryDescriptionPlain">): string {
+  const parts = [
+    j.descriptionPlain ?? "",
+    ...(j.lists ?? []).map((l) => [l.text ?? "", toText(l.content)].filter(Boolean).join("\n")),
+    j.additionalPlain ?? "",
+    j.salaryDescriptionPlain ?? "",
+  ];
+  return parts
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .join("\n\n")
+    .slice(0, MAX_DESC);
 }
 
 async function fetchLever(slug: string): Promise<Job[]> {
@@ -198,8 +227,9 @@ async function fetchLever(slug: string): Promise<Job[]> {
       department: j.categories?.team ?? null,
       postedAt: j.createdAt ? new Date(j.createdAt).toISOString() : null,
       url: j.hostedUrl,
-      description: (j.descriptionPlain ?? "").slice(0, MAX_DESC),
+      description: leverDescription(j),
       employmentType: j.categories?.commitment ?? null,
+      ...(j.salaryRange ? { compensation: { leverSalaryRange: j.salaryRange } } : {}),
     };
   });
 }

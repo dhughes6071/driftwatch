@@ -10,6 +10,7 @@
           "location",
           "remote",
           "remoteEligible",
+          "salaryText",
           "department",
           "postedAt",
           "url",
@@ -46,6 +47,9 @@
           },
           "remoteEligible": {
             "label": "Remote-eligible"
+          },
+          "salaryText": {
+            "label": "Pay"
           }
         }
       }

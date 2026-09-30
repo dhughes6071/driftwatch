@@ -27,7 +27,7 @@
     "maxJobs": {
       "title": "Maximum jobs to return",
       "type": "integer",
-      "description": "Hard cap on results. This is your main cost control \u2014 you are charged per job returned.",
+      "description": "Hard cap on results. This is your main cost control — you are charged per job returned.",
       "default": 1000,
       "minimum": 1,
       "maximum": 100000
@@ -58,6 +58,25 @@
       "description": "Only roles posted in the last N days. Roles with no posting date are kept.",
       "minimum": 1,
       "maximum": 365
+    },
+    "onlyWithSalary": {
+      "title": "Only jobs that state pay",
+      "type": "boolean",
+      "description": "Only roles that state pay: Ashby's own pay data where the company publishes it, otherwise a range or rate read from the description. US pay-transparency laws make this common.",
+      "default": false
+    },
+    "minAnnualSalary": {
+      "title": "Minimum yearly pay",
+      "type": "integer",
+      "description": "Only roles whose pay range reaches at least this much per year, in the job's own currency. Hourly and monthly pay are converted (hour × 2,080, month × 12). Implies 'only jobs that state pay'.",
+      "minimum": 0
+    },
+    "salaryCurrencies": {
+      "title": "Pay currencies",
+      "type": "array",
+      "description": "Only roles paying in these currencies, e.g. \"USD\", \"GBP\", \"EUR\". Implies 'only jobs that state pay'.",
+      "editor": "stringList",
+      "default": []
     },
     "includeDescription": {
       "title": "Include full job description",

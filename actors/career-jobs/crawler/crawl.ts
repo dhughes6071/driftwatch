@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 import { fetchCompany, type Ats, type Job as AtsJob } from "../../../src/jobs/ats.ts";
 import { WorkdayClient, companyName as workdayName, normalize, type Site } from "../../workday-jobs/src/workday.ts";
 import { salaryFields, type IndexJob, type Source } from "../src/format.ts";
-import { fromAshbyCompensation } from "../src/salary.ts";
+import { fromStructuredPay } from "../src/salary.ts";
 import * as Oracle from "../sources/oracle.ts";
 import * as SmartR from "../sources/smartrecruiters.ts";
 import { SMALL_SOURCES, smallJobId } from "../sources/small.ts";
@@ -360,7 +360,7 @@ function fromAtsJob(j: AtsJob, companyName: string, now: string): IndexJob {
     employmentType: j.employmentType,
     d: null,
     // Ashby publishes pay as data; everything else is read from the text at publish.
-    ...salaryFields(fromAshbyCompensation(j.compensation)),
+    ...salaryFields(fromStructuredPay(j.compensation)),
   };
 }
 

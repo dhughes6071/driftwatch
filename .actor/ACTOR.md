@@ -27,6 +27,10 @@ arms race, and no proxy bill. When a company posts a role, it appears here.
 
 - **Straight from the source** — the company's own board, not a third-party aggregator
 - **One schema across three ATSs** — Greenhouse, Ashby, and Lever normalized identically
+- **Pay ranges as data** — Ashby's own pay data where the company publishes it, otherwise the
+  range stated in the description, as `salaryMin` / `salaryMax` / `salaryCurrency` /
+  `salaryPeriod`, annualised, and filterable with `onlyWithSalary`, `minAnnualSalary` and
+  `salaryCurrencies`
 - **Curated registry included** — 3,500+ verified companies, 120,000+ open roles, or name your own
 - **Simple pricing** — $1.50 per 1,000 jobs delivered, no platform usage on top; `maxJobs` caps the cost per run
 
@@ -62,6 +66,10 @@ run before charging, so filtered-out roles are never billed.
 | `description` | Full description as plain text (optional) |
 | `employmentType` | Full-time, contract, etc. where published |
 | `ats` | Which system it came from |
+| `salaryMin` / `salaryMax` / `salaryCurrency` / `salaryPeriod` | Stated pay, e.g. 150000 / 180000 / "USD" / "year" (null when none is stated) |
+| `salaryAnnualMin` / `salaryAnnualMax` | The same pay per year (hour × 2,080, week × 52, month × 12) |
+| `salaryText` | Exactly what the pay was read from, so you can check it |
+| `salarySource` | `structured` (the company's own Ashby pay data) or `description` (read from the text) |
 
 ## Examples
 
@@ -73,6 +81,11 @@ run before charging, so filtered-out roles are never billed.
 **Specific companies, recent postings only**
 ```json
 { "companies": [{ "slug": "stripe" }, { "slug": "ramp" }], "postedWithinDays": 14 }
+```
+
+**Engineering roles paying $180k+ a year**
+```json
+{ "useCuratedList": true, "titleKeywords": ["engineer"], "minAnnualSalary": 180000, "salaryCurrencies": ["USD"], "maxJobs": 1000 }
 ```
 
 **Fast and cheap — titles and links only**
@@ -98,6 +111,11 @@ genuinely location-independent roles.
 
 Slugs are usually just the company name in lowercase (`stripe`, `figma`, `ramp`).
 Leave `ats` blank and we'll work out which system a company uses.
+
+Pay is read only when it clearly is pay (not revenue, funding, bonuses or benefits), so
+a missing salary is far more likely than a wrong one. A bare "$" is read as Canadian or
+Australian dollars when the location is in Canada or Australia, otherwise US dollars. The
+pay filters cost nothing extra: the pay comes with every job.
 
 Companies that are unreachable or have no open roles are skipped — one bad
 company never sinks a run.

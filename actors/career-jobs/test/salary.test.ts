@@ -120,3 +120,26 @@ test("currency code after each number, no symbol (NVIDIA on Workday, 30 Sep)", (
   // a symbol-prefixed range is read once, not twice
   assert.deepEqual(pick("Pay range: $98,000 USD - $125,000 USD per year"), { min: 98000, max: 125000, currency: "USD", period: "year" });
 });
+
+test("Greenhouse pay ranges (no period given: size decides)", async () => {
+  const { fromGreenhousePay, fromStructuredPay } = await import("../src/salary.ts");
+  const r = (min: number, max: number, cur = "USD") => ({ payInputRanges: [{ min_cents: min * 100, max_cents: max * 100, currency_type: cur, title: "Range" }] });
+  const y = fromGreenhousePay(r(130000, 150000));
+  assert.deepEqual(y && [y.min, y.max, y.currency, y.period, y.source], [130000, 150000, "USD", "year", "structured"]);
+  const h = fromGreenhousePay(r(24, 31.5, "CAD"));
+  assert.deepEqual(h && [h.period, h.currency, h.annualMax], ["hour", "CAD", 65520]);
+  assert.equal(fromGreenhousePay(r(2000, 5000)), null, "the ambiguous middle is not guessed");
+  assert.equal(fromGreenhousePay({ payInputRanges: [] }), null);
+  assert.equal(fromStructuredPay(r(90000, 110000))?.min, 90000);
+  assert.equal(fromStructuredPay(null), null);
+});
+
+test("Lever salaryRange", async () => {
+  const { fromLeverSalaryRange, fromStructuredPay } = await import("../src/salary.ts");
+  const y = fromLeverSalaryRange({ leverSalaryRange: { min: 110000, max: 180000, currency: "USD", interval: "per-year-salary" } });
+  assert.deepEqual(y && [y.min, y.max, y.currency, y.period, y.source], [110000, 180000, "USD", "year", "structured"]);
+  const h = fromStructuredPay({ leverSalaryRange: { min: 22, max: 26, currency: "usd", interval: "per-hour-wage" } });
+  assert.deepEqual(h && [h.period, h.currency], ["hour", "USD"]);
+  assert.equal(fromLeverSalaryRange({ leverSalaryRange: { min: 1, max: 2, currency: "USD", interval: "per-year-salary" } }), null, "implausible");
+  assert.equal(fromLeverSalaryRange({ leverSalaryRange: { min: 100, max: 200, currency: "USD", interval: "one-time" } }), null);
+});

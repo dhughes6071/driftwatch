@@ -303,3 +303,42 @@ export function fromAshbyCompensation(comp: unknown): Salary | null {
   }
   return null;
 }
+
+/**
+ * Greenhouse's pay-transparency field (`pay_input_ranges`, returned with
+ * `?pay_transparency=true`): used by about 1 in 6 Greenhouse roles, often
+ * with no pay in the description text (sampled 30 Sep). It has no period, so
+ * the size decides: yearly from 15,000 up, hourly below 300, else unused.
+ */
+export function fromGreenhousePay(comp: unknown): Salary | null {
+  const r = (comp as { payInputRanges?: Array<{ min_cents?: number | null; max_cents?: number | null; currency_type?: string | null }> } | null)
+    ?.payInputRanges?.[0];
+  if (!r?.currency_type || !(r.min_cents || r.max_cents)) return null;
+  const min = (r.min_cents ?? r.max_cents!) / 100;
+  const max = (r.max_cents ?? r.min_cents!) / 100;
+  const period: Period | null = max >= 15_000 ? "year" : max < 300 ? "hour" : null;
+  const currency = r.currency_type.toUpperCase();
+  if (!period || !plausible(min, max, period, currency)) return null;
+  const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 2 });
+  return { ...build(min, max, currency, period, `${currency} ${fmt(min)} - ${fmt(max)}`), source: "structured" };
+}
+
+/** Lever's `salaryRange`: { min, max, currency, interval: "per-year-salary" | "per-hour-wage" | ... } (1 in 5 Lever roles, 30 Sep). */
+export function fromLeverSalaryRange(comp: unknown): Salary | null {
+  const r = (comp as { leverSalaryRange?: { min?: number; max?: number; currency?: string; interval?: string } } | null)?.leverSalaryRange;
+  if (!r?.currency || !(r.min || r.max)) return null;
+  const period = ({ year: "year", hour: "hour", month: "month", week: "week", day: "day" } as Record<string, Period>)[
+    r.interval?.match(/per-(year|hour|month|week|day)/)?.[1] ?? ""
+  ];
+  const min = r.min || r.max!;
+  const max = r.max || r.min!;
+  const currency = r.currency.toUpperCase();
+  if (!period || !plausible(min, max, period, currency)) return null;
+  const fmt = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits: 2 });
+  return { ...build(min, max, currency, period, `${currency} ${fmt(min)} - ${fmt(max)} ${r.interval}`), source: "structured" };
+}
+
+/** A company's own structured pay, from whichever system published it (Ashby, Greenhouse or Lever). */
+export function fromStructuredPay(comp: unknown): Salary | null {
+  return fromAshbyCompensation(comp) ?? fromGreenhousePay(comp) ?? fromLeverSalaryRange(comp);
+}

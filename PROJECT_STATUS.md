@@ -93,6 +93,13 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   NVIDIA-style "124,000 USD - 195,500 USD" (code after each number) was not read -- fixed in the shared reader:
   +11,954 jobs with pay across the index (11,803 Workday), 3 of 1.83M changed. Index pay coverage 28.4% -> 29.0%.
   Cloud test: NVIDIA "software engineer" at $200k+ -> 5 jobs with pay in 17 s, 5 charged.
+- **30 Sep: pay in the first actor (Greenhouse/Ashby/Lever, builds 0.5.7-0.5.9)** — `src/jobs/pay.ts`: the company's
+  structured pay first (Ashby compensation; Greenhouse `pay_input_ranges` via `?pay_transparency=true`; Lever
+  `salaryRange`), else the description (shared reader, exact copy in `src/jobs/salary.ts`); bare "$" is CAD/AUD by
+  location. Filters onlyWithSalary / minAnnualSalary / salaryCurrencies, Pay column. Found while testing: Lever
+  `descriptionPlain` is only the intro -- requirements, benefits and pay sit in `lists` / `additionalPlain`; descriptions
+  now join every section. Cloud tests: 20k curated jobs -> Greenhouse 52% with pay, Ashby 29%; all 3,038 Lever jobs ->
+  43% (was 0%). The Career API index picks up the new pay fields and fuller Lever descriptions in tonight's crawl.
 - **Main actor pricing cleanup still blocked until 10 Oct** (checked 30 Sep: Console "Change" button still disabled while the
   price change is pending). Note: the extra `apify-default-dataset-item` charge is $0.01 per 1,000 (under 1% on top of
   $1.50), not a doubling.
