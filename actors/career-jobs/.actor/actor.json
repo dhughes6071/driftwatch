@@ -1,8 +1,8 @@
 {
   "actorSpecification": 1,
   "name": "career-site-jobs-api",
-  "title": "Career Site Jobs API — 1.7M jobs, 15 hiring systems",
-  "description": "Search 1.7M+ open roles on 19,000+ companies' own career sites in seconds: Workday, Oracle, SmartRecruiters, UKG, Greenhouse, Workable and 9 more, refreshed daily, with pay ranges. Filter by title, location, company, salary.",
+  "title": "Career Site Jobs API — 1.8M Jobs with Salaries | $2 per 1K",
+  "description": "1.8M open jobs from 19,600 companies' own career sites (Workday, Oracle, Greenhouse, SmartRecruiters, UKG + 10 more), refreshed daily. Pay on 29% of jobs. Filter by title, location or salary, or get only new jobs each run. $2 per 1,000.",
   "version": "0.1",
   "buildTag": "latest",
   "dockerfile": "./Dockerfile",

@@ -1,11 +1,16 @@
-# Job Scraper — Greenhouse, Ashby, Lever ATS Career Sites
+# Greenhouse, Lever & Ashby Jobs Scraper — with Salaries
 
-Scrape open roles from **3,500+ company career sites** running Greenhouse, Ashby,
-or Lever.
+Scrape jobs from the startups and tech companies that hire through **Greenhouse, Lever and
+Ashby**: Stripe, SpaceX, Anduril, Ramp, Figma and 3,500+ more. It reads the same **public
+JSON job-board APIs** those companies use for their own career pages, so there is no HTML
+to break and no proxy to pay for.
 
-Unlike other job scrapers, this one reads the **public JSON APIs** those
-systems publish for syndication rather than parsing HTML — so it does not
-break when a page changes.
+**Who uses it**
+
+- **Tech job boards.** Startup and engineering roles from the source, with pay.
+- **Recruiters.** Every open role at a list of target companies in one run.
+- **Salary benchmarking.** Stated pay ranges, including each company's own structured pay
+  data where it publishes it.
 
 > **Need big employers too?** Greenhouse, Ashby and Lever are mostly startups and
 > scale-ups. Most of the Fortune 500 (NVIDIA, Salesforce, CVS, Lowe's) hire through
@@ -14,8 +19,9 @@ break when a page changes.
 > directly.
 >
 > **Want everything in one search?** Our [Career Site Jobs API](https://apify.com/viridian_layout_ea2/career-site-jobs-api)
-> searches 900,000+ roles across Workday, Greenhouse, Ashby and Lever at once. The jobs
-> are collected daily, so results come back in 10–20 seconds.
+> searches 1.8 million jobs from 19,600 companies across 15 hiring systems at once
+> (Workday, Oracle, Greenhouse, Lever, Ashby and more). The jobs are collected daily, so
+> results come back in seconds.
 
 ## Why this one
 

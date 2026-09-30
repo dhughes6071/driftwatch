@@ -1,8 +1,18 @@
-# Career Site Jobs API — 15 hiring systems, 1.7 million jobs
+# Career Site Jobs API — 1.8M Jobs with Salaries
 
-Search **every open role on 19,000+ companies' own career sites** in seconds, not hours.
-That's more than 1.7 million jobs from 15 applicant-tracking systems, collected fresh every
-day, with the stated pay range extracted for nearly 500,000 of them.
+A jobs API built from the source: **every open role on 19,600 companies' own career
+sites**, collected fresh every day and searchable in seconds. 1.8 million jobs from 15
+hiring systems (Workday, Oracle, SmartRecruiters, UKG, Greenhouse, Workable, Ashby, Lever,
+BambooHR and more), with the stated pay range pulled out for more than 500,000 of them.
+
+**Who uses it**
+
+- **Job boards and newsletters.** Schedule a daily search with `onlyNewSinceLastRun` and get
+  a clean feed with no duplicates.
+- **Recruiters and sales teams.** See who is hiring for what, where, right now.
+- **Salary research.** Filter by minimum pay and currency across real, current postings.
+- **Labour-market and AI projects.** Build a large, structured, deduplicated job dataset
+  without running a scraper.
 
 Large employers hire through Workday (NVIDIA, Salesforce, CVS, Lowe's, Morgan Stanley) or
 Oracle Recruiting Cloud (JPMorgan Chase, Marriott, Kroger, Hilton, Macy's); mid-size and global
@@ -13,9 +23,9 @@ Recruitee. This Actor covers all of them with one set of output fields.
 
 | System | Jobs |
 |---|---:|
-| Workday | 863,000+ |
-| Oracle Recruiting Cloud | 306,000+ |
-| SmartRecruiters | 227,000+ |
+| Workday | 870,000+ |
+| Oracle Recruiting Cloud | 310,000+ |
+| SmartRecruiters | 230,000+ |
 | UKG Pro (UltiPro) | 107,000+ |
 | Greenhouse | 91,000+ |
 | Workable | 62,000+ |
@@ -29,7 +39,7 @@ Recruitee. This Actor covers all of them with one set of output fields.
 | Rippling | 9,500+ |
 | Lever | 3,000+ |
 
-*Counts from the 29 Sep 2026 index; they change daily.*
+*Counts from the 30 Sep 2026 index; they change daily.*
 
 ## Why this one
 

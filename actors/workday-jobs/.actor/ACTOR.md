@@ -1,12 +1,18 @@
-# Workday Jobs Scraper
+# Workday Jobs Scraper — Any myworkdayjobs Site, with Salaries
 
-Get every open role from any company's **Workday career site** (`*.myworkdayjobs.com`,
-`*.myworkdaysite.com`) as clean, structured data. Workday runs hiring for most of the
-Fortune 500, including NVIDIA, Salesforce, TJX, Walmart and thousands more.
+Scrape every open job from any company's **Workday career site**: the `myworkdayjobs.com`
+(and `myworkdaysite.com`) pages behind NVIDIA, Salesforce, CVS, Walmart and thousands more.
+Paste a career-site link, or search the built-in list of **4,100+ verified Workday career
+sites across 1,785 companies** by company name.
 
-Paste a career site URL, or use the built-in list of **4,100+ verified Workday career
-sites across 1,785 companies**, found through Common Crawl and each checked against the
-live site.
+**Who uses it**
+
+- **Tracking specific employers.** Schedule it with `onlyNewSinceLastRun` and see each new
+  opening once.
+- **Competitive hiring intelligence.** Every role a competitor has open, with location,
+  category and pay.
+- **Big employers, complete.** Workday stops at 2,000 results; this doesn't (NVIDIA: all
+  2,650).
 
 > **Need startups too?** Most startups and scale-ups hire through Greenhouse, Ashby or
 > Lever rather than Workday. Our [Greenhouse / Ashby / Lever Job Scraper](https://apify.com/viridian_layout_ea2/company-career-site-jobs)
@@ -14,8 +20,9 @@ live site.
 > directly.
 >
 > **Want everything in one search?** Our [Career Site Jobs API](https://apify.com/viridian_layout_ea2/career-site-jobs-api)
-> searches 900,000+ roles across Workday, Greenhouse, Ashby and Lever at once. The jobs
-> are collected daily, so results come back in 10–20 seconds.
+> searches 1.8 million jobs from 19,600 companies across 15 hiring systems at once
+> (Workday, Oracle, Greenhouse, Lever, Ashby and more). The jobs are collected daily, so
+> results come back in seconds.
 
 ## Why this one
 

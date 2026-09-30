@@ -1,8 +1,8 @@
 {
   "actorSpecification": 1,
   "name": "workday-jobs-scraper",
-  "title": "Workday Jobs Scraper — Any Company's Workday Career Site",
-  "description": "Scrape every open role from any Workday career site (myworkdayjobs.com): NVIDIA, Salesforce, TJX and thousands more. Gets past Workday's hidden 2,000-job limit. Reads the site's public JSON API, no browser or proxies.",
+  "title": "Workday Jobs Scraper — Any myworkdayjobs Site, with Salaries",
+  "description": "Every open role from any Workday career site (myworkdayjobs.com): NVIDIA, Salesforce, CVS and 4,100+ built in. Gets past Workday's hidden 2,000-job cap. Salaries, pay filters and an only-new-jobs mode. Uses Workday's JSON API, so no browser or proxies.",
   "version": "0.1",
   "buildTag": "latest",
   "dockerfile": "./Dockerfile",
