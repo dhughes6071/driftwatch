@@ -8,9 +8,11 @@
  *   rippling    https://ats.rippling.com/api/v2/board/{co}/jobs (+ /jobs/{id})    JSON, detail has structured pay
  *   teamtailor  https://{co}.teamtailor.com/jobs.rss                             RSS, includes descriptions
  *   recruitee   https://{co}.recruitee.com/api/offers/                           JSON, includes descriptions
+ *   workable    https://apply.workable.com/api/v1/widget/accounts/{co}?details=true  JSON, all jobs with descriptions (added 29 Sep)
+ *   jobvite     https://jobs.jobvite.com/{co}/jobs (+ /job/{id})                 HTML only; the list page shows every job (added 29 Sep)
  *
- * Skipped: JazzHR and Jobvite serve HTML only; Workable's feed 404s (and was
- * unreliable in Aug 2026); Paylocity's feed returned no jobs for any sample.
+ * Skipped: JazzHR serves HTML only on few companies; Paylocity's feed returned
+ * no jobs for any sample.
  *
  * One interface, so the crawl has one loop for all of them. `build` is only
  * called for roles not seen before, so detail requests happen once per role.
@@ -547,9 +549,183 @@ export const ukg: SmallSource<UkgRow> = {
   },
 };
 
+// ------------------------------------------------------------------ Workable
+
+export interface WorkableRow {
+  shortcode: string;
+  title?: string;
+  employment_type?: string | null;
+  telecommuting?: boolean;
+  department?: string | null;
+  url?: string;
+  published_on?: string;
+  created_at?: string;
+  locations?: Array<{ country?: string | null; countryCode?: string | null; city?: string | null; region?: string | null; hidden?: boolean }>;
+  description?: string;
+}
+
+/**
+ * Workable rate-limits hard: ten parallel requests hit 429 within seconds (29 Sep),
+ * while one request every 500 ms ran 120 in a row cleanly. So requests go one
+ * at a time, spaced out, and a 429 waits and retries rather than dropping the company.
+ */
+let workableGate: Promise<unknown> = Promise.resolve();
+const WORKABLE_SPACING_MS = 500;
+function workableFetch(url: string): Promise<Response | null> {
+  const run = workableGate.then(async () => {
+    for (let attempt = 0; attempt < 6; attempt++) {
+      try {
+        const r = await fetch(url, { headers: UA, signal: AbortSignal.timeout(30_000) });
+        if (r.status !== 429 && r.status < 500) {
+          await new Promise((res) => setTimeout(res, WORKABLE_SPACING_MS));
+          return r;
+        }
+        await r.arrayBuffer();
+      } catch {
+        // retry
+      }
+      await new Promise((res) => setTimeout(res, 5_000 * (attempt + 1)));
+    }
+    return null;
+  });
+  workableGate = run.catch(() => null);
+  return run;
+}
+
+/**
+ * The widget repeats a job once per location (Kreyco: 4,862 rows, 908 jobs,
+ * 29 Sep). One row per shortcode, with every location kept.
+ */
+export function mergeWorkable(rows: WorkableRow[]): WorkableRow[] {
+  const by = new Map<string, WorkableRow>();
+  for (const r of rows) {
+    const seen = by.get(r.shortcode);
+    if (!seen) by.set(r.shortcode, { ...r, locations: [...(r.locations ?? [])] });
+    else
+      for (const l of r.locations ?? [])
+        if (!seen.locations!.some((x) => x.city === l.city && x.region === l.region && x.country === l.country)) seen.locations!.push(l);
+  }
+  return [...by.values()];
+}
+
+/** Account names seen by `list`, so discovery needs no second request per company. */
+export const workableNames = new Map<string, string>();
+
+/** Workable's public widget feed: one request returns every published job with its description. */
+export const workable: SmallSource<WorkableRow> = {
+  ats: "workable",
+  async list(co) {
+    const r = await workableFetch(`https://apply.workable.com/api/v1/widget/accounts/${encodeURIComponent(co)}?details=true`);
+    if (!r?.ok) return null;
+    try {
+      const d = (await r.json()) as { name?: string; jobs?: WorkableRow[] };
+      if (d.name?.trim()) workableNames.set(co, d.name.trim());
+      return d.jobs ? mergeWorkable(d.jobs) : null;
+    } catch {
+      return null;
+    }
+  },
+  id: (_co, p) => p.shortcode,
+  async build(co, name, p, now) {
+    const locs = (p.locations ?? [])
+      .filter((l) => !l.hidden)
+      .map((l) => [l.city, l.region, l.country].filter(Boolean).join(", "))
+      .filter(Boolean);
+    const j = job("workable", co, name, {
+      id: p.shortcode,
+      title: p.title,
+      location: locs[0] ?? null,
+      additional: locs.slice(1),
+      country: p.locations?.[0]?.countryCode ?? null,
+      workplace: p.telecommuting ? "Remote" : null,
+      remoteFlag: !!p.telecommuting,
+      department: p.department || null,
+      postedAt: p.published_on ?? p.created_at,
+      url: p.url ?? `https://apply.workable.com/j/${p.shortcode}`,
+      employmentType: p.employment_type || null,
+      firstSeenAt: now,
+    });
+    return j && { job: j, description: toText(p.description) || null };
+  },
+};
+
+// ------------------------------------------------------------------ Jobvite
+
+export interface JobviteRow {
+  id: string;
+  title: string;
+  location: string | null;
+  department: string | null;
+}
+
+const stripTags = (h: string) => decodeXml(h.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+/** "Suitland, Maryland" / "2 Locations" / "Remote, United States". */
+const jobviteLocation = (h: string) => {
+  const t = stripTags(h).replace(/\s+,/g, ",");
+  return t && !/^\d+ Locations?$/i.test(t) ? t : null;
+};
+
+/** Jobvite's list page: tables of jobs under department headings; "Hot Jobs" repeats some. */
+export function parseJobviteList(html: string, co: string): JobviteRow[] {
+  const rows = new Map<string, JobviteRow>();
+  const re = new RegExp(
+    `<h3[^>]*>([\\s\\S]*?)</h3>|<td class="jv-job-list-name">\\s*<a href="/${co}/job/(\\w+)"[^>]*>([\\s\\S]*?)</a>\\s*</td>(?:\\s*<td(?! class="jv-job-list-location")[^>]*>[\\s\\S]*?</td>)*?\\s*<td class="jv-job-list-location">([\\s\\S]*?)</td>|<a href="/${co}/job/(\\w+)"[^>]*>([\\s\\S]*?)</a>`,
+    "gi",
+  );
+  let dept: string | null = null;
+  for (const m of html.matchAll(re)) {
+    if (m[1] !== undefined) dept = stripTags(m[1]) || null;
+    else if (m[2]) rows.set(m[2], { id: m[2], title: cleanJobviteTitle(m[3]), location: jobviteLocation(m[4]), department: dept });
+    else if (m[5] && !rows.has(m[5]) && !/\/apply/.test(m[0])) rows.set(m[5], { id: m[5], title: cleanJobviteTitle(m[6]), location: null, department: null });
+  }
+  return [...rows.values()].filter((r) => r.title);
+}
+
+/** Detail-page meta line: "Accounting<span class='jv-inline-separator'></span> Aguascaliente, Aguascaliente". */
+export function parseJobviteMeta(h: string | undefined): { department: string | null; location: string | null } {
+  if (!h) return { department: null, location: null };
+  const parts = h.split(/<span[^>]*jv-inline-separator[^>]*>\s*<\/span>/i);
+  return {
+    department: parts.length > 1 ? stripTags(parts[0]) || null : null,
+    location: jobviteLocation(parts.at(-1)!),
+  };
+}
+
+/** "IT Project Coordinator<span> | </span>Req#4720" -> "IT Project Coordinator". */
+const cleanJobviteTitle = (h: string) => stripTags(h.replace(/<span[^>]*>\s*\|\s*<\/span>[\s\S]*$/i, ""));
+
+export const jobvite: SmallSource<JobviteRow> = {
+  ats: "jobvite",
+  async list(co) {
+    // Companies that left Jobvite redirect elsewhere; only jobs.jobvite.com pages count.
+    try {
+      const r = await fetch(`https://jobs.jobvite.com/${co}/jobs`, { headers: UA, redirect: "manual", signal: AbortSignal.timeout(30_000) });
+      return r.status === 200 ? parseJobviteList(await r.text(), co) : null;
+    } catch {
+      return null;
+    }
+  },
+  id: (_co, p) => p.id,
+  async build(co, name, p, now) {
+    const html = await getText(`https://jobs.jobvite.com/${co}/job/${p.id}`);
+    const desc = html?.match(/class="jv-job-detail-description"[^>]*>([\s\S]*?)<div class="jv-job-detail-bottom-actions/)?.[1];
+    const meta = parseJobviteMeta(html?.match(/<p class="jv-job-detail-meta">([\s\S]*?)<\/p>/)?.[1]);
+    const location = p.location ?? meta.location;
+    const j = job("jobvite", co, name, {
+      id: p.id,
+      title: p.title,
+      location,
+      department: p.department ?? meta.department,
+      url: `https://jobs.jobvite.com/${co}/job/${p.id}`,
+      firstSeenAt: now,
+    });
+    return j && { job: j, description: toText(desc?.replace(/^\s*<h3>Description<\/h3>/i, "")) || null };
+  },
+};
+
 /** The index id of a small-source job -- used by the crawl before `build` runs, so it must match `job()`. */
 export const smallJobId = <P>(src: SmallSource<P>, co: string, p: P) =>
   `${src.ats}:${(src.companyKey?.(co) ?? co).toLowerCase()}:${src.id(co, p)}`;
 
 export { ukgParts };
-export const SMALL_SOURCES = [bamboohr, breezy, personio, rippling, teamtailor, recruitee, ukg] as SmallSource<unknown>[];
+export const SMALL_SOURCES = [bamboohr, breezy, personio, rippling, teamtailor, recruitee, ukg, workable, jobvite] as SmallSource<unknown>[];

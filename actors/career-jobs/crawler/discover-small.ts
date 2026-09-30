@@ -12,13 +12,15 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { SMALL_SOURCES, parseTeamtailor, ukgParts, type SmallSource } from "../sources/small.ts";
+import { SMALL_SOURCES, parseTeamtailor, ukgParts, workableNames, type SmallSource } from "../sources/small.ts";
 import { pool } from "./crawl.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const registryPath = (ats: string) => resolve(HERE, `../sources/${ats}.json`);
 
 const NOT_REAL = /\b(trial|demo|sandbox|test|testing|staging|example|dummy)\b/i;
+/** Copies of a real board kept for review or migration ("actionet-review" beside "actionet"). */
+const NOT_REAL_SLUG = /[-_](review|preview|old|copy|internal|uat|qa)$/i;
 const NOISE_SLUGS = new Set(["www", "api", "app", "help", "support", "careers", "jobs", "career", "status", "blog", "docs", "static", "cdn"]);
 
 /** "Personio SE & Co. KG" -> "Personio". */
@@ -97,6 +99,18 @@ export function shareUkgNames(reg: Array<{ id: string; name: string }>): void {
   }
 }
 
+/** Jobvite pages carry the name only in the title: "Abcam Careers" -> "Abcam". */
+export function jobviteNameFromPage(html: string): string | null {
+  const t = html.match(/<title>([^<]*)<\/title>/i)?.[1];
+  const n = t && decodeName(t)
+    .replace(/\s*[|:–-]\s*(jobvite|careers?|jobs).*$/i, "")
+    .replace(/\b(career opportunities|job opportunities|careers? (?:site|page)|careers?|jobs|job openings|openings)\b/gi, "")
+    .replace(/[\s|:–-]+$/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return n && n.length > 1 && !GENERIC_BOARD.test(n) ? n : null;
+}
+
 async function nameFor(ats: string, co: string, rows: unknown[]): Promise<string> {
   const first = rows[0] as Record<string, unknown>;
   try {
@@ -125,6 +139,13 @@ async function nameFor(ats: string, co: string, rows: unknown[]): Promise<string
         });
         return (r.ok && ukgNameFromPage(await r.text(), board)) || tenant;
       }
+      case "workable": {
+        return workableNames.get(co) ?? co;
+      }
+      case "jobvite": {
+        const r = await fetch(`https://jobs.jobvite.com/${co}/jobs`, { headers: { "user-agent": "career-jobs-index/0.1 (+public career-site listings)" }, signal: AbortSignal.timeout(20_000) });
+        return (r.ok && jobviteNameFromPage(await r.text())) || co;
+      }
       case "bamboohr": {
         const r = await fetch(`https://${co}.bamboohr.com/careers`, { signal: AbortSignal.timeout(20_000) });
         const m = r.ok ? (await r.text()).match(/og:site_name" content="([^"]+)"/) : null;
@@ -140,6 +161,8 @@ async function nameFor(ats: string, co: string, rows: unknown[]): Promise<string
 if (import.meta.url === `file://${process.argv[1]}`) {
   const cand = JSON.parse(readFileSync(process.argv[2], "utf8")) as Record<string, string[]>;
   for (const src of SMALL_SOURCES as SmallSource<unknown>[]) {
+    // Only systems named in the candidates file; the others keep their registries.
+    if (!cand[src.ats]) continue;
     const slugs = [...new Map((cand[src.ats] ?? []).map((c) => [c.toLowerCase(), c])).values()].filter(
       (c) => !NOISE_SLUGS.has(c.toLowerCase()),
     );
@@ -159,7 +182,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
         }
         if (rows && rows.length > 0) {
           const name = cleanLegalName(decodeName(await nameFor(src.ats, co, rows)));
-          if (!NOT_REAL.test(name) && !NOT_REAL.test(co)) out.push({ id: co, name, jobCount: rows.length });
+          if (!NOT_REAL.test(name) && !NOT_REAL.test(co) && !NOT_REAL_SLUG.test(co)) out.push({ id: co, name, jobCount: rows.length });
         }
       } catch {
         // unreachable candidate

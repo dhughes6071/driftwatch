@@ -71,6 +71,13 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   UKG's second host (recruiting2), two UKG boards named "Firefox" from the browser-warning logo; 20 large UKG tenants
   hand-named (e.g. BUC1007BUCC = Buc-ee's). Teamtailor RSS caps at 100 roles/company. Store title "Career Site Jobs API —
   1.7M jobs, 13 hiring systems"; build 0.1.7. 29 tests.
+- **29 Sep: Workable and Jobvite added** — Workable via the public widget feed (one request per company, all jobs +
+  descriptions; hard rate limit, so requests are serialised 500 ms apart; the feed repeats a job once per location, merged
+  by shortcode). Jobvite via HTML list + detail pages (no posting dates; some boards add a Company column). 2,257 Workable
+  companies / 62,908 jobs (20.5% with pay), 361 Jobvite companies / 10,977 jobs (46.6% with pay). Salary extractor now
+  reads "Minimum Salary … Maximum Salary" pairs. `CRAWL_ONLY=a,b` runs a catch-up crawl for named systems only. Index
+  **1,760,652 jobs, 19,610 companies, 15 systems**; build 0.1.9, store title "… 15 hiring systems". 34 tests. Known: a
+  Jobvite-only search reads nearly every shard (~90 s) because Jobvite jobs are undated.
 - **Published on the Store 27 Sep:** https://apify.com/viridian_layout_ea2/career-site-jobs-api — live page verified:
   "from $2.00 / 1,000 jobs", custom icon, 900,000+ description.
 

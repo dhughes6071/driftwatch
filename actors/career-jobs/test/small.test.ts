@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { SMALL_SOURCES, parsePersonio, parseTeamtailor, smallJobId } from "../sources/small.ts";
-import { cleanLegalName, decodeName, shareUkgNames, ukgNameFromPage } from "../crawler/discover-small.ts";
+import { SMALL_SOURCES, mergeWorkable, parseJobviteList, parseJobviteMeta, parsePersonio, parseTeamtailor, smallJobId } from "../sources/small.ts";
+import { cleanLegalName, decodeName, jobviteNameFromPage, shareUkgNames, ukgNameFromPage } from "../crawler/discover-small.ts";
 
 test("Personio XML: fields, extra offices, description sections", () => {
   const rows = parsePersonio(`<?xml version="1.0"?><workzag-jobs><position>
@@ -50,6 +50,8 @@ test("the crawl's pre-build id matches the id build() produces, for every small 
     teamtailor: ["acme", { guid: "g1", title: "Engineer", link: "x", pubDate: null, remoteStatus: null, department: null, locations: [], description: "" }],
     recruitee: ["acme", { id: 7, title: "Engineer" }],
     ukg: ["recruiting2.ultipro.com|AAM1000AAM|c5a88c41", { Id: "6f0e", Title: "Engineer" }],
+    workable: ["Acme", { shortcode: "ABC123", title: "Engineer" }],
+    jobvite: ["Acme", { id: "oAAA1", title: "Engineer", location: null, department: null }],
   };
   for (const src of SMALL_SOURCES) {
     const s = samples[src.ats];
@@ -85,4 +87,50 @@ test("UKG: generic board labels are not names; a tenant's boards share its best 
   ];
   shareUkgNames(reg);
   assert.deepEqual(reg.map((r) => r.name), ["Big 5 Sporting Goods", "Big 5 Sporting Goods", "ZZZ1000"]);
+});
+
+test("Jobvite list page: departments, locations, hot-jobs duplicates", () => {
+  const rows = parseJobviteList(`
+    <div class="jv-featured-job"><div class="jv-featured-job-title"><a href="/acme/job/oAAA1">Coordinator</a></div></div>
+    <h3 class="h2">Administrative &amp; Facility</h3>
+    <table class="jv-job-list"><tbody><tr>
+      <td class="jv-job-list-name"><a href="/acme/job/oAAA1">IT Project Coordinator<span class=""> | </span>Req#4720</a></td>
+      <td class="jv-job-list-location">  Remote,\n  United States </td></tr>
+    <tr><td class="jv-job-list-name"><a href="/acme/job/oBBB2">Architect</a></td>
+      <td class="jv-job-list-location"><div class="jv-meta">2 Locations</div></td></tr></tbody></table>
+    <a href="/acme/job/oBBB2/apply">Apply</a>`, "acme");
+  assert.deepEqual(rows, [
+    { id: "oAAA1", title: "IT Project Coordinator", location: "Remote, United States", department: "Administrative & Facility" },
+    { id: "oBBB2", title: "Architect", location: null, department: "Administrative & Facility" },
+  ]);
+});
+
+test("Jobvite company names come from the page title", () => {
+  assert.equal(jobviteNameFromPage("<title>Abcam Careers</title>"), "Abcam");
+  assert.equal(jobviteNameFromPage("<title>Careers | Jobvite</title>"), null);
+  assert.equal(jobviteNameFromPage("<title>ActioNet Career Opportunities</title>"), "ActioNet");
+});
+
+test("Workable: a job listed once per location becomes one job with all its locations", () => {
+  const loc = (city: string) => ({ city, region: "Illinois", country: "United States", countryCode: "US" });
+  const rows = mergeWorkable([
+    { shortcode: "A1", title: "Nurse", locations: [loc("Chicago")] },
+    { shortcode: "A1", title: "Nurse", locations: [loc("Oak Park")] },
+    { shortcode: "A1", title: "Nurse", locations: [loc("Chicago")] },
+    { shortcode: "B2", title: "Driver", locations: [loc("Glenview")] },
+  ]);
+  assert.equal(rows.length, 2);
+  assert.deepEqual(rows[0].locations!.map((l) => l.city), ["Chicago", "Oak Park"]);
+});
+
+test("Jobvite: a Company column between title and location, and the detail meta line", () => {
+  const rows = parseJobviteList(`<h3 class="h2">Accounting</h3><table class="jv-job-list"><tbody><tr>
+    <td class="jv-job-list-name"><a href="/se/job/o5gR" title="x">Finance Manager</a></td>
+    <td class="jv-job-company">Judd Wire Mexico, S.A. de C.V.</td>
+    <td class="jv-job-list-location"> Aguascaliente,\n Aguascaliente </td></tr></tbody></table>`, "se");
+  assert.deepEqual(rows, [{ id: "o5gR", title: "Finance Manager", location: "Aguascaliente, Aguascaliente", department: "Accounting" }]);
+  assert.deepEqual(parseJobviteMeta(`\n Conservation<span class='jv-inline-separator'></span>\n  Toronto,\n  Ontario\n`), {
+    department: "Conservation", location: "Toronto, Ontario",
+  });
+  assert.deepEqual(parseJobviteMeta(" Toronto,\n Ontario "), { department: null, location: "Toronto, Ontario" });
 });

@@ -86,7 +86,9 @@
           "rippling",
           "teamtailor",
           "recruitee",
-          "ukg"
+          "ukg",
+          "workable",
+          "jobvite"
         ],
         "enumTitles": [
           "Workday",
@@ -101,7 +103,9 @@
           "Rippling",
           "Teamtailor",
           "Recruitee",
-          "UKG Pro (UltiPro)"
+          "UKG Pro (UltiPro)",
+          "Workable",
+          "Jobvite"
         ]
       },
       "default": []

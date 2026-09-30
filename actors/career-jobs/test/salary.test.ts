@@ -99,3 +99,12 @@ test("large figures next to 'per month' are yearly", () => {
   assert.deepEqual(pick("Microbiologist 2 salary $5,111 to $6,870 per month"), { min: 5111, max: 6870, currency: "USD", period: "month" });
   assert.deepEqual(pick("Salary ₹20,000 - ₹25,000 per month"), { min: 20000, max: 25000, currency: "INR", period: "month" });
 });
+
+test("minimum/maximum pairs and an hourly range after a job title (Jobvite, 29 Sep)", () => {
+  assert.deepEqual(pick("Hours & Days of Work: 35 hours per week Minimum Salary: $77,932.00 Maximum Salary: $97,388.00 Target Start Date"), {
+    min: 77932, max: 97388, currency: "USD", period: "year",
+  });
+  assert.deepEqual(pick("Full-Time Retail Sales Associate $15.00 – $18.00 per hour + Unlimited Commission"), {
+    min: 15, max: 18, currency: "USD", period: "hour",
+  });
+});

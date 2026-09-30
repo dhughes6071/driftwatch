@@ -36,6 +36,9 @@ const PER_SITE = Number(process.env.PER_SITE ?? 3);
 const ATS_CONCURRENCY = 8;
 /** For trial runs: only the first N companies / career sites. */
 const LIMIT = process.env.CRAWL_LIMIT ? Number(process.env.CRAWL_LIMIT) : Infinity;
+/** Catch-up runs for newly added systems: CRAWL_ONLY=workable,jobvite. Others keep last night's rows (purge is 3 days). */
+const ONLY = process.env.CRAWL_ONLY ? new Set(process.env.CRAWL_ONLY.split(",").map((s) => s.trim())) : null;
+const wanted = (...systems: string[]) => !ONLY || systems.some((s) => ONLY.has(s));
 
 // ------------------------------------------------------------------ database
 
@@ -124,7 +127,9 @@ export async function crawl() {
   };
 
   // ---------------------------------------------------------- Greenhouse / Ashby / Lever
-  const companies = (JSON.parse(readFileSync(resolve(ROOT, "src/jobs/companies.json"), "utf8")) as Array<{ ats: Ats; slug: string }>).slice(0, LIMIT);
+  const companies = (JSON.parse(readFileSync(resolve(ROOT, "src/jobs/companies.json"), "utf8")) as Array<{ ats: Ats; slug: string }>)
+    .filter((c) => wanted(c.ats))
+    .slice(0, LIMIT);
   const names = await greenhouseNames(db, companies);
   log(`ATS: ${companies.length} companies`);
   await pool(companies, ATS_CONCURRENCY, async ({ ats, slug }) => {
@@ -146,6 +151,7 @@ export async function crawl() {
   const sites = JSON.parse(
     readFileSync(resolve(ROOT, "actors/workday-jobs/src/sites.json"), "utf8"),
   ) as Array<Site & { jobCount: number }>;
+  if (!wanted("workday")) sites.length = 0;
   // Trial runs take the smallest sites (the list is sorted biggest first).
   if (Number.isFinite(LIMIT)) sites.splice(0, Math.max(0, sites.length - LIMIT));
   log(`Workday: ${sites.length} career sites`);
@@ -210,7 +216,7 @@ export async function crawl() {
 
   // ---------------------------------------------------------- Oracle Recruiting Cloud
   // Same shape as Workday: list everything, fetch a detail only for new roles.
-  const oracleSites = readRegistry<Oracle.OracleSite>("actors/career-jobs/sources/oracle-sites.json");
+  const oracleSites = wanted("oracle") ? readRegistry<Oracle.OracleSite>("actors/career-jobs/sources/oracle-sites.json") : [];
   log(`Oracle: ${oracleSites.length} career sites`);
   await pool(oracleSites, 6, async (site) => {
     // One bad site or posting must never stop the run (a null title did, 27 Sep).
@@ -241,7 +247,7 @@ export async function crawl() {
   });
 
   // ---------------------------------------------------------- SmartRecruiters
-  const srCompanies = readRegistry<{ id: string }>("actors/career-jobs/sources/smartrecruiters.json");
+  const srCompanies = wanted("smartrecruiters") ? readRegistry<{ id: string }>("actors/career-jobs/sources/smartrecruiters.json") : [];
   log(`SmartRecruiters: ${srCompanies.length} companies`);
   await pool(srCompanies, 6, async ({ id: company }) => {
     try {
@@ -275,6 +281,7 @@ export async function crawl() {
   // registry each. `build` (which may fetch a detail) runs only for new roles.
   const small: Record<string, { companies: number; jobs: number }> = {};
   for (const src of SMALL_SOURCES) {
+    if (!wanted(src.ats)) continue;
     const companies = readRegistry<{ id: string; name: string }>(`actors/career-jobs/sources/${src.ats}.json`);
     if (!companies.length) continue;
     small[src.ats] = { companies: 0, jobs: 0 };

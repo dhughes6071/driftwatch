@@ -61,6 +61,12 @@ const SINGLE_RE = new RegExp(
   "gi",
 );
 
+/** "Minimum Salary: $77,932.00 Maximum Salary: $97,388.00" (Jobvite postings, 29 Sep). */
+const MINMAX_RE = new RegExp(
+  String.raw`\bmin(?:imum)?\.?\s*(?:annual\s+|hourly\s+|base\s+)?(?:salary|pay|rate|wage|compensation)?\s*(?:rate\s*)?:?\s*(${CUR})\s?(${NUM})(${K})${CODE_AFTER}[^\d$£€]{0,40}?\bmax(?:imum)?\.?\s*(?:annual\s+|hourly\s+|base\s+)?(?:salary|pay|rate|wage|compensation)?\s*(?:rate\s*)?:?\s*(${CUR})\s?(${NUM})(${K})`,
+  "gi",
+);
+
 // English plus the main European languages in the index (DE, FR, ES, IT, NL, PT, Nordics).
 const PAY_CONTEXT =
   /\b(pay|paid|salary|salaries|compensation|wage|wages|rate|range|base|earn|earning|earnings|ote|remuneration|hourly|annual|annually|per annum|yearly|stipend|gehalt\w*|\w*gehalt|verg[üu]tung\w*|salaire|r[ée]mun[ée]ration|salario|sueldo|retribuzione|stipendio|salaris|loon|sal[áa]rio|l[öo]n|l[øo]nn)\b/i;
@@ -196,7 +202,9 @@ export function extractSalary(description: string | null | undefined, countryHin
     const index = m.index ?? 0;
     const before = text.slice(Math.max(0, index - 250), index);
     const after = text.slice(index + whole.length, index + whole.length + 60);
-    if (vetoedBefore(before) || NOT_PAY_AFTER.test(after)) continue;
+    // An hourly rate right after the range outweighs a stray word before it
+    // ("Retail Sales Associate ... $15.00 – $18.00 per hour", 29 Sep).
+    if ((vetoedBefore(before) && !PERIOD_AFTER[0][0].test(after)) || NOT_PAY_AFTER.test(after)) continue;
     // "$120-150k": the k on the high end applies to both.
     const kk1 = k1 || (!k1 && k2 && Number(n1.replace(/,/g, "")) < 1000 ? k2 : "");
     const min = toNumber(n1, kk1);
@@ -223,6 +231,20 @@ export function extractSalary(description: string | null | undefined, countryHin
     const period = periodFor(text.slice(Math.max(0, index - 60), index + whole.length), after, value, value, currency);
     if (!period) continue;
     candidates.push({ index, s: build(value, value, currency, period, whole.trim()) });
+  }
+
+  for (const m of text.matchAll(MINMAX_RE)) {
+    const [whole, cur1, n1, k1, cur2, n2, k2] = m;
+    const index = m.index ?? 0;
+    const before = text.slice(Math.max(0, index - 250), index);
+    const after = text.slice(index + whole.length, index + whole.length + 60);
+    if (vetoedBefore(before) || NOT_PAY_AFTER.test(after)) continue;
+    const min = toNumber(n1, k1);
+    const max = toNumber(n2, k2);
+    const currency = currencyOf(cur1, countryHint) ?? currencyOf(cur2, countryHint) ?? dollarFor(countryHint);
+    const period = periodFor(before + whole, after, max, min, currency);
+    if (!period) continue;
+    candidates.push({ index, s: build(min, max, currency, period, whole.replace(/\s+/g, " ").trim()) });
   }
 
   candidates.sort((a, b) => a.index - b.index);
