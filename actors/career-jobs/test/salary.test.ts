@@ -108,3 +108,15 @@ test("minimum/maximum pairs and an hourly range after a job title (Jobvite, 29 S
     min: 15, max: 18, currency: "USD", period: "hour",
   });
 });
+
+test("currency code after each number, no symbol (NVIDIA on Workday, 30 Sep)", () => {
+  assert.deepEqual(pick("The base salary range is 124,000 USD - 195,500 USD for Level 4, and 148,000 USD - 235,750 USD for Level 5."), {
+    min: 124000, max: 195500, currency: "USD", period: "year",
+  });
+  assert.deepEqual(pick("Salary: 55.000 EUR - 65.000 EUR brutto pro Jahr"), { min: 55000, max: 65000, currency: "EUR", period: "year" });
+  // still refused: no pay context, or not pay
+  assert.equal(pick("Reported revenue of 400 USD - 500 USD million this quarter"), null);
+  assert.equal(pick("Teams of 20-50 people across 3 sites"), null);
+  // a symbol-prefixed range is read once, not twice
+  assert.deepEqual(pick("Pay range: $98,000 USD - $125,000 USD per year"), { min: 98000, max: 125000, currency: "USD", period: "year" });
+});

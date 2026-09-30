@@ -4,20 +4,53 @@
     "overview": {
       "title": "Jobs",
       "transformation": {
-        "fields": ["title", "companyName", "location", "department", "workplaceType", "remote", "postedAt", "employmentType", "url"]
+        "fields": [
+          "title",
+          "companyName",
+          "location",
+          "department",
+          "workplaceType",
+          "remote",
+          "salaryText",
+          "postedAt",
+          "employmentType",
+          "url"
+        ]
       },
       "display": {
         "component": "table",
         "properties": {
-          "title": { "label": "Role" },
-          "companyName": { "label": "Company" },
-          "location": { "label": "Location" },
-          "department": { "label": "Category" },
-          "workplaceType": { "label": "Workplace" },
-          "remote": { "label": "Remote" },
-          "postedAt": { "label": "Posted" },
-          "employmentType": { "label": "Type" },
-          "url": { "label": "Apply", "format": "link" }
+          "title": {
+            "label": "Role"
+          },
+          "companyName": {
+            "label": "Company"
+          },
+          "location": {
+            "label": "Location"
+          },
+          "department": {
+            "label": "Category"
+          },
+          "workplaceType": {
+            "label": "Workplace"
+          },
+          "remote": {
+            "label": "Remote"
+          },
+          "salaryText": {
+            "label": "Pay"
+          },
+          "postedAt": {
+            "label": "Posted"
+          },
+          "employmentType": {
+            "label": "Type"
+          },
+          "url": {
+            "label": "Apply",
+            "format": "link"
+          }
         }
       }
     }

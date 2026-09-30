@@ -42,6 +42,11 @@ straight through. In testing on 26 Sep 2026 it returned **2,650 of NVIDIA's 2,65
 - **Only what's new, on a schedule.** Turn on `onlyNewSinceLastRun` and schedule the run:
   each run skips every role that search has already delivered, so you track an employer's
   new openings without paying twice for the same job.
+- **Pay ranges as data.** US pay-transparency laws put a pay range in about 1 in 4 US Workday
+  postings. The Actor reads it out of the description into `salaryMin` / `salaryMax` /
+  `salaryCurrency` / `salaryPeriod`, annualises it, and lets you filter on it. It only takes
+  numbers that are clearly pay, not revenue, bonuses or benefits, so a missing salary is far
+  more likely than a wrong one.
 - **Pay only for what you get.** Filters run before charging, so filtered-out roles are
   never billed.
 
@@ -68,6 +73,9 @@ You pay only for jobs actually delivered to your dataset:
 | `titleKeywords` / `locationKeywords` | Case-insensitive "contains" filters. |
 | `remoteOnly` | Only roles whose location or workplace label says remote. |
 | `postedWithinDays` | Only recent roles. |
+| `onlyWithSalary` | Only roles whose description states pay. |
+| `minAnnualSalary` | Only roles whose pay reaches at least this much a year, in the job's own currency (hourly and monthly pay are converted). |
+| `salaryCurrencies` | Only roles paying in these currencies, e.g. `["USD"]`. |
 | `onlyNewSinceLastRun` | Only roles this same search hasn't delivered before. The first run returns everything that matches. Changing any filter starts a new history. |
 | `monitorName` | Optional. Keeps two searches with identical filters on separate histories (e.g. one per client). |
 | `includeDescription` | Adds the description, exact date, employment type, country and every location. Turn off for a faster run. |
@@ -93,6 +101,9 @@ You pay only for jobs actually delivered to your dataset:
 | `jobReqId` | The company's requisition number |
 | `url` | Apply link on the company's own career site |
 | `description` | Plain-text description (optional) |
+| `salaryMin` / `salaryMax` / `salaryCurrency` / `salaryPeriod` | Stated pay, read from the description: e.g. 98000 / 125000 / "USD" / "year" |
+| `salaryAnnualMin` / `salaryAnnualMax` | The same pay per year (hour × 2,080, week × 52, month × 12) |
+| `salaryText` | Exactly what the pay was read from, so you can check it |
 
 The field names match our [Greenhouse / Ashby / Lever jobs Actor](https://apify.com/viridian_layout_ea2/company-career-site-jobs),
 so the two datasets can be combined.
@@ -118,6 +129,11 @@ so the two datasets can be combined.
 { "useCuratedList": true, "companyKeywords": ["nvidia", "amd"], "titleKeywords": ["engineer"], "onlyNewSinceLastRun": true, "maxJobs": 5000 }
 ```
 
+**Software roles at big tech paying $200k+ a year**
+```json
+{ "useCuratedList": true, "companyKeywords": ["nvidia", "salesforce", "adobe"], "titleKeywords": ["software"], "minAnnualSalary": 200000, "salaryCurrencies": ["USD"] }
+```
+
 **Nursing jobs in Texas at hospital systems in the list**
 ```json
 { "useCuratedList": true, "companyKeywords": ["health", "hospital"], "titleKeywords": ["nurse", "rn"], "locationKeywords": ["TX", "Texas"] }
@@ -132,4 +148,6 @@ so the two datasets can be combined.
 - `onlyNewSinceLastRun` remembers each search's delivered roles for 180 days in a key-value
   store named `workday-jobs-monitor` in your own Apify account. Roles cut off by `maxJobs` or
   your spending limit are still delivered on the next run.
+- Pay comes from the description, so with `includeDescription` off the salary fields are
+  empty, unless you use a pay filter, which fetches each candidate's details anyway.
 - `companyName` is filled in for all 1,785 companies in the built-in list. For a career site outside the list it falls back to the Workday id.

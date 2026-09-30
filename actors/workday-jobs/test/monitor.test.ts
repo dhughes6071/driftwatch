@@ -37,3 +37,10 @@ test("remembered postings: kept across runs, expired after KEEP_DAYS, run count 
   assert.equal(s.toState(prev, now).runs, 4); // saving mid-run and again at the end counts one run
   assert.equal(new SeenPostings(null).size, 0);
 });
+
+test("monitor key: pay filters split the history only when used", () => {
+  const k = monitorKey(base, undefined);
+  assert.equal(k, monitorKey({ ...base, onlyWithSalary: false, salaryCurrencies: [] }, undefined));
+  assert.notEqual(k, monitorKey({ ...base, onlyWithSalary: true }, undefined));
+  assert.notEqual(monitorKey({ ...base, minAnnualSalary: 100000 }, undefined), monitorKey({ ...base, minAnnualSalary: 150000 }, undefined));
+});

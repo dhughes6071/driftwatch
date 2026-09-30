@@ -31,6 +31,9 @@ export interface MonitorFilters {
   locationKeywords: string[];
   remoteOnly: boolean;
   postedWithinDays?: number;
+  onlyWithSalary?: boolean;
+  minAnnualSalary?: number;
+  salaryCurrencies?: string[];
 }
 
 export function monitorKey(f: MonitorFilters, name: string | undefined): string {
@@ -44,6 +47,10 @@ export function monitorKey(f: MonitorFilters, name: string | undefined): string 
     norm(f.locationKeywords),
     f.remoteOnly,
     f.postedWithinDays ?? null,
+    // Pay filters (added later) only join the key when used, so earlier searches keep their history.
+    ...(f.onlyWithSalary || f.minAnnualSalary || f.salaryCurrencies?.length
+      ? [["pay", !!f.onlyWithSalary, f.minAnnualSalary ?? null, norm(f.salaryCurrencies ?? [])]]
+      : []),
   ]);
   const label = (name ?? "").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
   return `${label || "search"}-${createHash("sha256").update(canon + "|" + label).digest("hex").slice(0, 16)}`;

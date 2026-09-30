@@ -41,6 +41,12 @@ interface Input {
   locationKeywords?: string[];
   remoteOnly?: boolean;
   postedWithinDays?: number;
+  /** Only roles whose description states pay. */
+  onlyWithSalary?: boolean;
+  /** Only roles whose annualised top of range reaches this, in the job's own currency. */
+  minAnnualSalary?: number;
+  /** Only roles paying in these currencies, e.g. ["USD"]. */
+  salaryCurrencies?: string[];
   includeDescription?: boolean;
   maxJobs?: number;
   maxJobsPerCompany?: number;
@@ -67,6 +73,9 @@ try {
     locationKeywords = [],
     remoteOnly = false,
     postedWithinDays,
+    onlyWithSalary = false,
+    minAnnualSalary,
+    salaryCurrencies = [],
     includeDescription = true,
     maxJobs = 1000,
     maxJobsPerCompany,
@@ -115,7 +124,10 @@ try {
   const monitor = onlyNewSinceLastRun ? await Actor.openKeyValueStore(MONITOR_STORE) : null;
   const mKey = monitor
     ? monitorKey(
-        { careerSiteUrls, useCuratedList, companyKeywords, searchText, titleKeywords, locationKeywords, remoteOnly, postedWithinDays },
+        {
+          careerSiteUrls, useCuratedList, companyKeywords, searchText, titleKeywords, locationKeywords, remoteOnly, postedWithinDays,
+          onlyWithSalary, minAnnualSalary, salaryCurrencies,
+        },
         monitorName,
       )
     : null;
@@ -140,6 +152,9 @@ try {
   const locKw = locationKeywords.map((k) => k.toLowerCase()).filter(Boolean);
   const locMatch = locationMatcher(locKw);
   const cutoff = postedWithinDays ? now.getTime() - postedWithinDays * 86_400_000 : null;
+  const currencies = new Set(salaryCurrencies.map((c) => c.trim().toUpperCase()).filter(Boolean));
+  // Pay is read from the description, so any pay filter needs the detail call.
+  const needSalary = onlyWithSalary || !!minAnnualSalary || currencies.size > 0;
 
   /** Decide from the list row alone. "maybe" means the detail call must settle it. */
   function preFilter(p: Posting): "yes" | "no" | "maybe" {
@@ -156,12 +171,17 @@ try {
       if (/^\d+ locations?$/.test(loc)) verdict = "maybe";
       else if (!locMatch(loc)) return "no";
     }
-    if (remoteOnly) verdict = "maybe";
+    if (remoteOnly || needSalary) verdict = "maybe";
     return verdict;
   }
 
   function finalFilter(j: Job): boolean {
     if (remoteOnly && !j.remote) return false;
+    if (needSalary) {
+      if (j.salaryAnnualMax == null) return false;
+      if (minAnnualSalary && j.salaryAnnualMax < minAnnualSalary) return false;
+      if (currencies.size && !currencies.has(j.salaryCurrency ?? "")) return false;
+    }
     if (locKw.length) {
       const all = [j.location ?? "", ...j.additionalLocations].join(" | ").toLowerCase();
       if (!locMatch(all)) return false;
@@ -279,7 +299,7 @@ try {
     coverageWarnings: incomplete,
     ...(monitor ? { newSinceLastRun: { monitorKey: mKey, firstRun: !prevState, alreadyDeliveredSkipped: alreadyDelivered } } : {}),
     perSite,
-    filters: { searchText, titleKeywords, locationKeywords, remoteOnly, postedWithinDays },
+    filters: { searchText, titleKeywords, locationKeywords, remoteOnly, postedWithinDays, onlyWithSalary, minAnnualSalary, salaryCurrencies },
     finishedAt: new Date().toISOString(),
   });
   log.info(`Done. ${pushed} jobs from ${perSite.filter((s) => s.jobs > 0).length} career site(s).`);

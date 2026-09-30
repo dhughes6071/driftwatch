@@ -87,6 +87,12 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   delivered postings (tenant/site/path + job id, 180 days, cap 150k) in a named store `workday-jobs-monitor` in the
   caller's account (`src/monitor.ts`); remembered postings are skipped before any detail call, and jobs cut off by
   maxJobs are still delivered next run. Cloud test: 3 runs x maxJobs 5 on NVIDIA -> 15 distinct jobs, each charged.
+- **30 Sep: pay extraction in the Workday actor (build 0.1.8)** — `src/salary.ts` is an exact copy of the Career API's
+  (a test fails if they drift); salary fields on every job with a fetched description, plus `onlyWithSalary` /
+  `minAnnualSalary` / `salaryCurrencies` filters (they force the detail call) and a Pay column. Found while testing:
+  NVIDIA-style "124,000 USD - 195,500 USD" (code after each number) was not read -- fixed in the shared reader:
+  +11,954 jobs with pay across the index (11,803 Workday), 3 of 1.83M changed. Index pay coverage 28.4% -> 29.0%.
+  Cloud test: NVIDIA "software engineer" at $200k+ -> 5 jobs with pay in 17 s, 5 charged.
 - **Main actor pricing cleanup still blocked until 10 Oct** (checked 30 Sep: Console "Change" button still disabled while the
   price change is pending). Note: the extra `apify-default-dataset-item` charge is $0.01 per 1,000 (under 1% on top of
   $1.50), not a doubling.

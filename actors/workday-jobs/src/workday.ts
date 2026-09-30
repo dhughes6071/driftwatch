@@ -24,6 +24,7 @@
  */
 
 import NAMES from "./names.json" with { type: "json" };
+import { extractSalary, type Period, type Salary } from "./salary.ts";
 
 /**
  * Display names for known Workday tenants ("ms" -> "Morgan Stanley").
@@ -115,6 +116,16 @@ export interface Job {
   description?: string;
   employmentType: string | null;
   jobReqId: string | null;
+  /** Stated pay, read from the description (null when none is stated or no description was fetched). */
+  salaryMin: number | null;
+  salaryMax: number | null;
+  salaryCurrency: string | null;
+  salaryPeriod: Period | null;
+  /** Annualised (hour x 2,080, day x 260, week x 52, month x 12), same currency. */
+  salaryAnnualMin: number | null;
+  salaryAnnualMax: number | null;
+  /** The text the pay was read from, for checking. */
+  salaryText: string | null;
 }
 
 export type Fetch = typeof fetch;
@@ -485,9 +496,26 @@ export function normalize(
     url: d?.externalUrl ?? `${publicBase(site)}${p.externalPath}`,
     employmentType: d?.timeType ?? null,
     jobReqId: reqId,
+    ...salaryFields(null),
   };
-  if (d) job.description = toText(d.jobDescription);
+  if (d) {
+    job.description = toText(d.jobDescription);
+    Object.assign(job, salaryFields(extractSalary(job.description, job.country)));
+  }
   return job;
+}
+
+/** Salary fields from an extraction result (all null when there is none). */
+export function salaryFields(s: Salary | null) {
+  return {
+    salaryMin: s?.min ?? null,
+    salaryMax: s?.max ?? null,
+    salaryCurrency: s?.currency ?? null,
+    salaryPeriod: s?.period ?? null,
+    salaryAnnualMin: s?.annualMin ?? null,
+    salaryAnnualMax: s?.annualMax ?? null,
+    salaryText: s?.text ?? null,
+  };
 }
 
 function sleep(ms: number) {

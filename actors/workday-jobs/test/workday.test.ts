@@ -194,6 +194,24 @@ test("normalize prefers the detail call and flags remote from the workplace labe
   assert.equal(job.description, "Build things\n- GPUs");
 });
 
+test("normalize reads stated pay from the description, in the job's own currency", () => {
+  const detail = (desc: string, country: string) => ({
+    title: "Analyst", location: "Toronto", jobReqId: "R2", jobDescription: desc, country: { descriptor: country },
+  });
+  const p = { title: "Analyst", externalPath: "/job/X/An_R2", bulletFields: ["R2"] };
+  const us = normalize(SITE, p, null, detail("<p>The base pay range for this role is $98,000 - $125,000 per year.</p>", "United States of America"));
+  assert.deepEqual(
+    [us.salaryMin, us.salaryMax, us.salaryCurrency, us.salaryPeriod, us.salaryAnnualMax],
+    [98000, 125000, "USD", "year", 125000],
+  );
+  const ca = normalize(SITE, p, null, detail("<p>Hourly pay: $24.00 - $28.00 per hour</p>", "Canada"));
+  assert.deepEqual([ca.salaryCurrency, ca.salaryPeriod, ca.salaryAnnualMax], ["CAD", "hour", 58240]);
+  const none = normalize(SITE, p, null, detail("<p>We raised $185 million last year.</p>", "United States of America"));
+  assert.equal(none.salaryMin, null);
+  const noDetail = normalize(SITE, p, null, null);
+  assert.equal(noDetail.salaryText, null);
+});
+
 test("normalize without detail: no fake location from 'N Locations', URL built from the site", () => {
   const job = normalize(
     SITE,

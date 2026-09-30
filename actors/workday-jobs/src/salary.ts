@@ -1,3 +1,4 @@
+// COPY of actors/career-jobs/src/salary.ts -- keep identical below this line (test/salary-sync.test.ts checks).
 /**
  * Pay-range extraction from job descriptions.
  *

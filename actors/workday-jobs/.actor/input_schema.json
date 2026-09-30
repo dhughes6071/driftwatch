@@ -52,6 +52,25 @@
       "description": "Only roles whose location or the company's workplace label says remote.",
       "default": false
     },
+    "onlyWithSalary": {
+      "title": "Only jobs that state pay",
+      "type": "boolean",
+      "description": "Only roles whose description states a pay range or rate. About 1 in 4 US Workday roles do, thanks to pay-transparency laws. Pay is read from the description, so this fetches each candidate's details.",
+      "default": false
+    },
+    "minAnnualSalary": {
+      "title": "Minimum yearly pay",
+      "type": "integer",
+      "description": "Only roles whose pay range reaches at least this much per year, in the job's own currency. Hourly and monthly pay are converted (hour × 2,080, month × 12). Implies 'only jobs that state pay'.",
+      "minimum": 0
+    },
+    "salaryCurrencies": {
+      "title": "Pay currencies",
+      "type": "array",
+      "description": "Only roles paying in these currencies, e.g. \"USD\", \"GBP\", \"EUR\". Implies 'only jobs that state pay'.",
+      "editor": "stringList",
+      "default": []
+    },
     "postedWithinDays": {
       "title": "Posted within (days)",
       "type": "integer",
