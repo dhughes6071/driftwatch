@@ -83,6 +83,10 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   `src/monitor.ts`); later runs return only jobs with `firstSeenAt` after it. Shards now carry `newestFirstSeen`, so
   monitor runs skip shards with nothing new. Cloud test (build 0.1.10): first run 314 jobs charged 314; immediate rerun
   0 jobs, 0 shards read, 1.7 s. Index republished: 1,808,281 jobs. 36 tests.
+- **30 Sep: Workday actor gets "new since last run" too (build 0.1.6)** — live scraper, so it remembers each search's
+  delivered postings (tenant/site/path + job id, 180 days, cap 150k) in a named store `workday-jobs-monitor` in the
+  caller's account (`src/monitor.ts`); remembered postings are skipped before any detail call, and jobs cut off by
+  maxJobs are still delivered next run. Cloud test: 3 runs x maxJobs 5 on NVIDIA -> 15 distinct jobs, each charged.
 - **Main actor pricing cleanup still blocked until 10 Oct** (checked 30 Sep: Console "Change" button still disabled while the
   price change is pending). Note: the extra `apify-default-dataset-item` charge is $0.01 per 1,000 (under 1% on top of
   $1.50), not a doubling.

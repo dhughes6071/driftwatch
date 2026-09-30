@@ -26,6 +26,7 @@ import {
   type Posting,
   type Site,
 } from "./workday.ts";
+import { MONITOR_STORE, SeenPostings, monitorKey, postingKey, type MonitorState } from "./monitor.ts";
 
 interface Input {
   /** Workday career-site URLs. Any page on the site works, including a single job. */
@@ -43,6 +44,10 @@ interface Input {
   includeDescription?: boolean;
   maxJobs?: number;
   maxJobsPerCompany?: number;
+  /** Return only jobs this same search has not delivered before (for scheduled runs). */
+  onlyNewSinceLastRun?: boolean;
+  /** Optional label, so two searches with the same filters keep separate histories. */
+  monitorName?: string;
 }
 
 /** Charged once per job delivered. Must match the event configured in Apify. */
@@ -65,6 +70,8 @@ try {
     includeDescription = true,
     maxJobs = 1000,
     maxJobsPerCompany,
+    onlyNewSinceLastRun = false,
+    monitorName,
   } = input;
 
   // ---------------------------------------------------------------- targets
@@ -102,6 +109,29 @@ try {
     );
   }
   log.info(`Fetching ${unique.length} Workday career site(s)`);
+
+  // ---------------------------------------------------------------- new since last run
+
+  const monitor = onlyNewSinceLastRun ? await Actor.openKeyValueStore(MONITOR_STORE) : null;
+  const mKey = monitor
+    ? monitorKey(
+        { careerSiteUrls, useCuratedList, companyKeywords, searchText, titleKeywords, locationKeywords, remoteOnly, postedWithinDays },
+        monitorName,
+      )
+    : null;
+  const prevState = monitor && mKey ? await monitor.getValue<MonitorState>(mKey) : null;
+  const history = new SeenPostings(prevState);
+  let alreadyDelivered = 0;
+  const saveMonitor = async () => {
+    if (monitor && mKey) await monitor.setValue(mKey, history.toState(prevState));
+  };
+  if (monitor) {
+    log.info(
+      prevState
+        ? `Returning only jobs this search has not delivered in its ${prevState.runs} earlier run(s).`
+        : `First run of this search (${mKey}): returning all current matches and remembering them.`,
+    );
+  }
 
   // ---------------------------------------------------------------- filters
 
@@ -159,7 +189,7 @@ try {
 
     // 1. List. Keep rows that pass (or might pass) the filters; stop early
     //    once there are certainly enough.
-    const candidates: Array<{ p: Posting; category: string | null; sure: boolean }> = [];
+    const candidates: Array<{ p: Posting; category: string | null; sure: boolean; key: string }> = [];
     let sure = 0;
     try {
       await client.collect(site, {
@@ -169,9 +199,12 @@ try {
           log.warning(why);
         },
         onPosting: (p, category) => {
+          const key = postingKey(site.tenant, site.site, p.externalPath);
+          // Delivered by an earlier run of this search: skip before any detail call.
+          if (monitor && history.has(key)) return void alreadyDelivered++;
           const v = preFilter(p);
           if (v === "no") return;
-          candidates.push({ p, category, sure: v === "yes" });
+          candidates.push({ p, category, sure: v === "yes", key });
           if (v === "yes") sure++;
           return sure >= siteCap;
         },
@@ -185,29 +218,41 @@ try {
 
     // 2. Details (when wanted or needed), final filter, charge + push -- in
     //    small batches so the charging limit and caps are honoured promptly.
-    let delivered = 0;
-    for (let i = 0; i < candidates.length && delivered < siteCap && !budgetReached; i += DETAIL_CONCURRENCY) {
+    let siteDelivered = 0;
+    for (let i = 0; i < candidates.length && siteDelivered < siteCap && !budgetReached; i += DETAIL_CONCURRENCY) {
       const batch = candidates.slice(i, i + DETAIL_CONCURRENCY);
       const jobs = await Promise.all(
-        batch.map(async ({ p, category, sure }) => {
+        batch.map(async ({ p, category, sure, key }) => {
           const needDetail = includeDescription || !sure;
           const d = needDetail ? await client.detail(site, p.externalPath) : null;
           // A job that vanished between list and detail is simply gone.
           if (needDetail && !d) return null;
-          return normalize(site, p, category, d, now);
+          return { j: normalize(site, p, category, d, now), key };
         }),
       );
-      for (const j of jobs) {
-        if (!j || delivered >= siteCap || pushed >= maxJobs) continue;
+      for (const r of jobs) {
+        if (!r || siteDelivered >= siteCap || pushed >= maxJobs) continue;
+        const { j, key } = r;
         // One company often runs several career sites listing the same role.
         if (seenJobs.has(j.id)) continue;
+        // ...and may list a role delivered earlier under another site's path.
+        if (monitor && history.has(`id:${j.id}`)) {
+          alreadyDelivered++;
+          history.add(key, new Date().toISOString());
+          continue;
+        }
         if (!finalFilter(j)) continue;
         seenJobs.add(j.id);
 
         const record = includeDescription ? j : { ...j, description: undefined };
         const charge = await Actor.pushData(record, EVENT_JOB);
         pushed++;
-        delivered++;
+        siteDelivered++;
+        if (monitor) {
+          const at = new Date().toISOString();
+          history.add(key, at);
+          history.add(`id:${j.id}`, at);
+        }
         if (charge?.eventChargeLimitReached) {
           budgetReached = true;
           log.info("Charging limit reached -- stopping cleanly with everything delivered so far.");
@@ -216,11 +261,15 @@ try {
       }
     }
 
-    perSite.push({ site: label, jobs: delivered, status: candidates.length ? "ok" : "no matching jobs" });
-    log.info(`${label}: ${delivered} jobs (total ${pushed}/${maxJobs})`);
+    perSite.push({ site: label, jobs: siteDelivered, status: candidates.length ? "ok" : "no matching jobs" });
+    log.info(`${label}: ${siteDelivered} jobs (total ${pushed}/${maxJobs})`);
+    // Save as we go, so a crash never re-charges for jobs already delivered.
+    if (siteDelivered) await saveMonitor();
   }
 
   // ---------------------------------------------------------------- summary
+
+  await saveMonitor();
 
   await Actor.setValue("SUMMARY", {
     jobsReturned: pushed,
@@ -228,6 +277,7 @@ try {
     sitesWithJobs: perSite.filter((s) => s.jobs > 0).length,
     stoppedBecause: budgetReached ? "charging_limit" : pushed >= maxJobs ? "maxJobs" : "completed",
     coverageWarnings: incomplete,
+    ...(monitor ? { newSinceLastRun: { monitorKey: mKey, firstRun: !prevState, alreadyDeliveredSkipped: alreadyDelivered } } : {}),
     perSite,
     filters: { searchText, titleKeywords, locationKeywords, remoteOnly, postedWithinDays },
     finishedAt: new Date().toISOString(),

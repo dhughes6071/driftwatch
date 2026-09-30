@@ -39,6 +39,9 @@ straight through. In testing on 26 Sep 2026 it returned **2,650 of NVIDIA's 2,65
   so the Actor fetches all of them, and location filters match against every one.
 - **Exact posting dates.** The list view only says "Posted 30+ Days Ago"; the Actor
   returns the real date.
+- **Only what's new, on a schedule.** Turn on `onlyNewSinceLastRun` and schedule the run:
+  each run skips every role that search has already delivered, so you track an employer's
+  new openings without paying twice for the same job.
 - **Pay only for what you get.** Filters run before charging, so filtered-out roles are
   never billed.
 
@@ -65,6 +68,8 @@ You pay only for jobs actually delivered to your dataset:
 | `titleKeywords` / `locationKeywords` | Case-insensitive "contains" filters. |
 | `remoteOnly` | Only roles whose location or workplace label says remote. |
 | `postedWithinDays` | Only recent roles. |
+| `onlyNewSinceLastRun` | Only roles this same search hasn't delivered before. The first run returns everything that matches. Changing any filter starts a new history. |
+| `monitorName` | Optional. Keeps two searches with identical filters on separate histories (e.g. one per client). |
 | `includeDescription` | Adds the description, exact date, employment type, country and every location. Turn off for a faster run. |
 | `maxJobs` / `maxJobsPerCompany` | Caps on results, and your main cost control. |
 
@@ -108,6 +113,11 @@ so the two datasets can be combined.
 { "useCuratedList": true, "searchText": "data", "remoteOnly": true, "includeDescription": false, "maxJobs": 2000 }
 ```
 
+**Daily alert: new NVIDIA and AMD engineering roles (schedule it once a day)**
+```json
+{ "useCuratedList": true, "companyKeywords": ["nvidia", "amd"], "titleKeywords": ["engineer"], "onlyNewSinceLastRun": true, "maxJobs": 5000 }
+```
+
 **Nursing jobs in Texas at hospital systems in the list**
 ```json
 { "useCuratedList": true, "companyKeywords": ["health", "hospital"], "titleKeywords": ["nurse", "rn"], "locationKeywords": ["TX", "Texas"] }
@@ -119,4 +129,7 @@ so the two datasets can be combined.
   never sinks a run, and the run's `SUMMARY` record lists what happened to each site.
 - Some companies run several Workday career sites (Salesforce runs nine, including Slack
   and Tableau). A role listed on more than one of them is returned once.
+- `onlyNewSinceLastRun` remembers each search's delivered roles for 180 days in a key-value
+  store named `workday-jobs-monitor` in your own Apify account. Roles cut off by `maxJobs` or
+  your spending limit are still delivered on the next run.
 - `companyName` is filled in for all 1,785 companies in the built-in list. For a career site outside the list it falls back to the Workday id.
