@@ -45,8 +45,11 @@ Recruitee. This Actor covers all of them with one set of output fields.
 - **Pay ranges as data.** About a quarter of all roles — far more in the US, where
   pay-transparency laws apply — state a salary or hourly rate. It's extracted into
   `salaryMin` / `salaryMax` / `salaryCurrency` / `salaryPeriod`, annualised into
-  `salaryAnnualMin` / `salaryAnnualMax`, and filterable. Ashby's own structured pay data is
-  used where they exist (Ashby, Rippling, UKG, Recruitee, and the pay fields of Breezy and BambooHR).
+  `salaryAnnualMin` / `salaryAnnualMax`, and filterable. Each system's own structured pay data
+  is used where it exists (Ashby, Rippling, UKG, Recruitee, and the pay fields of Breezy and BambooHR).
+- **Only what's new, on a schedule.** Turn on `onlyNewSinceLastRun` and schedule the search
+  daily: each run returns only roles added since the last one, so you never pay twice for
+  the same job.
 - **Real company names** (`companyName`), plus the career-site id (`company`) for joins.
 - **Pay only for what you get.** Filters run before charging.
 
@@ -67,6 +70,8 @@ included, so you are not billed for compute separately.
 | `locationKeywords` | Matches any listed location or the country. |
 | `companyKeywords` | Matches the company name or its career-site id. |
 | `postedWithinDays` | Only recent roles. Undated roles count from the day the index first saw them. |
+| `onlyNewSinceLastRun` | Only roles the index added since this same search last ran. The first run returns everything that matches. Changing any filter starts a new history. |
+| `monitorName` | Optional. Keeps two searches with identical filters on separate histories (e.g. one per client). |
 | `remoteOnly` | Only roles whose location or workplace label says remote. |
 | `onlyWithSalary` | Only roles whose posting states pay. |
 | `minAnnualSalary` | Only roles whose pay range reaches at least this per year, in the job's own currency (hourly × 2,080, monthly × 12). |
@@ -117,6 +122,11 @@ Actors, which fetch a company's jobs live when you need the very latest.
 { "titleKeywords": ["software engineer"], "salaryCurrencies": ["USD"], "minAnnualSalary": 150000, "maxJobs": 2000 }
 ```
 
+**Daily feed of new nursing roles in Ohio (schedule it once a day)**
+```json
+{ "titleKeywords": ["nurse", "RN"], "locationKeywords": ["Ohio", "OH"], "onlyNewSinceLastRun": true, "maxJobs": 5000 }
+```
+
 **Everything two companies have open**
 ```json
 { "companyKeywords": ["Morgan Stanley", "Stripe"], "maxJobs": 10000 }
@@ -132,6 +142,10 @@ Actors, which fetch a company's jobs live when you need the very latest.
   say exactly when. For a single company's roles to the minute, use the live Actors
   linked above.
 - Roles disappear from the index within a few days of the company closing them.
+- `onlyNewSinceLastRun` remembers each search in a key-value store named
+  `career-site-jobs-monitor` in your own Apify account. If a run stops at `maxJobs` or your
+  spending limit, the new roles it didn't deliver are not offered again, so set `maxJobs`
+  comfortably above a day's volume.
 - Jobvite career pages don't show a posting date, so Jobvite roles are dated by when the index
   first saw them (`firstSeenAt`).
 - Teamtailor's feed lists at most 100 roles per company, so its very largest employers are

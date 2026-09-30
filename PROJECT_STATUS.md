@@ -78,6 +78,14 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   reads "Minimum Salary … Maximum Salary" pairs. `CRAWL_ONLY=a,b` runs a catch-up crawl for named systems only. Index
   **1,760,652 jobs, 19,610 companies, 15 systems**; build 0.1.9, store title "… 15 hiring systems". 34 tests. Known: a
   Jobvite-only search reads nearly every shard (~90 s) because Jobvite jobs are undated.
+- **30 Sep: "new since last run" (`onlyNewSinceLastRun`, optional `monitorName`)** — each search's last-read index time is
+  kept in a named key-value store `career-site-jobs-monitor` in the caller's own account (key = hash of the filters + name,
+  `src/monitor.ts`); later runs return only jobs with `firstSeenAt` after it. Shards now carry `newestFirstSeen`, so
+  monitor runs skip shards with nothing new. Cloud test (build 0.1.10): first run 314 jobs charged 314; immediate rerun
+  0 jobs, 0 shards read, 1.7 s. Index republished: 1,808,281 jobs. 36 tests.
+- **Main actor pricing cleanup still blocked until 10 Oct** (checked 30 Sep: Console "Change" button still disabled while the
+  price change is pending). Note: the extra `apify-default-dataset-item` charge is $0.01 per 1,000 (under 1% on top of
+  $1.50), not a doubling.
 - **Published on the Store 27 Sep:** https://apify.com/viridian_layout_ea2/career-site-jobs-api — live page verified:
   "from $2.00 / 1,000 jobs", custom icon, 900,000+ description.
 

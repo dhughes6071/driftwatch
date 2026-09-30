@@ -21,6 +21,8 @@ export interface Query {
   salaryCurrencies?: string[];
   maxJobs: number;
   maxJobsPerCompany?: number;
+  /** Only jobs the index first saw after this time (ISO): "new since last run". */
+  seenAfter?: string;
 }
 
 export type Fetcher = (url: string) => Promise<Uint8Array>;
@@ -86,6 +88,7 @@ export function makeMatcher(q: Query, now = Date.now()) {
   const needSalary = !!q.onlyWithSalary || !!q.minAnnualSalary || currencies.size > 0;
 
   return (j: IndexJob): boolean => {
+    if (q.seenAfter && !(j.firstSeenAt > q.seenAfter)) return false;
     if (needSalary) {
       if (j.salaryAnnualMax == null) return false;
       if (q.minAnnualSalary && j.salaryAnnualMax < q.minAnnualSalary) return false;
@@ -135,6 +138,8 @@ export async function search(
     // unless it also holds undated jobs, which still qualify by firstSeenAt.
     // (Skip, not stop: the undated jobs sit in the last shards.)
     if (cutoff && shard.undated === 0 && shard.newest && shard.newest < cutoff) continue;
+    // Nothing in this shard is newer than the caller's last run.
+    if (q.seenAfter && shard.newestFirstSeen && shard.newestFirstSeen <= q.seenAfter) continue;
 
     const text = unzipText(await fetcher(shard.url));
     shardsRead++;

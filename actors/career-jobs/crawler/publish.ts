@@ -86,6 +86,7 @@ export async function publish() {
       newest: dated[0] ?? null,
       oldest: dated.at(-1) ?? null,
       undated: part.length - dated.length,
+      newestFirstSeen: part.reduce((m, j) => (j.firstSeenAt > m ? j.firstSeenAt : m), ""),
     });
     log(`uploaded ${key}: ${part.length} jobs, ${(body.length / 1e6).toFixed(1)} MB`);
     part = [];

@@ -90,6 +90,8 @@ export interface ShardRef {
   oldest: string | null;
   /** Jobs with no postedAt; a date filter can only rule a shard out when this is 0. */
   undated: number;
+  /** Latest firstSeenAt in the shard, so "new since last run" can skip shards with nothing new. Absent in pre-30 Sep indexes. */
+  newestFirstSeen?: string;
 }
 
 export interface Manifest {

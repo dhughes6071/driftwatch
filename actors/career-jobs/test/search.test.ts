@@ -4,6 +4,7 @@ import { gzipSync } from "node:zlib";
 import type { IndexJob, Manifest } from "../src/format.ts";
 import { compareNewestFirst } from "../src/format.ts";
 import { descriptionsFor, makeMatcher, search, type Fetcher } from "../src/search.ts";
+import { monitorKey } from "../src/monitor.ts";
 
 const NOW = Date.parse("2026-09-27T12:00:00Z");
 const day = (n: number) => new Date(NOW - n * 86_400_000).toISOString();
@@ -40,7 +41,8 @@ function fakeIndex(jobs: IndexJob[], shardSize: number, descs: Record<string, Re
     const url = `mem://s${i}`;
     files.set(url, gzipSync(part.map((j) => JSON.stringify(j)).join("\n")));
     const dated = part.filter((j) => j.postedAt).map((j) => j.postedAt!);
-    shards.push({ key: url, url, count: part.length, newest: dated[0] ?? null, oldest: dated.at(-1) ?? null, undated: part.length - dated.length });
+    const newestFirstSeen = part.reduce((m, j) => (j.firstSeenAt > m ? j.firstSeenAt : m), "");
+    shards.push({ key: url, url, count: part.length, newest: dated[0] ?? null, oldest: dated.at(-1) ?? null, undated: part.length - dated.length, newestFirstSeen });
   }
   const desc: Record<string, string> = {};
   for (const [k, v] of Object.entries(descs)) {
@@ -153,4 +155,30 @@ test("salary filters", () => {
   assert.deepEqual([withPay, gbp, noPay].filter(min).map((j) => j.id), ["p"], "top of range reaches 100k");
   const cur = makeMatcher({ salaryCurrencies: ["gbp"], maxJobs: 10 }, NOW);
   assert.deepEqual([withPay, gbp, noPay].filter(cur).map((j) => j.id), ["g"]);
+});
+
+test("new since last run: only jobs first seen after the last index, and shards with nothing new are skipped", async () => {
+  // 20 jobs seen in an older crawl, 3 new ones first seen today (one posted long ago, one undated).
+  const old = Array.from({ length: 20 }, (_, i) => job({ id: `o${i}`, postedAt: day(2 + i), firstSeenAt: day(30) }));
+  const fresh = [
+    job({ id: "n1", postedAt: day(0), firstSeenAt: day(0) }),
+    job({ id: "n2", postedAt: day(60), firstSeenAt: day(0) }),
+    job({ id: "n3", postedAt: null, firstSeenAt: day(0) }),
+  ];
+  const { manifest, fetcher, reads } = fakeIndex([...old, ...fresh], 5);
+  const r = await search(manifest, { maxJobs: 100, seenAfter: day(1) }, fetcher, NOW);
+  assert.deepEqual(r.jobs.map((j) => j.id).sort(), ["n1", "n2", "n3"]);
+  assert.ok(reads.length < manifest.shards.length, `read ${reads.length} of ${manifest.shards.length}`);
+  // Nothing new since the latest index: no shard needs reading.
+  const none = await search(manifest, { maxJobs: 100, seenAfter: day(0) }, fetcher, NOW);
+  assert.equal(none.jobs.length, 0);
+  assert.equal(none.shardsRead, 0);
+});
+
+test("monitor key: same filters, same key; limits and order ignored; name or filter change starts afresh", () => {
+  const a = monitorKey({ titleKeywords: ["nurse"], locationKeywords: ["Ohio"], maxJobs: 100 }, undefined);
+  assert.equal(a, monitorKey({ locationKeywords: ["Ohio"], titleKeywords: ["nurse"], maxJobs: 5, seenAfter: "x" }, undefined));
+  assert.notEqual(a, monitorKey({ titleKeywords: ["nurse"], locationKeywords: ["Texas"], maxJobs: 100 }, undefined));
+  assert.notEqual(a, monitorKey({ titleKeywords: ["nurse"], locationKeywords: ["Ohio"], maxJobs: 100 }, "Team A"));
+  assert.match(monitorKey({ maxJobs: 1 }, "Ohio Nurses!"), /^ohio-nurses-[0-9a-f]{16}$/);
 });

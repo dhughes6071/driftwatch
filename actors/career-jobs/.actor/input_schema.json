@@ -41,6 +41,18 @@
       "maximum": 365,
       "prefill": 7
     },
+    "onlyNewSinceLastRun": {
+      "title": "Only jobs new since this search last ran",
+      "type": "boolean",
+      "description": "For scheduled runs: return only jobs the index has added since this same search last ran, so you never pay for the same job twice. The first run returns all current matches. The Actor remembers each search in a key-value store named <code>career-site-jobs-monitor</code> in your account; changing any filter starts a new history.",
+      "default": false
+    },
+    "monitorName": {
+      "title": "Search name (optional)",
+      "type": "string",
+      "description": "Only needed to keep two searches with identical filters separate, e.g. one per client.",
+      "editor": "textfield"
+    },
     "remoteOnly": {
       "title": "Remote roles only",
       "type": "boolean",
