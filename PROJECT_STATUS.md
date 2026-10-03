@@ -100,6 +100,13 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   `descriptionPlain` is only the intro -- requirements, benefits and pay sit in `lists` / `additionalPlain`; descriptions
   now join every section. Cloud tests: 20k curated jobs -> Greenhouse 52% with pay, Ashby 29%; all 3,038 Lever jobs ->
   43% (was 0%). The Career API index picks up the new pay fields and fuller Lever descriptions in tonight's crawl.
+- **3 Oct: first actor failure investigated (build 0.5.11)** — Insights showed the success rate dipping 2-3 Oct (30-day
+  public stats: 1 FAILED, 3 TIMED-OUT of 97); users don't share runs, so no logs. Reproduced instead: (1) a `null` in
+  `companies` crashed it, and all three actors reported crashes as SUCCEEDED (catch + `Actor.exit()` in finally) -- now
+  `Actor.fail(reason)`; (2) plain names (`["stripe"]`) and job-board links silently returned 0 jobs -- `src/jobs/targets.ts`
+  now accepts names, links and objects, skips bad entries with a reason, and warns when no company has a board;
+  (3) one `pushData` per job (~35 ms each) meant a full 125k-job run outlived the 1-hour timeout -- now 500 per call:
+  20k jobs in 62 s (was 457 s). Builds: main 0.5.11, Workday 0.1.10, Career API 0.1.12.
 - **Main actor pricing cleanup still blocked until 10 Oct** (checked 30 Sep: Console "Change" button still disabled while the
   price change is pending). Note: the extra `apify-default-dataset-item` charge is $0.01 per 1,000 (under 1% on top of
   $1.50), not a doubling.

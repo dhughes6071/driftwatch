@@ -17,10 +17,14 @@
 import { Actor, log } from "apify";
 import { fetchCompany, VERIFIED_ATS, type Ats, type Job } from "./ats.ts";
 import { payFor, type PayFields } from "./pay.ts";
+import { parseCompanyEntry } from "./targets.ts";
 
 interface Input {
-  /** Explicit companies to fetch. Takes precedence over `useCuratedList`. */
-  companies?: Array<{ ats?: Ats; slug: string }>;
+  /**
+   * Explicit companies to fetch. Takes precedence over `useCuratedList`.
+   * [{ slug, ats? }], plain names, or job-board links (see targets.ts).
+   */
+  companies?: unknown[];
   /** Use our verified registry of companies instead of naming them. */
   useCuratedList?: boolean;
   /** Cap on results. Also the main cost control for the caller. */
@@ -72,11 +76,20 @@ try {
   let targets: Array<{ ats: Ats; slug: string }> = [];
 
   if (companies?.length) {
-    // A caller may name the ATS or leave it to us to work out.
-    targets = companies.flatMap((c) =>
-      c.ats ? [{ ats: c.ats, slug: c.slug }] : VERIFIED_ATS.map((ats) => ({ ats, slug: c.slug })),
-    );
-    log.info(`Fetching ${companies.length} caller-specified companies`);
+    const skipped: string[] = [];
+    for (const entry of companies) {
+      const t = parseCompanyEntry(entry);
+      if ("skip" in t) skipped.push(t.skip);
+      // A caller may name the ATS (or paste a link that does) or leave it to us to work out.
+      else targets.push(...(t.ats ? [{ ats: t.ats, slug: t.slug }] : VERIFIED_ATS.map((ats) => ({ ats, slug: t.slug }))));
+    }
+    if (skipped.length) {
+      log.warning(
+        `Skipped ${skipped.length} of ${companies.length} companies: ${skipped.slice(0, 5).join("; ")}. ` +
+          `Use a name ("stripe"), a job-board link, or {"slug": "stripe", "ats": "greenhouse"}.`,
+      );
+    }
+    log.info(`Fetching ${companies.length - skipped.length} caller-specified companies`);
   } else if (useCuratedList) {
     targets = await loadCuratedTargets();
     log.info(`Fetching ${targets.length} companies from the curated registry`);
@@ -98,6 +111,26 @@ try {
   let budgetReached = false;
 
   const CONCURRENCY = 5;
+  /** Records per pushData call. One call per job took ~35 ms each, so a 125k-job run outlived the 1-hour timeout. */
+  const PUSH_BATCH = 500;
+
+  /*
+   * Charge and push together. pushData(items, eventName) charges per item as
+   * it is stored, and pushes only as many as the caller's spending limit
+   * allows, so nobody is billed for a record they did not receive. If the
+   * budget runs out mid-run we stop cleanly.
+   */
+  async function deliver(records: object[]) {
+    for (let i = 0; i < records.length && !budgetReached; i += PUSH_BATCH) {
+      const chunk = records.slice(i, i + PUSH_BATCH);
+      const charge = await Actor.pushData(chunk, EVENT_JOB);
+      if (charge?.eventChargeLimitReached) {
+        pushed += charge.chargedCount;
+        budgetReached = true;
+        log.info("Caller's charging limit reached -- stopping cleanly.");
+      } else pushed += chunk.length;
+    }
+  }
 
   for (let i = 0; i < targets.length && pushed < maxJobs && !budgetReached; i += CONCURRENCY) {
     const batch = targets.slice(i, i + CONCURRENCY);
@@ -121,8 +154,9 @@ try {
       }
       companiesOk++;
 
+      const batch: object[] = [];
       for (const job of jobs) {
-        if (pushed >= maxJobs || budgetReached) break;
+        if (pushed + batch.length >= maxJobs) break;
 
         // A slug probed across several ATSs can yield the same role twice.
         if (seen.has(job.id)) continue;
@@ -137,24 +171,21 @@ try {
         const { compensation: _internal, ...pub } = job;
         const record = includeDescription ? { ...pub, ...pay } : { ...pub, description: undefined, ...pay };
 
-        /*
-         * Charge and push together. pushData(item, eventName) charges for the
-         * item as it is stored, so a caller is never billed for a record they
-         * did not receive. If their budget is exhausted mid-run we stop
-         * cleanly rather than delivering unbilled work or erroring out.
-         */
-        const charge = await Actor.pushData(record, EVENT_JOB);
-        pushed++;
-
-        if (charge?.eventChargeLimitReached) {
-          budgetReached = true;
-          log.info("Caller's charging limit reached -- stopping cleanly.");
-          break;
-        }
+        batch.push(record);
       }
+      await deliver(batch);
+      if (budgetReached) break;
     }
 
     log.info(`progress: ${pushed}/${maxJobs} jobs from ${companiesOk} companies`);
+  }
+
+  if (companies?.length && companiesOk === 0 && targets.length) {
+    const slugs = [...new Set(targets.map((t) => t.slug))].slice(0, 10).join(", ");
+    log.warning(
+      `None of these companies has a public Greenhouse, Lever or Ashby job board: ${slugs}. ` +
+        `Check the slug on the company's careers page (e.g. jobs.lever.co/{slug}), or paste that link instead.`,
+    );
   }
 
   // ---------------------------------------------------------------- summary
@@ -172,11 +203,13 @@ try {
     `Done. ${pushed} jobs from ${companiesOk} companies ` +
       `(${companiesFailed} empty or unreachable).`,
   );
-} catch (err) {
-  log.error(`Actor failed: ${err instanceof Error ? err.message : String(err)}`);
-  throw err;
-} finally {
   await Actor.exit();
+} catch (err) {
+  // Actor.fail marks the run FAILED with the reason; exiting normally here
+  // used to report crashed runs as SUCCEEDED (found 3 Oct 2026).
+  const msg = err instanceof Error ? err.message : String(err);
+  log.error(`Actor failed: ${msg}`);
+  await Actor.fail(msg);
 }
 
 // ------------------------------------------------------------------ helpers

@@ -12,7 +12,7 @@
     "companies": {
       "title": "Specific companies (optional)",
       "type": "array",
-      "description": "Company job-board slugs, e.g. \"stripe\" or \"ramp\". Usually the company name in lowercase. Leave the ATS blank and we'll work out which system they use. Overrides the curated list.",
+      "description": "Companies to fetch, in any of these forms: names (\"stripe\"), job-board links (\"https://jobs.lever.co/veeva\"), or objects ({\"slug\": \"ramp\", \"ats\": \"ashby\"}). Leave the ATS out and we'll work out which system each company uses. Overrides the curated list.",
       "editor": "json",
       "prefill": [
         {

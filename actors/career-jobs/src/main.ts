@@ -104,11 +104,13 @@ try {
     finishedAt: new Date().toISOString(),
   });
   log.info(`Done. ${pushed} jobs delivered.`);
-} catch (err) {
-  log.error(`Actor failed: ${err instanceof Error ? err.message : String(err)}`);
-  throw err;
-} finally {
   await Actor.exit();
+} catch (err) {
+  // Actor.fail marks the run FAILED with the reason; exiting normally here
+  // used to report crashed runs as SUCCEEDED (found 3 Oct 2026).
+  const msg = err instanceof Error ? err.message : String(err);
+  log.error(`Actor failed: ${msg}`);
+  await Actor.fail(msg);
 }
 
 /** Public record: the index row minus internals, plus freshness. */

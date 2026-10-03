@@ -115,8 +115,10 @@ genuinely location-independent roles.
 
 ## Notes
 
-Slugs are usually just the company name in lowercase (`stripe`, `figma`, `ramp`).
-Leave `ats` blank and we'll work out which system a company uses.
+Name companies however is easiest: `"stripe"`, a job-board link such as
+`"https://jobs.lever.co/veeva"`, or `{"slug": "ramp", "ats": "ashby"}`. Slugs are usually
+just the company name in lowercase. Leave `ats` blank and we'll work out which system a
+company uses. If a company has no public Greenhouse, Lever or Ashby board, the run log says so.
 
 Pay is read only when it clearly is pay (not revenue, funding, bonuses or benefits), so
 a missing salary is far more likely than a wrong one. A bare "$" is read as Canadian or
