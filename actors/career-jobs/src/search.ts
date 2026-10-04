@@ -125,14 +125,21 @@ export async function search(
   q: Query,
   fetcher: Fetcher = httpFetcher,
   now = Date.now(),
-): Promise<{ jobs: IndexJob[]; shardsRead: number }> {
+  /** Stop reading shards after this time (ms), returning what was found, so a run never hits its own timeout. */
+  deadline = Infinity,
+): Promise<{ jobs: IndexJob[]; shardsRead: number; timeLimited: boolean }> {
   const match = makeMatcher(q, now);
   const cutoff = q.postedWithinDays ? new Date(now - q.postedWithinDays * 86_400_000).toISOString() : null;
   const perCompany = new Map<string, number>();
   const out: IndexJob[] = [];
   let shardsRead = 0;
+  let timeLimited = false;
 
   for (const shard of manifest.shards) {
+    if (Date.now() > deadline) {
+      timeLimited = true;
+      break;
+    }
     if (out.length >= q.maxJobs) break;
     // A shard whose newest dated job is older than the cutoff can be skipped --
     // unless it also holds undated jobs, which still qualify by firstSeenAt.
@@ -157,7 +164,7 @@ export async function search(
       if (out.length >= q.maxJobs) break;
     }
   }
-  return { jobs: out, shardsRead };
+  return { jobs: out, shardsRead, timeLimited };
 }
 
 /** Fetch descriptions for the given jobs, reading only the chunks they live in. */

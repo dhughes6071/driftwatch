@@ -202,8 +202,14 @@ try {
   const perSite: Array<{ site: string; jobs: number; status: string }> = [];
   const incomplete: string[] = [];
 
+  // Finish inside the run's own time limit: stop starting sites and detail batches with a margin left.
+  const timeoutAt = Actor.getEnv().timeoutAt?.getTime() ?? Infinity;
+  const softStop = timeoutAt - Math.min(45_000, Math.max(8_000, (timeoutAt - Date.now()) * 0.2));
+  let timeLimited = false;
+  const outOfTime = () => (Date.now() > softStop ? (timeLimited = true) : false);
+
   for (const site of unique) {
-    if (pushed >= maxJobs || budgetReached) break;
+    if (pushed >= maxJobs || budgetReached || outOfTime()) break;
     const label = `${site.tenant}/${site.site}`;
     const siteCap = Math.min(maxJobsPerCompany ?? Infinity, maxJobs - pushed);
 
@@ -239,7 +245,7 @@ try {
     // 2. Details (when wanted or needed), final filter, charge + push -- in
     //    small batches so the charging limit and caps are honoured promptly.
     let siteDelivered = 0;
-    for (let i = 0; i < candidates.length && siteDelivered < siteCap && !budgetReached; i += DETAIL_CONCURRENCY) {
+    for (let i = 0; i < candidates.length && siteDelivered < siteCap && !budgetReached && !outOfTime(); i += DETAIL_CONCURRENCY) {
       const batch = candidates.slice(i, i + DETAIL_CONCURRENCY);
       const jobs = await Promise.all(
         batch.map(async ({ p, category, sure, key }) => {
@@ -295,7 +301,7 @@ try {
     jobsReturned: pushed,
     sitesFetched: perSite.length,
     sitesWithJobs: perSite.filter((s) => s.jobs > 0).length,
-    stoppedBecause: budgetReached ? "charging_limit" : pushed >= maxJobs ? "maxJobs" : "completed",
+    stoppedBecause: budgetReached ? "charging_limit" : pushed >= maxJobs ? "maxJobs" : timeLimited ? "time_limit" : "completed",
     coverageWarnings: incomplete,
     ...(monitor ? { newSinceLastRun: { monitorKey: mKey, firstRun: !prevState, alreadyDeliveredSkipped: alreadyDelivered } } : {}),
     perSite,
@@ -303,7 +309,10 @@ try {
     finishedAt: new Date().toISOString(),
   });
   log.info(`Done. ${pushed} jobs from ${perSite.filter((s) => s.jobs > 0).length} career site(s).`);
-  await Actor.exit();
+  if (timeLimited) {
+    log.warning(`Stopped early to finish inside this run's time limit (${perSite.length} of ${unique.length} career sites). Give the run a longer timeout for complete results.`);
+  }
+  await Actor.exit(timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout for complete results.` : undefined);
 } catch (err) {
   // Actor.fail marks the run FAILED with the reason; exiting normally here
   // used to report crashed runs as SUCCEEDED (found 3 Oct 2026).

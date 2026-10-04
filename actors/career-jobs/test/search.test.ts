@@ -182,3 +182,14 @@ test("monitor key: same filters, same key; limits and order ignored; name or fil
   assert.notEqual(a, monitorKey({ titleKeywords: ["nurse"], locationKeywords: ["Ohio"], maxJobs: 100 }, "Team A"));
   assert.match(monitorKey({ maxJobs: 1 }, "Ohio Nurses!"), /^ohio-nurses-[0-9a-f]{16}$/);
 });
+
+test("search stops at the deadline and says so", async () => {
+  const jobs = Array.from({ length: 30 }, (_, i) => job({ id: `j${i}`, postedAt: day(i) }));
+  const { manifest, fetcher } = fakeIndex(jobs, 5);
+  const r = await search(manifest, { maxJobs: 100 }, fetcher, NOW, Date.now() - 1);
+  assert.equal(r.timeLimited, true);
+  assert.equal(r.shardsRead, 0);
+  const all = await search(manifest, { maxJobs: 100 }, fetcher, NOW);
+  assert.equal(all.timeLimited, false);
+  assert.equal(all.jobs.length, 30);
+});

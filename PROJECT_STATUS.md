@@ -107,6 +107,15 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   now accepts names, links and objects, skips bad entries with a reason, and warns when no company has a board;
   (3) one `pushData` per job (~35 ms each) meant a full 125k-job run outlived the 1-hour timeout -- now 500 per call:
   20k jobs in 62 s (was 457 s). Builds: main 0.5.11, Workday 0.1.10, Career API 0.1.12.
+- **4 Oct: another first-actor TIMED-OUT (30-day count 3 -> 4)** — a filtered search over all 3,584 boards took 328 s,
+  past the 300 s timeout many integrations set. Fixes (main 0.5.16): Greenhouse's light list (~12x smaller) is checked
+  against title/location/remote/date before descriptions are downloaded (only matching jobs or boards fetched in full);
+  20 boards at a time in a worker pool; the run stops before its own timeout and ends SUCCEEDED with what it found
+  (`stoppedBecause: "time_limit"` + status message); each board capped at 60 s, with a watchdog log (on Apify a few
+  requests hung forever at 0% CPU despite their 10 s abort, e.g. ashby/bjakcareer -- never seen locally). Found in
+  testing and fixed before charging starts: 0.5.13-0.5.15 could deliver past maxJobs (32,179 for a 20,000 cap).
+  Workday 0.1.11 and Career API 0.1.13 also stop before their timeout. Results: same filtered full scan 36 s at 1 GB
+  (was 328 s); 300 s "remote staff engineer" search complete in 40 s; 20k-job runs exact (38 s at 4 GB, 90 s at 1 GB).
 - **Main actor pricing cleanup still blocked until 10 Oct** (checked 30 Sep: Console "Change" button still disabled while the
   price change is pending). Note: the extra `apify-default-dataset-item` charge is $0.01 per 1,000 (under 1% on top of
   $1.50), not a doubling.

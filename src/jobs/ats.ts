@@ -113,7 +113,7 @@ function toText(html: string | undefined | null): string {
     .slice(0, MAX_DESC);
 }
 
-const REMOTE_RE = /\bremote\b|\bwork from home\b|\bwfh\b|\bdistributed\b|\banywhere\b/i;
+export const REMOTE_RE = /\bremote\b|\bwork from home\b|\bwfh\b|\bdistributed\b|\banywhere\b/i;
 
 // ------------------------------------------------------------------ greenhouse
 
@@ -131,13 +131,36 @@ interface GhJob {
   pay_input_ranges?: unknown[];
 }
 
-async function fetchGreenhouse(slug: string): Promise<Job[]> {
-  const data = await getJson<{ jobs?: GhJob[] }>(
-    `https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(slug)}/jobs?content=true&pay_transparency=true`,
-  );
-  if (!data?.jobs) return [];
+/**
+ * A cheap test on a job's title / location / date, run before descriptions
+ * are downloaded. Greenhouse's full list is ~12x the size of its plain list
+ * (Stripe: 5.6 MB vs 0.46 MB, 4 Oct), and a filtered search over every
+ * company spent most of its time downloading descriptions it then threw away.
+ */
+export type Prefilter = (j: { title: string; location: string | null; postedAt: string | null }) => boolean;
 
-  return data.jobs.map((j) => {
+/** At or below this many matches, fetch each matching job instead of the company's full list. */
+const GH_PER_JOB_MAX = 15;
+
+async function fetchGreenhouse(slug: string, prefilter?: Prefilter): Promise<Job[]> {
+  const base = `https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(slug)}/jobs`;
+  let rows: GhJob[] | undefined;
+  if (prefilter) {
+    const light = (await getJson<{ jobs?: GhJob[] }>(`${base}?pay_transparency=true`))?.jobs;
+    if (!light) return [];
+    const hits = light.filter((j) =>
+      prefilter({ title: j.title.trim(), location: j.location?.name ?? null, postedAt: j.first_published ?? j.updated_at ?? null }),
+    );
+    if (hits.length === 0) return [];
+    if (hits.length <= GH_PER_JOB_MAX) {
+      const full = await Promise.all(hits.map((j) => getJson<GhJob>(`${base}/${j.id}?pay_transparency=true`)));
+      rows = full.map((f, i) => f ?? hits[i]); // a job that fails its detail call keeps its light row
+    }
+  }
+  rows ??= (await getJson<{ jobs?: GhJob[] }>(`${base}?content=true&pay_transparency=true`))?.jobs;
+  if (!rows) return [];
+
+  return rows.map((j) => {
     const loc = j.location?.name ?? null;
     return {
       id: `greenhouse:${slug}:${j.id}`,
@@ -335,8 +358,13 @@ const FETCHERS: Record<Ats, (slug: string) => Promise<Job[]>> = {
 };
 
 /** Fetch all open roles for one company on one ATS. */
-export async function fetchCompany(ats: Ats, slug: string): Promise<Job[]> {
-  const jobs = await FETCHERS[ats](slug);
+/**
+ * All open jobs at one company. With a `prefilter`, systems that can list
+ * jobs without their descriptions (Greenhouse) may skip companies -- or jobs
+ * -- that fail it, so only use one when the caller filters the same way.
+ */
+export async function fetchCompany(ats: Ats, slug: string, prefilter?: Prefilter): Promise<Job[]> {
+  const jobs = ats === "greenhouse" ? await fetchGreenhouse(slug, prefilter) : await FETCHERS[ats](slug);
   log.debug("ats fetch", { ats, slug, jobs: jobs.length });
   return jobs;
 }

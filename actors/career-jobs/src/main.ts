@@ -68,7 +68,13 @@ try {
     if (prev) q.seenAfter = prev.seenThrough;
   }
 
-  const { jobs, shardsRead } = await search(manifest, q);
+  // Finish inside the run's own time limit (a caller's short timeout used to end in TIMED-OUT).
+  const timeoutAt = Actor.getEnv().timeoutAt?.getTime() ?? Infinity;
+  const margin = Math.min(45_000, Math.max(8_000, (timeoutAt - Date.now()) * 0.25));
+  const { jobs, shardsRead, timeLimited } = await search(manifest, q, httpFetcher, Date.now(), timeoutAt - margin);
+  if (timeLimited) {
+    log.warning(`Stopped early to finish inside this run's time limit (read ${shardsRead} of ${manifest.shards.length} index shards). Give the run a longer timeout for complete results.`);
+  }
   log.info(`${jobs.length} matching jobs (read ${shardsRead} of ${manifest.shards.length} index shards)`);
 
   const descriptions = includeDescription && jobs.length ? await descriptionsFor(manifest, jobs) : new Map<string, string>();
@@ -85,7 +91,7 @@ try {
     }
   }
 
-  const stoppedBecause = budgetReached ? "charging_limit" : pushed >= q.maxJobs ? "maxJobs" : "completed";
+  const stoppedBecause = budgetReached ? "charging_limit" : pushed >= q.maxJobs ? "maxJobs" : timeLimited ? "time_limit" : "completed";
   if (monitor && key) {
     // Jobs past a limit are not delivered now and will not count as new next time.
     if (stoppedBecause !== "completed") {
@@ -104,7 +110,7 @@ try {
     finishedAt: new Date().toISOString(),
   });
   log.info(`Done. ${pushed} jobs delivered.`);
-  await Actor.exit();
+  await Actor.exit(timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout for complete results.` : undefined);
 } catch (err) {
   // Actor.fail marks the run FAILED with the reason; exiting normally here
   // used to report crashed runs as SUCCEEDED (found 3 Oct 2026).

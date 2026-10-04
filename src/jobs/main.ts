@@ -15,7 +15,7 @@
  * one unreachable company never sinks a run.
  */
 import { Actor, log } from "apify";
-import { fetchCompany, VERIFIED_ATS, type Ats, type Job } from "./ats.ts";
+import { fetchCompany, REMOTE_RE, VERIFIED_ATS, type Ats, type Job, type Prefilter } from "./ats.ts";
 import { payFor, type PayFields } from "./pay.ts";
 import { parseCompanyEntry } from "./targets.ts";
 
@@ -110,74 +110,151 @@ try {
   let companiesFailed = 0;
   let budgetReached = false;
 
-  const CONCURRENCY = 5;
+  /** Boards fetched at once. At 5, a scan of all 3,584 companies took 328 s -- past the 300 s timeout many integrations use. */
+  const CONCURRENCY = 20;
   /** Records per pushData call. One call per job took ~35 ms each, so a 125k-job run outlived the 1-hour timeout. */
   const PUSH_BATCH = 500;
+
+  /*
+   * Finish before the run's own timeout rather than being killed by it
+   * (users were getting TIMED-OUT, 3-4 Oct). Workers stop taking new
+   * companies at `softStop`; at `hardStop` the run delivers what it has and
+   * ends even if a slow board is still downloading. The caller keeps
+   * everything found and gets a SUCCEEDED run that says it stopped early.
+   */
+  const timeoutAt = Actor.getEnv().timeoutAt?.getTime() ?? Infinity;
+  const runMs = timeoutAt - Date.now();
+  const margin = Math.min(45_000, Math.max(8_000, runMs * 0.2));
+  const softStop = timeoutAt - margin;
+  const hardStop = timeoutAt - margin / 2;
+  let timeLimited = false;
 
   /*
    * Charge and push together. pushData(items, eventName) charges per item as
    * it is stored, and pushes only as many as the caller's spending limit
    * allows, so nobody is billed for a record they did not receive. If the
-   * budget runs out mid-run we stop cleanly.
+   * budget runs out mid-run we stop cleanly. Calls are serialised.
    */
-  async function deliver(records: object[]) {
-    for (let i = 0; i < records.length && !budgetReached; i += PUSH_BATCH) {
-      const chunk = records.slice(i, i + PUSH_BATCH);
-      const charge = await Actor.pushData(chunk, EVENT_JOB);
-      if (charge?.eventChargeLimitReached) {
-        pushed += charge.chargedCount;
-        budgetReached = true;
-        log.info("Caller's charging limit reached -- stopping cleanly.");
-      } else pushed += chunk.length;
-    }
+  let pending: object[] = [];
+  /**
+   * Jobs accepted for delivery: pending + being pushed + pushed. maxJobs is
+   * enforced on this, not on `pushed`: while a batch is being pushed it is in
+   * neither `pending` nor `pushed`, and checking those let a 20,000-job run
+   * deliver 32,179 (4 Oct, before charging started; caught in testing).
+   */
+  let accepted = 0;
+  let pushing: Promise<void> = Promise.resolve();
+  function flush(): Promise<void> {
+    const records = pending;
+    pending = [];
+    pushing = pushing.then(async () => {
+      for (let i = 0; i < records.length && !budgetReached; i += PUSH_BATCH) {
+        const chunk = records.slice(i, i + PUSH_BATCH);
+        const charge = await Actor.pushData(chunk, EVENT_JOB);
+        if (charge?.eventChargeLimitReached) {
+          pushed += charge.chargedCount;
+          budgetReached = true;
+          log.info("Caller's charging limit reached -- stopping cleanly.");
+        } else pushed += chunk.length;
+      }
+    });
+    return pushing;
   }
 
-  for (let i = 0; i < targets.length && pushed < maxJobs && !budgetReached; i += CONCURRENCY) {
-    const batch = targets.slice(i, i + CONCURRENCY);
+  // The title / location / remote / date filters, applied to Greenhouse's light list before descriptions are downloaded.
+  const filters = { remoteOnly, titleKeywords, locationKeywords, cutoff };
+  const prefilter: Prefilter | undefined =
+    remoteOnly || titleKeywords.length || locationKeywords.length || cutoff
+      ? (j) => matches({ ...j, remote: REMOTE_RE.test(`${j.location ?? ""} ${j.title}`), remoteEligible: false } as Job, filters)
+      : undefined;
 
-    const results = await Promise.all(
-      batch.map(async (t) => {
-        try {
-          return { t, jobs: await fetchCompany(t.ats, t.slug) };
-        } catch (err) {
-          // Fail soft. One bad company must never sink the run.
-          log.warning(`${t.ats}/${t.slug} failed: ${String(err)}`);
-          return { t, jobs: [] as Job[] };
-        }
-      }),
-    );
+  let stopped = false;
+  const full = () => stopped || budgetReached || accepted >= maxJobs;
+  let next = 0;
+  let searched = 0;
 
-    for (const { t, jobs } of results) {
+  /*
+   * Every company gets at most COMPANY_TIMEOUT_MS. On Apify, runs with 20
+   * parallel downloads sat at 0% CPU forever on a few requests whose own
+   * 10 s abort never fired (4 Oct; never reproduced locally). The race below
+   * guarantees progress whatever the network does, and the watchdog names
+   * anything slow so it shows up in the log.
+   */
+  const COMPANY_TIMEOUT_MS = 60_000; // the biggest boards (Databricks, Zscaler) need ~30 s to parse on a 1 GB run's quarter CPU
+  const inflight = new Map<string, number>();
+  const watchdog = setInterval(() => {
+    const slow = [...inflight].filter(([, at]) => Date.now() - at > COMPANY_TIMEOUT_MS).map(([k]) => k);
+    if (slow.length) log.warning(`Still waiting on ${slow.length} job board(s): ${slow.slice(0, 5).join(", ")}`);
+  }, 30_000);
+  watchdog.unref();
+  const withTimeout = <T,>(p: Promise<T>, ms: number, what: string) =>
+    Promise.race([
+      p,
+      new Promise<never>((_, rej) => setTimeout(() => rej(new Error(`${what} took over ${ms / 1000} s`)), ms).unref()),
+    ]);
+
+  async function worker() {
+    while (!full()) {
+      if (Date.now() > softStop) {
+        timeLimited = true;
+        return;
+      }
+      const t = targets[next++];
+      if (!t) return;
+      let jobs: Job[] = [];
+      const key = `${t.ats}/${t.slug}`;
+      inflight.set(key, Date.now());
+      try {
+        jobs = await withTimeout(fetchCompany(t.ats, t.slug, prefilter), COMPANY_TIMEOUT_MS, key);
+      } catch (err) {
+        // Fail soft. One bad company must never sink the run.
+        log.warning(`${key} failed: ${err instanceof Error ? err.message : String(err)}`);
+      } finally {
+        inflight.delete(key);
+      }
+      searched++;
       if (jobs.length === 0) {
         companiesFailed++;
         continue;
       }
       companiesOk++;
 
-      const batch: object[] = [];
       for (const job of jobs) {
-        if (pushed + batch.length >= maxJobs) break;
+        if (full()) break;
 
         // A slug probed across several ATSs can yield the same role twice.
         if (seen.has(job.id)) continue;
         seen.add(job.id);
 
-        if (!matches(job, { remoteOnly, titleKeywords, locationKeywords, cutoff })) continue;
+        if (!matches(job, filters)) continue;
 
-        // Pay is read from the list response (description + Ashby's pay data), so it costs no extra request.
+        // Pay is read from the list response (description + structured pay data), so it costs no extra request.
         const pay = payFor(job);
         if (needSalary && !payMatches(pay, minAnnualSalary, currencies)) continue;
 
         const { compensation: _internal, ...pub } = job;
-        const record = includeDescription ? { ...pub, ...pay } : { ...pub, description: undefined, ...pay };
-
-        batch.push(record);
+        pending.push(includeDescription ? { ...pub, ...pay } : { ...pub, description: undefined, ...pay });
+        accepted++;
       }
-      await deliver(batch);
-      if (budgetReached) break;
+      if (pending.length >= PUSH_BATCH) await flush();
+      if (searched % 200 === 0) log.info(`progress: ${accepted}/${maxJobs} jobs, ${searched}/${targets.length} boards searched`);
     }
+  }
 
-    log.info(`progress: ${pushed}/${maxJobs} jobs from ${companiesOk} companies`);
+  const scan = Promise.all(Array.from({ length: CONCURRENCY }, worker));
+  const outOfTime = new Promise<"time">((res) => {
+    const ms = hardStop - Date.now();
+    if (Number.isFinite(ms)) setTimeout(() => res("time"), Math.max(0, ms)).unref();
+  });
+  if ((await Promise.race([scan, outOfTime])) === "time") timeLimited = true;
+  stopped = true; // boards still downloading after a hard stop are dropped, not delivered half-way
+  clearInterval(watchdog);
+  await flush();
+  if (timeLimited) {
+    log.warning(
+      `Stopped early to finish inside this run's time limit: searched ${searched} of ${targets.length} company boards. ` +
+        `Give the run a longer timeout to search them all.`,
+    );
   }
 
   if (companies?.length && companiesOk === 0 && targets.length) {
@@ -194,7 +271,7 @@ try {
     jobsReturned: pushed,
     companiesWithJobs: companiesOk,
     companiesEmptyOrUnreachable: companiesFailed,
-    stoppedBecause: budgetReached ? "charging_limit" : pushed >= maxJobs ? "maxJobs" : "completed",
+    stoppedBecause: budgetReached ? "charging_limit" : pushed >= maxJobs ? "maxJobs" : timeLimited ? "time_limit" : "completed",
     filters: { remoteOnly, titleKeywords, locationKeywords, postedWithinDays, onlyWithSalary, minAnnualSalary, salaryCurrencies },
     finishedAt: new Date().toISOString(),
   });
@@ -203,7 +280,9 @@ try {
     `Done. ${pushed} jobs from ${companiesOk} companies ` +
       `(${companiesFailed} empty or unreachable).`,
   );
-  await Actor.exit();
+  await Actor.exit(
+    timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout to search every company.` : undefined,
+  );
 } catch (err) {
   // Actor.fail marks the run FAILED with the reason; exiting normally here
   // used to report crashed runs as SUCCEEDED (found 3 Oct 2026).
