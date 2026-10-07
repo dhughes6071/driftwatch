@@ -1,9 +1,12 @@
 # Career Site Jobs API — 1.8M Jobs with Salaries
 
-A jobs API built from the source: **every open role on 19,600 companies' own career
-sites**, collected fresh every day and searchable in seconds. 1.8 million jobs from 15
-hiring systems (Workday, Oracle, SmartRecruiters, UKG, Greenhouse, Workable, Ashby, Lever,
-BambooHR and more), with the stated pay range pulled out for more than 500,000 of them.
+Search **1.8 million open jobs from 19,600 companies' own career sites** (not job boards)
+in seconds. Workday, Oracle, Greenhouse, Lever and 11 more hiring systems, refreshed every
+night. Get job titles, companies, locations, posting dates, descriptions, and salaries where
+the posting states them (more than 500,000 jobs), as clean JSON, CSV or Excel. You don't
+need any coding, proxies or servers.
+
+*Built and maintained by CMM Research.*
 
 **Who uses it**
 
@@ -13,6 +16,35 @@ BambooHR and more), with the stated pay range pulled out for more than 500,000 o
 - **Salary research.** Filter by minimum pay and currency across real, current postings.
 - **Labour-market and AI projects.** Build a large, structured, deduplicated job dataset
   without running a scraper.
+
+**A real result** (from a 7 Oct 2026 search for data engineers paid in USD):
+
+```json
+{
+  "title": "Senior Data Engineer",
+  "companyName": "Credence",
+  "company": "credence",
+  "location": "McLean, Virginia, United States",
+  "additionalLocations": [
+    "Boston, Massachusetts, United States",
+    "Warner Robins, Georgia, United States",
+    "Wright-Patterson Air Force Base, Ohio, United States"
+  ],
+  "remote": false,
+  "department": "DOW AI/Tech",
+  "postedAt": "2026-10-07T00:00:00.000Z",
+  "employmentType": "Full-time",
+  "salaryMin": 115000,
+  "salaryMax": 155000,
+  "salaryCurrency": "USD",
+  "salaryPeriod": "year",
+  "salaryText": "$115,000 - $155,000",
+  "url": "https://apply.workable.com/j/7AE92C7BA3",
+  "ats": "workable"
+}
+```
+
+Every job also comes with its description (plain text, up to 8,000 characters) and the fields listed under **Output** below.
 
 Large employers hire through Workday (NVIDIA, Salesforce, CVS, Lowe's, Morgan Stanley) or
 Oracle Recruiting Cloud (JPMorgan Chase, Marriott, Kroger, Hilton, Macy's); mid-size and global
@@ -87,7 +119,7 @@ included, so you are not billed for compute separately.
 | `minAnnualSalary` | Only roles whose pay range reaches at least this per year, in the job's own currency (hourly × 2,080, monthly × 12). |
 | `salaryCurrencies` | Only roles paying in these currencies, e.g. `USD`, `GBP`. |
 | `sources` | Limit to any of the 15 systems (`workday`, `oracle`, `smartrecruiters`, `ukg`, `greenhouse`, `workable`, `ashby`, `lever`, `bamboohr`, `breezy`, `personio`, `rippling`, `teamtailor`, `recruitee`, `jobvite`). |
-| `includeDescription` | Adds the full description as plain text. |
+| `includeDescription` | Adds the job description as plain text (up to 8,000 characters). |
 | `maxJobs` / `maxJobsPerCompany` | Caps on results, and your cost control. |
 
 ## Output

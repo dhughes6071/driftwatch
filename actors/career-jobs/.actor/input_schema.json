@@ -123,7 +123,7 @@
       "default": []
     },
     "includeDescription": {
-      "title": "Include full job description",
+      "title": "Include job description",
       "type": "boolean",
       "description": "Turn off for a smaller, faster dataset with titles, locations and links only.",
       "default": true

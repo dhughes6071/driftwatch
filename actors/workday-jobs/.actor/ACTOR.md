@@ -1,9 +1,12 @@
 # Workday Jobs Scraper — Any myworkdayjobs Site, with Salaries
 
-Scrape every open job from any company's **Workday career site**: the `myworkdayjobs.com`
-(and `myworkdaysite.com`) pages behind NVIDIA, Salesforce, CVS, Walmart and thousands more.
-Paste a career-site link, or search the built-in list of **4,100+ verified Workday career
-sites across 1,785 companies** by company name.
+Pull **every open job from any company's Workday career site**, including the jobs past
+Workday's hidden 2,000-result limit. The `myworkdayjobs.com` sites of NVIDIA, Salesforce,
+CVS, Walmart and **4,100+ more are built in**; paste any other Workday link to add it. Get
+job titles, locations, posting dates, descriptions, and salaries where the posting states
+them, as clean JSON, CSV or Excel. You don't need any coding, proxies or servers.
+
+*Built and maintained by CMM Research.*
 
 **Who uses it**
 
@@ -13,6 +16,31 @@ sites across 1,785 companies** by company name.
   category and pay.
 - **Big employers, complete.** Workday stops at 2,000 results; this doesn't (NVIDIA: all
   2,650).
+
+**A real result** (NVIDIA, 7 Oct 2026):
+
+```json
+{
+  "title": "Senior Product Development Engineer - Boards",
+  "companyName": "NVIDIA",
+  "company": "nvidia",
+  "location": "US, CA, Santa Clara",
+  "remote": false,
+  "department": "Operations",
+  "postedAt": "2026-05-19",
+  "employmentType": "Full time",
+  "salaryMin": 136000,
+  "salaryMax": 212750,
+  "salaryCurrency": "USD",
+  "salaryPeriod": "year",
+  "salaryText": "136,000 USD - 212,750 USD",
+  "url": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/US-CA-Santa-Clara/Senior-Product-Development-Engineer---Boards_JR2016909",
+  "ats": "workday",
+  "jobReqId": "JR2016909"
+}
+```
+
+Every job also comes with its description (plain text, up to 8,000 characters) and the fields listed under **Output** below.
 
 > **Need startups too?** Most startups and scale-ups hire through Greenhouse, Ashby or
 > Lever rather than Workday. Our [Greenhouse / Ashby / Lever Job Scraper](https://apify.com/viridian_layout_ea2/company-career-site-jobs)

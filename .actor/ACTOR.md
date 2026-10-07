@@ -1,9 +1,12 @@
 # Greenhouse, Lever & Ashby Jobs Scraper — with Salaries
 
-Scrape jobs from the startups and tech companies that hire through **Greenhouse, Lever and
-Ashby**: Stripe, SpaceX, Anduril, Ramp, Figma and 3,500+ more. It reads the same **public
-JSON job-board APIs** those companies use for their own career pages, so there is no HTML
-to break and no proxy to pay for.
+Get **every open job at Stripe, SpaceX, Ramp, Figma and 3,500+ other startups and tech
+companies**, read from the Greenhouse, Lever and Ashby job boards they publish themselves,
+so it doesn't break when a page changes. Get job titles, locations, posting dates,
+descriptions, and salaries where the posting states them (nearly half of all jobs), as
+clean JSON, CSV or Excel. You don't need any coding, proxies or servers.
+
+*Built and maintained by CMM Research.*
 
 **Who uses it**
 
@@ -11,6 +14,29 @@ to break and no proxy to pay for.
 - **Recruiters.** Every open role at a list of target companies in one run.
 - **Salary benchmarking.** Stated pay ranges, including each company's own structured pay
   data where it publishes it.
+
+**A real result** (Stripe, 7 Oct 2026):
+
+```json
+{
+  "title": "Offensive Security Engineer",
+  "company": "stripe",
+  "location": "US - Remote",
+  "remote": true,
+  "department": "8611 Security Analytics",
+  "postedAt": "2026-09-25T14:53:02-04:00",
+  "employmentType": null,
+  "salaryMin": 170400,
+  "salaryMax": 255700,
+  "salaryCurrency": "USD",
+  "salaryPeriod": "year",
+  "salaryText": "$170,400 – $255,700",
+  "url": "https://stripe.com/jobs/search?gh_jid=8233889",
+  "ats": "greenhouse"
+}
+```
+
+Every job also comes with its description (plain text, up to 8,000 characters) and the fields listed under **Output** below.
 
 > **Need big employers too?** Greenhouse, Ashby and Lever are mostly startups and
 > scale-ups. Most of the Fortune 500 (NVIDIA, Salesforce, CVS, Lowe's) hire through
@@ -69,7 +95,7 @@ run before charging, so filtered-out roles are never billed.
 | `department` | Team or department |
 | `postedAt` | ISO 8601 posting date |
 | `url` | Canonical apply link on the company's own board |
-| `description` | Full description as plain text (optional) |
+| `description` | Job description as plain text, up to 8,000 characters (optional) |
 | `employmentType` | Full-time, contract, etc. where published |
 | `ats` | Which system it came from |
 | `salaryMin` / `salaryMax` / `salaryCurrency` / `salaryPeriod` | Stated pay, e.g. 150000 / 180000 / "USD" / "year" (null when none is stated) |

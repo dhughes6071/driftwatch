@@ -2,7 +2,7 @@
   "actorSpecification": 1,
   "name": "company-career-site-jobs",
   "title": "Greenhouse, Lever & Ashby Jobs Scraper — with Salaries",
-  "description": "Jobs from 3,500+ companies on Greenhouse, Lever and Ashby, read from their public JSON APIs so it doesn't break. Pay on nearly half of all roles, pay and remote filters, full descriptions. 125,000+ open roles.",
+  "description": "Jobs from 3,500+ companies on Greenhouse, Lever and Ashby, read from their public JSON APIs so it doesn't break. Pay on nearly half of all roles, pay and remote filters, job descriptions. 125,000+ open roles.",
   "version": "0.5",
   "buildTag": "latest",
   "dockerfile": "./Dockerfile",

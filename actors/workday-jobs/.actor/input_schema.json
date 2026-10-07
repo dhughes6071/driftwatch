@@ -91,7 +91,7 @@
       "editor": "textfield"
     },
     "includeDescription": {
-      "title": "Include full job description",
+      "title": "Include job description",
       "type": "boolean",
       "description": "Adds the description, exact posting date, employment type, country and every location. Turn off for a faster run with titles, locations and links only.",
       "default": true
