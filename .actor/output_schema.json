@@ -1,0 +1,19 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "Greenhouse, Lever & Ashby Jobs Scraper output",
+  "description": "One record per job in the default dataset, plus a SUMMARY record describing the run.",
+  "properties": {
+    "jobs": {
+      "type": "string",
+      "title": "Jobs",
+      "description": "Every job delivered, one record each: title, company, location, department, posting date, salary where stated, apply URL, and (optionally) the description.",
+      "template": "{{links.apiDefaultDatasetUrl}}/items"
+    },
+    "summary": {
+      "type": "string",
+      "title": "Run summary",
+      "description": "Jobs returned, companies with jobs or without a board, filters used, and why the run stopped.",
+      "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/SUMMARY"
+    }
+  }
+}

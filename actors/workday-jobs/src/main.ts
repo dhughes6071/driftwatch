@@ -149,6 +149,10 @@ try {
 
   const now = new Date();
   const titleKw = titleKeywords.map((k) => k.toLowerCase()).filter(Boolean);
+  // Titles use the same rule as locations: keywords of 3 characters or fewer
+  // ("RN", "QA", "PM") match whole words only -- as substrings "RN" matched
+  // "External" and "Vernon" (found 7 Oct 2026).
+  const titleMatch = locationMatcher(titleKw);
   const locKw = locationKeywords.map((k) => k.toLowerCase()).filter(Boolean);
   const locMatch = locationMatcher(locKw);
   const cutoff = postedWithinDays ? now.getTime() - postedWithinDays * 86_400_000 : null;
@@ -158,7 +162,7 @@ try {
 
   /** Decide from the list row alone. "maybe" means the detail call must settle it. */
   function preFilter(p: Posting): "yes" | "no" | "maybe" {
-    if (titleKw.length && !titleKw.some((k) => p.title.toLowerCase().includes(k))) return "no";
+    if (titleKw.length && !titleMatch(p.title)) return "no";
     if (postedWithinDays) {
       const age = minAgeDays(p.postedOn);
       // "Posted 30+ Days Ago" is at least 30 days old; for any window up to 30 days it is out.

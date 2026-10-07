@@ -193,3 +193,14 @@ test("search stops at the deadline and says so", async () => {
   assert.equal(all.timeLimited, false);
   assert.equal(all.jobs.length, 30);
 });
+
+test("short title keywords match whole words only (RN must not match External or Vernon)", () => {
+  const m = makeMatcher({ titleKeywords: ["nurse", "RN"], maxJobs: 10 }, NOW);
+  assert.equal(m(job({ id: "a", title: "RN - Med Surg" })), true);
+  assert.equal(m(job({ id: "b", title: "Registered Nurse (RN)" })), true);
+  assert.equal(m(job({ id: "c", title: "Copywriter - External Comms" })), false);
+  assert.equal(m(job({ id: "d", title: "Practice Manager - Vernon Hills" })), false);
+  const x = makeMatcher({ titleExcludeKeywords: ["VP"], maxJobs: 10 }, NOW);
+  assert.equal(x(job({ id: "e", title: "VP of Sales" })), false);
+  assert.equal(x(job({ id: "f", title: "MVP Product Engineer" })), true);
+});

@@ -309,7 +309,10 @@ function matches(
 
   if (f.titleKeywords.length) {
     const t = job.title.toLowerCase();
-    if (!f.titleKeywords.some((k) => t.includes(k.toLowerCase()))) return false;
+    // Titles use the same rule as locations: keywords of 3 characters or fewer
+    // ("RN", "QA", "PM") match whole words only -- as substrings "RN" matched
+    // "External" and "Vernon" (found 7 Oct 2026).
+    if (!locationMatcher(f.titleKeywords)(t)) return false;
   }
 
   if (f.locationKeywords.length) {

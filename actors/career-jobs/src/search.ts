@@ -79,6 +79,11 @@ const norm = (a?: string[]) => (a ?? []).map((s) => s.trim().toLowerCase()).filt
 export function makeMatcher(q: Query, now = Date.now()) {
   const title = norm(q.titleKeywords);
   const exclude = norm(q.titleExcludeKeywords);
+  // Titles use the same rule as locations: keywords of 3 characters or fewer
+  // ("RN", "QA", "PM") match whole words only -- as substrings "RN" matched
+  // "External" and "Vernon" (found 7 Oct 2026).
+  const titleMatch = locationMatcher(title);
+  const excludeMatch = locationMatcher(exclude);
   const loc = norm(q.locationKeywords);
   const locMatch = locationMatcher(loc);
   const comp = norm(q.companyKeywords);
@@ -96,8 +101,8 @@ export function makeMatcher(q: Query, now = Date.now()) {
     }
     if (sources.size && !sources.has(j.ats)) return false;
     const t = j.title.toLowerCase();
-    if (title.length && !title.some((k) => t.includes(k))) return false;
-    if (exclude.length && exclude.some((k) => t.includes(k))) return false;
+    if (title.length && !titleMatch(t)) return false;
+    if (exclude.length && excludeMatch(t)) return false;
     if (q.remoteOnly && !j.remote) return false;
     if (loc.length) {
       if (!locMatch([j.location ?? "", ...j.additionalLocations, j.country ?? ""].join(" | "))) return false;
