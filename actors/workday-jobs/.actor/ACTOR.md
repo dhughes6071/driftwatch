@@ -6,7 +6,8 @@ CVS, Walmart and **4,100+ more are built in**; paste any other Workday link to a
 job titles, locations, posting dates, descriptions, and salaries where the posting states
 them, as clean JSON, CSV or Excel. You don't need any coding, proxies or servers.
 
-*Built and maintained by CMM Research.*
+*Built and maintained by CMM Research.* Missing a company, or need a custom feed?
+Email us at [chazmichael_michaels@icloud.com](mailto:chazmichael_michaels@icloud.com).
 
 **Who uses it**
 

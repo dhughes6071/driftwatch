@@ -6,7 +6,8 @@ night. Get job titles, companies, locations, posting dates, descriptions, and sa
 the posting states them (more than 500,000 jobs), as clean JSON, CSV or Excel. You don't
 need any coding, proxies or servers.
 
-*Built and maintained by CMM Research.*
+*Built and maintained by CMM Research.* Missing a company, or need a custom feed?
+Email us at [chazmichael_michaels@icloud.com](mailto:chazmichael_michaels@icloud.com).
 
 **Who uses it**
 

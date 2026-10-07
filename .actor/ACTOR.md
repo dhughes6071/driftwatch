@@ -6,7 +6,8 @@ so it doesn't break when a page changes. Get job titles, locations, posting date
 descriptions, and salaries where the posting states them (nearly half of all jobs), as
 clean JSON, CSV or Excel. You don't need any coding, proxies or servers.
 
-*Built and maintained by CMM Research.*
+*Built and maintained by CMM Research.* Missing a company, or need a custom feed?
+Email us at [chazmichael_michaels@icloud.com](mailto:chazmichael_michaels@icloud.com).
 
 **Who uses it**
 
