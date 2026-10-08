@@ -1,6 +1,6 @@
-# Career Site Jobs API — 1.8M Jobs with Salaries
+# Career Site Jobs API — 1.7M+ Jobs with Salaries
 
-Search **1.8 million open jobs from 19,600 companies' own career sites** (not job boards)
+Search **more than 1.7 million open jobs from 19,000+ companies' own career sites** (not job boards)
 in seconds. Workday, Oracle, Greenhouse, Lever and 11 more hiring systems, refreshed every
 night. Get job titles, companies, locations, posting dates, descriptions, and salaries where
 the posting states them (more than 500,000 jobs), as clean JSON, CSV or Excel. You don't

@@ -46,7 +46,7 @@ Every job also comes with its description (plain text, up to 8,000 characters) a
 > directly.
 >
 > **Want everything in one search?** Our [Career Site Jobs API](https://apify.com/viridian_layout_ea2/career-site-jobs-api)
-> searches 1.8 million jobs from 19,600 companies across 15 hiring systems at once
+> searches more than 1.7 million jobs from 19,000+ companies across 15 hiring systems at once
 > (Workday, Oracle, Greenhouse, Lever, Ashby and more). The jobs are collected daily, so
 > results come back in seconds.
 
