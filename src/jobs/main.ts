@@ -18,6 +18,7 @@ import { Actor, log } from "apify";
 import { fetchCompany, REMOTE_RE, VERIFIED_ATS, type Ats, type Job, type Prefilter } from "./ats.ts";
 import { payFor, type PayFields } from "./pay.ts";
 import { parseCompanyEntry } from "./targets.ts";
+import { MONITOR_STORE, SeenJobs, monitorKey, type MonitorState } from "./monitor.ts";
 
 interface Input {
   /**
@@ -45,6 +46,10 @@ interface Input {
   minAnnualSalary?: number;
   /** Only roles paying in these currencies, e.g. ["USD"]. */
   salaryCurrencies?: string[];
+  /** Return only jobs this same search has not delivered before (for scheduled runs). */
+  onlyNewSinceLastRun?: boolean;
+  /** Optional label, so two searches with the same filters keep separate histories. */
+  monitorName?: string;
 }
 
 /** Charged once per job we deliver. Must match the event configured in Apify. */
@@ -67,6 +72,8 @@ try {
     onlyWithSalary = false,
     minAnnualSalary,
     salaryCurrencies = [],
+    onlyNewSinceLastRun = false,
+    monitorName,
   } = input;
   const currencies = new Set(salaryCurrencies.map((c) => c.trim().toUpperCase()).filter(Boolean));
   const needSalary = onlyWithSalary || !!minAnnualSalary || currencies.size > 0;
@@ -75,13 +82,19 @@ try {
 
   let targets: Array<{ ats: Ats; slug: string }> = [];
 
+  /** The named companies, normalised, for the "new since last run" key. */
+  const companyKeys: string[] = [];
   if (companies?.length) {
     const skipped: string[] = [];
     for (const entry of companies) {
       const t = parseCompanyEntry(entry);
-      if ("skip" in t) skipped.push(t.skip);
+      if ("skip" in t) {
+        skipped.push(t.skip);
+        continue;
+      }
+      companyKeys.push(`${t.ats ?? "*"}:${t.slug}`);
       // A caller may name the ATS (or paste a link that does) or leave it to us to work out.
-      else targets.push(...(t.ats ? [{ ats: t.ats, slug: t.slug }] : VERIFIED_ATS.map((ats) => ({ ats, slug: t.slug }))));
+      targets.push(...(t.ats ? [{ ats: t.ats, slug: t.slug }] : VERIFIED_ATS.map((ats) => ({ ats, slug: t.slug }))));
     }
     if (skipped.length) {
       log.warning(
@@ -104,6 +117,36 @@ try {
   // ---------------------------------------------------------------- fetch
 
   const cutoff = postedWithinDays ? Date.now() - postedWithinDays * 86_400_000 : null;
+
+  // ---------------------------------------------------------------- new since last run
+
+  const monitor = onlyNewSinceLastRun ? await Actor.openKeyValueStore(MONITOR_STORE) : null;
+  const mKey = monitor
+    ? monitorKey(
+        {
+          companies: companyKeys, useCuratedList, titleKeywords, locationKeywords, remoteOnly, postedWithinDays,
+          onlyWithSalary, minAnnualSalary, salaryCurrencies,
+        },
+        monitorName,
+      )
+    : null;
+  const prevState = monitor && mKey ? await monitor.getValue<MonitorState>(mKey) : null;
+  const history = new SeenJobs(prevState);
+  let alreadyDelivered = 0;
+  let lastSave = 0;
+  const saveMonitor = async (force = false) => {
+    // Saved as we go (at most every 20 s) so a crash never re-charges for jobs already delivered.
+    if (!monitor || !mKey || (!force && Date.now() - lastSave < 20_000)) return;
+    lastSave = Date.now();
+    await monitor.setValue(mKey, history.toState(prevState));
+  };
+  if (monitor) {
+    log.info(
+      prevState
+        ? `Returning only jobs this search has not delivered in its ${prevState.runs} earlier run(s).`
+        : `First run of this search (${mKey}): returning all current matches and remembering them.`,
+    );
+  }
   const seen = new Set<string>();
   let pushed = 0;
   let companiesOk = 0;
@@ -151,11 +194,17 @@ try {
       for (let i = 0; i < records.length && !budgetReached; i += PUSH_BATCH) {
         const chunk = records.slice(i, i + PUSH_BATCH);
         const charge = await Actor.pushData(chunk, EVENT_JOB);
+        const delivered = charge?.eventChargeLimitReached ? charge.chargedCount : chunk.length;
         if (charge?.eventChargeLimitReached) {
-          pushed += charge.chargedCount;
           budgetReached = true;
           log.info("Caller's charging limit reached -- stopping cleanly.");
-        } else pushed += chunk.length;
+        }
+        pushed += delivered;
+        if (monitor) {
+          const at = new Date().toISOString();
+          for (const r of chunk.slice(0, delivered)) history.add((r as { id: string }).id, at);
+          await saveMonitor();
+        }
       }
     });
     return pushing;
@@ -231,6 +280,11 @@ try {
         // Pay is read from the list response (description + structured pay data), so it costs no extra request.
         const pay = payFor(job);
         if (needSalary && !payMatches(pay, minAnnualSalary, currencies)) continue;
+        // Delivered by an earlier run of this search.
+        if (monitor && history.has(job.id)) {
+          alreadyDelivered++;
+          continue;
+        }
 
         const { compensation: _internal, ...pub } = job;
         pending.push(includeDescription ? { ...pub, ...pay } : { ...pub, description: undefined, ...pay });
@@ -267,8 +321,11 @@ try {
 
   // ---------------------------------------------------------------- summary
 
+  await saveMonitor(true);
+
   await Actor.setValue("SUMMARY", {
     jobsReturned: pushed,
+    ...(monitor ? { newSinceLastRun: { monitorKey: mKey, firstRun: !prevState, alreadyDeliveredSkipped: alreadyDelivered } } : {}),
     companiesWithJobs: companiesOk,
     companiesEmptyOrUnreachable: companiesFailed,
     stoppedBecause: budgetReached ? "charging_limit" : pushed >= maxJobs ? "maxJobs" : timeLimited ? "time_limit" : "completed",

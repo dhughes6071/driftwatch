@@ -116,6 +116,13 @@ market has ~1,970 users/30d; the leader (fantastic-jobs) has 1,473 at **$12 / 1k
   testing and fixed before charging starts: 0.5.13-0.5.15 could deliver past maxJobs (32,179 for a 20,000 cap).
   Workday 0.1.11 and Career API 0.1.13 also stop before their timeout. Results: same filtered full scan 36 s at 1 GB
   (was 328 s); 300 s "remote staff engineer" search complete in 40 s; 20k-job runs exact (38 s at 4 GB, 90 s at 1 GB).
+- **7 Oct: default memory, nightly alerts, "new since last run" for the first actor.** Default run memory: first actor and
+  Career API 2 GB (CPU-bound: more memory = faster at ~same cost; peak use 0.9 GB / 0.4 GB), Workday 1 GB (network-bound,
+  peak 0.2 GB). The old 4 GB default was capped by maxMemoryMbytes 2048 anyway. `crawler/check-index.sh` runs at 09:00
+  (launchd `com.x402.career-jobs-check`): macOS notification + `data/logs/alerts.log` if the published index is >30 h old,
+  last night's run failed, no run log exists, or the lock is >8 h old; `run-daily.sh` also notifies on failure. First
+  actor `onlyNewSinceLastRun` (`src/jobs/monitor.ts`, store `company-career-site-jobs-monitor`) built as **0.5.21 tagged
+  `beta`** (latest stays 0.5.20): 3 runs x 100 jobs -> 300 distinct. **10 Oct: point `latest` at it** (or push again).
 - **Main actor pricing cleanup still blocked until 10 Oct** (checked 30 Sep: Console "Change" button still disabled while the
   price change is pending). Note: the extra `apify-default-dataset-item` charge is $0.01 per 1,000 (under 1% on top of
   $1.50), not a doubling.

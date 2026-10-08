@@ -64,6 +64,9 @@ arms race, and no proxy bill. When a company posts a role, it appears here.
   range stated in the description, as `salaryMin` / `salaryMax` / `salaryCurrency` /
   `salaryPeriod`, annualised, and filterable with `onlyWithSalary`, `minAnnualSalary` and
   `salaryCurrencies`
+- **Only what's new, on a schedule** — turn on `onlyNewSinceLastRun` and schedule the run:
+  each run skips every job that search has already delivered, so you track new openings
+  without paying twice for the same job
 - **Curated registry included** — 3,500+ verified companies, 120,000+ open roles, or name your own
 - **Simple pricing** — $1.50 per 1,000 jobs delivered, no platform usage on top; `maxJobs` caps the cost per run
 
@@ -121,6 +124,11 @@ run before charging, so filtered-out roles are never billed.
 { "useCuratedList": true, "titleKeywords": ["engineer"], "minAnnualSalary": 180000, "salaryCurrencies": ["USD"], "maxJobs": 1000 }
 ```
 
+**Daily alert: new jobs at your target companies (schedule it once a day)**
+```json
+{ "companies": ["stripe", "ramp", "figma"], "onlyNewSinceLastRun": true, "maxJobs": 5000 }
+```
+
 **Fast and cheap — titles and links only**
 ```json
 { "useCuratedList": true, "includeDescription": false, "maxJobs": 2000 }
@@ -146,6 +154,10 @@ Name companies however is easiest: `"stripe"`, a job-board link such as
 `"https://jobs.lever.co/veeva"`, or `{"slug": "ramp", "ats": "ashby"}`. Slugs are usually
 just the company name in lowercase. Leave `ats` blank and we'll work out which system a
 company uses. If a company has no public Greenhouse, Lever or Ashby board, the run log says so.
+
+`onlyNewSinceLastRun` remembers each search's delivered jobs for 180 days in a key-value store
+named `company-career-site-jobs-monitor` in your own Apify account. Jobs cut off by `maxJobs`
+or your spending limit are still delivered on the next run.
 
 Pay is read only when it clearly is pay (not revenue, funding, bonuses or benefits), so
 a missing salary is far more likely than a wrong one. A bare "$" is read as Canadian or

@@ -13,5 +13,6 @@
   },
   "minMemoryMbytes": 256,
   "maxMemoryMbytes": 2048,
-  "output": "./output_schema.json"
+  "output": "./output_schema.json",
+  "defaultMemoryMbytes": 2048
 }

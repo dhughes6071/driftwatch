@@ -15,12 +15,17 @@ if ! mkdir "$LOCK" 2>/dev/null; then
 fi
 trap 'rmdir "$LOCK"' EXIT
 NODE="$(command -v node || echo /opt/homebrew/bin/node)"
+# Tell the owner straight away; check-index.sh repeats it at 09:00 if still broken.
+notify() {
+  echo "$(date '+%Y-%m-%d %H:%M') ALERT: nightly run: $1 (see $LOG)" >> data/logs/alerts.log
+  osascript -e "display notification \"Nightly run: $1. See $LOG\" with title \"Career Jobs index needs attention\" sound name \"Basso\"" 2>/dev/null
+}
 
 {
   echo "=== $(date) crawl"
-  "$NODE" --experimental-strip-types actors/career-jobs/crawler/crawl.ts || { echo "CRAWL FAILED"; exit 1; }
+  "$NODE" --experimental-strip-types actors/career-jobs/crawler/crawl.ts || { echo "CRAWL FAILED"; notify "the crawl failed"; exit 1; }
   echo "=== $(date) publish"
-  "$NODE" --experimental-strip-types actors/career-jobs/crawler/publish.ts || { echo "PUBLISH FAILED"; exit 1; }
+  "$NODE" --experimental-strip-types actors/career-jobs/crawler/publish.ts || { echo "PUBLISH FAILED"; notify "publishing failed"; exit 1; }
   echo "=== $(date) done"
 } >> "$LOG" 2>&1
 

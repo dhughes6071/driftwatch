@@ -59,6 +59,18 @@
       "minimum": 1,
       "maximum": 365
     },
+    "onlyNewSinceLastRun": {
+      "title": "Only jobs new since this search last ran",
+      "type": "boolean",
+      "description": "For scheduled runs: skip every job this same search has already delivered, so you never pay for the same job twice. The first run returns all current matches. Jobs cut off by the maximum are still delivered next time. The Actor remembers each search in a key-value store named <code>company-career-site-jobs-monitor</code> in your account; changing any filter or company starts a new history.",
+      "default": false
+    },
+    "monitorName": {
+      "title": "Search name (optional)",
+      "type": "string",
+      "description": "Only needed to keep two searches with identical filters separate, e.g. one per client.",
+      "editor": "textfield"
+    },
     "onlyWithSalary": {
       "title": "Only jobs that state pay",
       "type": "boolean",

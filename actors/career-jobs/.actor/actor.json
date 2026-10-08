@@ -17,5 +17,5 @@
   "environmentVariables": {
     "CAREER_MANIFEST_URL": "@careerManifestUrl"
   },
-  "defaultMemoryMbytes": 1024
+  "defaultMemoryMbytes": 2048
 }
