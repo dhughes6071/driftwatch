@@ -14,15 +14,15 @@ go first.
 ### Career Site Jobs API (`career-site-jobs-api`)
 
 **Title** (58 chars)
-> Career Site Jobs API — 1.8M Jobs with Salaries | $2 per 1K
+> Career Site Jobs API — 1.7M Jobs with Salaries | $2 per 1K
 
 **Short description**
-> 1.8M open jobs from 19,600 companies' own career sites (Workday, Oracle, Greenhouse,
+> 1.7M open jobs from 19,000+ companies' own career sites (Workday, Oracle, Greenhouse,
 > SmartRecruiters, UKG + 10 more), refreshed daily. Pay on 29% of jobs. Filter by title,
 > location or salary, or get only new jobs each run. $2 per 1,000.
 
 **README opening** (replaces the first paragraph)
-> A jobs API built from the source: every open role on 19,600 companies' own career sites,
+> A jobs API built from the source: every open role on 19,000+ companies' own career sites,
 > collected fresh every day and searchable in seconds. 1.8 million jobs from 15 hiring systems
 > (Workday, Oracle, SmartRecruiters, UKG, Greenhouse, Workable, Ashby, Lever, BambooHR and
 > more), with the stated pay range pulled out for more than 500,000 of them.
@@ -88,7 +88,7 @@ go first.
 answer comments. That matters more than the text.
 
 **Title** (73 chars, limit 80)
-> Show HN: I indexed 1.8M jobs straight from 19,600 companies' career sites
+> Show HN: I indexed 1.7M jobs straight from 19,000+ companies' career sites
 
 **Link:** https://apify.com/viridian_layout_ea2/career-site-jobs-api
 
@@ -99,8 +99,8 @@ answer comments. That matters more than the text.
 > system (Workday, Greenhouse, Oracle, Lever and so on), and most of those systems have a
 > public JSON API behind the career page. So I collect from those directly.
 >
-> A crawler on a Mac mini in my house goes through 19,600 companies' career sites every night
-> across 15 systems and publishes a searchable index: 1.8M open jobs, about 50,000 new each
+> A crawler on a Mac mini in my house goes through 19,000+ companies' career sites every night
+> across 15 systems and publishes a searchable index: 1.7M open jobs, about 50,000 new each
 > day. A search takes seconds because it reads the index, not the sites.
 >
 > Things I didn't expect:
@@ -128,21 +128,27 @@ answer comments. That matters more than the text.
 
 ## 3. Shorter version for Reddit (r/datasets, r/webscraping)
 
-Check each subreddit's self-promotion rules first. r/datasets prefers a free sample, so
-consider attaching a CSV of a few thousand jobs.
+Check each subreddit's self-promotion rules first. r/datasets prefers a free sample: it's on
+Kaggle (3,351 jobs, CC BY 4.0) at
+https://www.kaggle.com/datasets/dhughes6071/company-career-site-jobs-with-salaries-oct-2026
 
 **Title**
-> I built a daily index of 1.8M jobs from 19,600 companies' own career sites (Workday,
+> I built a daily index of 1.7M jobs from 19,000+ companies' own career sites (Workday,
 > Greenhouse, Oracle + 12 more)
 
 **Text**
 > Instead of scraping job boards, I collect jobs from the hiring systems companies publish
 > them through, like Workday, Greenhouse, Oracle and Lever. Most have a public JSON API behind
-> the career page. The index refreshes nightly: 1.8M open jobs, about 50k new a day, with the
+> the career page. The index refreshes nightly: 1.7M open jobs, about 50k new a day, with the
 > salary extracted where the posting states one (29% of jobs).
 >
 > Hardest parts were Workday's hidden 2,000-result cap (NVIDIA has 2,650 jobs, not 2,000) and
 > pulling salaries out of free text without catching revenue or bonus figures.
 >
-> It's searchable as an Apify actor (link), $2 per 1,000 jobs. Happy to share how any of the
-> systems' APIs work.
+> Free sample (3,351 recent jobs from all 15 systems, with salaries, CC BY 4.0):
+> https://www.kaggle.com/datasets/dhughes6071/company-career-site-jobs-with-salaries-oct-2026
+>
+> The full index is searchable as an Apify actor, $2 per 1,000 jobs:
+> https://apify.com/viridian_layout_ea2/career-site-jobs-api
+>
+> Happy to share how any of the systems' APIs work.
