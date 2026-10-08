@@ -134,3 +134,19 @@ test("Jobvite: a Company column between title and location, and the detail meta 
   });
   assert.deepEqual(parseJobviteMeta(" Toronto,\n Ontario "), { department: null, location: "Toronto, Ontario" });
 });
+
+test("UKG board labels: internal phrases are not part of the company name", async () => {
+  const { stripBoardWords, decodeName } = await import("../crawler/discover-small.ts");
+  const cases: Array<[string, string]> = [
+    ["Default CKE", "CKE"], ["MidFirst Bank - Default", "MidFirst Bank"], ["OCO Default Branding", "OCO"],
+    ["Default (All-EOS Job Aggregator)", ""], ["Renfrew Center (Default)", "Renfrew Center"], ["Default (MSD)", "MSD"],
+    ["Main Template", ""], ["Delta Sonic Job Board", "Delta Sonic"], ["CDYMCA Job Board - New Applicants", "CDYMCA"],
+    ["Romanoff External Job Board", "Romanoff"], ["Genesee & Wyoming Main Job Board", "Genesee & Wyoming"],
+    ["SCF New Branding 2018", "SCF"], ["- Rimkus", "Rimkus"], ["External Ocean State Job Lot Job Board", "Ocean State Job Lot"],
+    ["Eugene Water and Electric Board", "Eugene Water and Electric Board"],
+    ["International Research & Exchanges Board (IREX)", "International Research & Exchanges Board (IREX)"],
+    ["Buc-ee's", "Buc-ee's"],
+  ];
+  for (const [label, name] of cases) assert.equal(stripBoardWords(label), name, label);
+  assert.equal(decodeName("Ginsberg\\u0027s"), "Ginsberg's");
+});

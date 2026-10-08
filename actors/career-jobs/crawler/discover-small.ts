@@ -33,7 +33,7 @@ export function cleanLegalName(n: string): string {
 /** Decode the entities names arrive with ("Ollie&#x27;s", "Lawn \\u0026 Pest"). */
 export function decodeName(n: string): string {
   return n
-    .replace(/\\u0026/g, "&")
+    .replace(/\\u([0-9a-f]{4})/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
     .replace(/&amp;/g, "&")
     .replace(/&#x27;|&#39;|&apos;/g, "'")
     .replace(/&quot;/g, '"')
@@ -55,7 +55,7 @@ export const UKG_NAMES: Record<string, string> = {
 
 /** Board labels that are not company names (seen across 2,448 UKG boards, 28 Sep). */
 export const GENERIC_BOARD =
-  /^(default|all|current|current opportunities|careers?|career opportunities|career site|opportunities|jobs|job board|job opportunities|job openings|current openings|all openings|all jobs|search jobs|external|external careers|internal|corporate|stores?|retail|hourly|salaried|field|english|spanish|apply|join (?:us|our team)|en|us|usa)$/i;
+  /^(default|all|current|current opportunities|careers?|career opportunities|career site|opportunities|jobs|job board|job opportunities|job openings|current openings|all openings|all jobs|search jobs|external|external careers|internal|corporate|stores?|retail|hourly|salaried|field|english|spanish|apply|join (?:us|our team)|en|us|usa|board|postings?)$/i;
 
 /**
  * UKG publishes no company-name field. Best clue first: the logo's alt text
@@ -67,7 +67,7 @@ export function ukgNameFromPage(html: string, board: string): string | null {
   const alts = [...html.matchAll(/alt="([^"]+)"/g)].map((m) => m[1]);
   const logo = alts.find((a) => !/\b(chrome|firefox|internet explorer|safari|edge|opera)\b/i.test(a));
   const fromLogo = logo?.replace(/\b(brand|logo|image|img|header|banner)\b/gi, "").replace(/\s+/g, " ").trim();
-  if (fromLogo && fromLogo.length > 1 && !GENERIC_BOARD.test(fromLogo)) return tidy(fromLogo);
+  if (fromLogo && fromLogo.length > 1 && !GENERIC_BOARD.test(fromLogo) && tidy(fromLogo).length > 1) return tidy(fromLogo);
   const m = html.match(new RegExp(`"Id":"${board}","BrandId":"[^"]*","Name":"([^"]*)"`));
   const boardName = m
     ? decodeName(m[1])
@@ -75,12 +75,35 @@ export function ukgNameFromPage(html: string, board: string): string | null {
         .replace(/\s+/g, " ")
         .trim()
     : "";
-  if (boardName.length > 1 && !GENERIC_BOARD.test(m![1]) && !GENERIC_BOARD.test(boardName)) return tidy(boardName);
+  if (boardName.length > 1 && !GENERIC_BOARD.test(m![1]) && !GENERIC_BOARD.test(boardName) && tidy(boardName).length > 1) return tidy(boardName);
   return null;
 }
 
 /** "Big 5 Sporting Goods Opt 1" -> "Big 5 Sporting Goods". */
-const tidy = (n: string) => cleanLegalName(decodeName(n).replace(/\s+opt(?:ion)?\s*\d+$/i, "").trim());
+const tidy = (n: string) => cleanLegalName(stripBoardWords(decodeName(n).replace(/\s+opt(?:ion)?\s*\d+$/i, "").trim()));
+
+/**
+ * Phrases from a board's internal label, not the company's name: "Default CKE",
+ * "MidFirst Bank - Default", "Delta Sonic Job Board", "SCF New Branding 2018",
+ * "Main Template" (about 80 of 2,448 UKG boards, found 7 Oct 2026). Only whole
+ * phrases go -- "Eugene Water and Electric Board" keeps its "Board". A label
+ * that is nothing but such phrases comes back empty (or generic), so the caller
+ * falls back to another board's name.
+ */
+export function stripBoardWords(n: string): string {
+  if (/template/i.test(n)) return "";
+  const out = n
+    .replace(/\((?:all-[^)]*|default)\)/gi, "")
+    .replace(/^recruiting\s*-\s*/i, "")
+    .replace(/\s*-?\s*\b(?:main\s+|external\s+)?job\s+board\b.*$/i, "")
+    .replace(/\b(?:new\s+)?(?:re)?branding(?:\s+\d{4})?\b/gi, "")
+    .replace(/\bdefault\b/gi, "")
+    .replace(/^\s*external\s+|\s+external\s*$/gi, "")
+    .replace(/^[\s-]+|[\s-]+$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return out.replace(/^\((.+)\)$/, "$1");
+}
 
 /**
  * One company, several UKG boards: give every board of a tenant the best
