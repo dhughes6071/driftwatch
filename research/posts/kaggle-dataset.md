@@ -4,7 +4,7 @@
 > Company Career Site Jobs with Salaries (Oct 2026)
 
 **Subtitle** (limit 80)
-> 3,351 recent job postings from 1,974 employers' own career sites, 15 ATS systems
+> 3,351 recent job postings from 1,968 employers' own career sites, 15 ATS systems
 
 **URL slug**
 > company-career-site-jobs-with-salaries
@@ -25,7 +25,7 @@ publishes its jobs through: Workday, Oracle Recruiting Cloud, SmartRecruiters, U
 Workable, Ashby, Lever, BambooHR, Breezy, Personio, Recruitee, Teamtailor, Rippling and Jobvite.
 
 - **3,351 jobs** posted or first seen between 1 and 7 Oct 2026
-- **1,974 employers** in **91 countries**, at most 3 jobs per employer for variety
+- **1,968 employers** in **91 countries**, at most 3 jobs per employer for variety
 - **All 15 hiring systems**, roughly in proportion to their share of jobs (at least 60 rows each)
 - **971 jobs (29%) with a stated salary**, normalised to min / max / currency / period and annualised
 
