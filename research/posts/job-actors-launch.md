@@ -128,29 +128,63 @@ answer comments. That matters more than the text.
 
 ---
 
-## 3. Shorter version for Reddit (r/datasets, r/webscraping)
+## 3. Reddit (one version per subreddit)
 
-Check each subreddit's self-promotion rules first. r/datasets prefers a free sample: it's on
-Kaggle (3,351 jobs, CC BY 4.0) at
-https://www.kaggle.com/datasets/dhughes6071/company-career-site-jobs-with-salaries-oct-2026
+Check each subreddit's rules on self-promotion and flair before posting, and post them a day or
+more apart. Reply to every comment in the first few hours.
+
+### r/datasets
 
 **Title**
-> I built a daily index of 1.7M jobs from 19,000+ companies' own career sites (Workday,
-> Greenhouse, Oracle + 12 more)
+> [Dataset] 3,351 current job postings with salaries, straight from 1,968 employers' own career sites (15 hiring systems)
 
 **Text**
-> Instead of scraping job boards, I collect jobs from the hiring systems companies publish
-> them through, like Workday, Greenhouse, Oracle and Lever. Most have a public JSON API behind
-> the career page. The index refreshes nightly: 1.7M open jobs, about 50k new a day, with the
-> salary extracted where the posting states one (29% of jobs).
+> I've been collecting job postings directly from the hiring systems employers publish them
+> through (Workday, Oracle, Greenhouse, Lever, SmartRecruiters, UKG and 9 more) rather than from
+> job boards. Here's a free one-week sample:
 >
-> Hardest parts were Workday's hidden 2,000-result cap (NVIDIA has 2,650 jobs, not 2,000) and
-> pulling salaries out of free text without catching revenue or bonus figures.
+> - 3,351 jobs posted 1-7 Oct 2026, from 1,968 employers in 91 countries
+> - every hiring system represented, at most 3 jobs per employer
+> - 971 jobs (29%) with the stated salary normalised to min / max / currency / period, plus annualised figures
+> - title, company, location, ISO country, remote flag, department, employment type, dates, apply URL
+> - CC BY 4.0
 >
-> Free sample (3,351 recent jobs from all 15 systems, with salaries, CC BY 4.0):
-> https://www.kaggle.com/datasets/dhughes6071/company-career-site-jobs-with-salaries-oct-2026
+> Dataset: https://www.kaggle.com/datasets/dhughes6071/company-career-site-jobs-with-salaries-oct-2026
+> Starter notebook (pay by job type, how often pay is stated by country):
+> https://www.kaggle.com/code/dhughes6071/who-s-hiring-and-what-they-pay-15-hiring-systems
 >
-> The full index is searchable as an Apify actor, $2 per 1,000 jobs:
-> https://apify.com/viridian_layout_ea2/career-site-jobs-api
+> One thing that stood out: 42% of US postings state pay, against 29% in the UK and almost none
+> in India or Brazil.
 >
-> Happy to share how any of the systems' APIs work.
+> The sample comes from a nightly index of about 1.7M open jobs. If you need more, it's
+> searchable on Apify ($2 per 1,000 jobs): https://apify.com/viridian_layout_ea2/career-site-jobs-api
+>
+> Questions about how any field was built are welcome.
+
+### r/webscraping
+
+**Title**
+> Lessons from scraping 19,000+ company career sites across 15 ATS platforms every night
+
+**Text**
+> Instead of scraping job boards, I collect jobs from the hiring systems companies publish them
+> through: Workday, Greenhouse, Oracle, Lever, SmartRecruiters, UKG and 9 more. Most have a public
+> JSON API behind the career page, so there's no HTML parsing and no proxies. The index refreshes
+> nightly: about 1.7M open jobs, 50k new a day. A few things I learned:
+>
+> - **Workday caps search results at 2,000** and then silently wraps back to page one (NVIDIA
+>   reports 2,000 jobs, has 2,650). Splitting by job category, then location, until each slice is
+>   under the cap gets everything.
+> - **Workable rate-limits hard.** Ten parallel requests hit 429 in seconds; one every 500 ms runs
+>   clean. Its widget feed also repeats a job once per location, so dedupe on the shortcode.
+> - **Lever's `descriptionPlain` is only the intro.** Requirements, benefits and pay live in
+>   `lists` and `additionalPlain`.
+> - **Greenhouse sends full descriptions for every job** (Stripe's board is 5.6 MB), but the plain
+>   list is 12x smaller. Filter on that first and fetch details only for matches.
+> - **Garbage data hides in plain sight:** an Oracle test server with 78,000 gibberish postings, and
+>   UKG employers named "Firefox" (the alt text of an unsupported-browser warning).
+>
+> Free sample on Kaggle: https://www.kaggle.com/datasets/dhughes6071/company-career-site-jobs-with-salaries-oct-2026
+> The full index is an Apify actor: https://apify.com/viridian_layout_ea2/career-site-jobs-api
+>
+> Happy to go deeper on any of the ATS APIs.
