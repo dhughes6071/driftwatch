@@ -99,7 +99,7 @@ answer comments. That matters more than the text.
 > system (Workday, Greenhouse, Oracle, Lever and so on), and most of those systems have a
 > public JSON API behind the career page. So I collect from those directly.
 >
-> A crawler on a Mac mini in my house goes through 19,000+ companies' career sites every night
+> A crawler goes through 19,000+ companies' career sites every night
 > across 15 systems and publishes a searchable index: 1.7M open jobs, about 50,000 new each
 > day. A search takes seconds because it reads the index, not the sites.
 >
