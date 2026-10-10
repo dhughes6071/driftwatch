@@ -99,8 +99,8 @@ answer comments. That matters more than the text.
 > system (Workday, Greenhouse, Oracle, Lever and so on), and most of those systems have a
 > public JSON API behind the career page. So I collect from those directly.
 >
-> A crawler goes through 19,000+ companies' career sites every night
-> across 15 systems and publishes a searchable index: 1.7M open jobs, about 50,000 new each
+> A crawler goes through 19,000+ companies' career sites every night across 15 systems and
+> publishes a searchable index: 1.7M open jobs, about 50,000 new each
 > day. A search takes seconds because it reads the index, not the sites.
 >
 > Things I didn't expect:
@@ -119,8 +119,10 @@ answer comments. That matters more than the text.
 >   employers came out named "Firefox" (the alt text of an unsupported-browser warning).
 >
 > It runs on Apify, so you can try it on their free credit. It's $2 per 1,000 jobs, and there's
-> a "only jobs new since my last run" mode for daily feeds. There are also live scrapers for
-> single Workday or Greenhouse/Lever/Ashby companies.
+> an "only jobs new since my last run" mode for daily feeds. There are also live scrapers for
+> single Workday or Greenhouse/Lever/Ashby companies. If you just want to look at the data, a
+> free 3,351-job sample is on Kaggle:
+> https://www.kaggle.com/datasets/dhughes6071/company-career-site-jobs-with-salaries-oct-2026
 >
 > Happy to answer questions about any of the systems. Each one has its own odd way of breaking.
 
