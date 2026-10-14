@@ -76,8 +76,10 @@ investment, brokers paid, and links to the filing. See **Output** below.
 
 ## Pricing
 
-**PRICE TO BE CONFIRMED** per 1,000 filings, plus Apify's standard $0.00005 run-start fee.
-Platform usage is included, so you are not billed for compute separately.
+**$20 per 1,000 filings** ($0.02 per company), plus Apify's standard $0.00005 run-start fee.
+On Apify's paid plans it's cheaper: $18 (Starter), $16 (Scale) or $14 (Business) per 1,000.
+Platform usage is included, so you are not billed for compute separately. A full week of
+new operating companies (about 290) costs about $5.80.
 
 - **`maxResults`** is a hard cap per run (default 200).
 - **Apify's maximum cost per run** also works: if the limit is reached mid-run, the Actor
