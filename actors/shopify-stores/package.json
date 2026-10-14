@@ -1,0 +1,19 @@
+{
+  "name": "shopify-stores",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Apify actor: Shopify store leads from an index of live stores, found by DNS and re-checked weekly on the owner's machine.",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node --experimental-strip-types src/main.ts",
+    "local": "CRAWLEE_STORAGE_DIR=./storage ACTOR_TEST_PAY_PER_EVENT=1 node --experimental-strip-types src/main.ts",
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "discover": "node --experimental-strip-types crawler/discover.ts",
+    "enrich": "node --experimental-strip-types crawler/enrich.ts",
+    "publish-index": "node --experimental-strip-types crawler/publish.ts"
+  },
+  "dependencies": {
+    "apify": "^3.7.2"
+  }
+}

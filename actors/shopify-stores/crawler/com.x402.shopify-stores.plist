@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Daily 10:00 Shopify store refresh. Install: cp to ~/Library/LaunchAgents/ and launchctl load it. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.x402.shopify-stores</string>
+  <key>ProgramArguments</key>
+  <array><string>/bin/zsh</string><string>/Users/chaz-michaelmichaels/X402/actors/shopify-stores/crawler/run-daily.sh</string></array>
+  <key>EnvironmentVariables</key>
+  <dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+  <key>StartCalendarInterval</key>
+  <dict><key>Hour</key><integer>10</integer><key>Minute</key><integer>0</integer></dict>
+  <key>StandardOutPath</key><string>/tmp/shopify-stores.launchd.log</string>
+  <key>StandardErrorPath</key><string>/tmp/shopify-stores.launchd.log</string>
+</dict>
+</plist>

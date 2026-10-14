@@ -1,0 +1,219 @@
+{
+  "title": "Shopify Store Leads",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "keywords": {
+      "title": "Niche keywords",
+      "type": "array",
+      "editor": "stringList",
+      "description": "Stores whose name, description, domain, product types or brands contain one of these, e.g. \"tea\", \"pet supplies\", \"skincare\". Short keywords (3 letters or fewer) match whole words only.",
+      "prefill": [
+        "coffee"
+      ]
+    },
+    "excludeKeywords": {
+      "title": "Exclude keywords",
+      "type": "array",
+      "editor": "stringList",
+      "description": "Leave out stores matching any of these.",
+      "default": []
+    },
+    "countries": {
+      "title": "Countries",
+      "type": "array",
+      "editor": "stringList",
+      "description": "Two-letter country codes of the business, e.g. \"US\", \"GB\", \"AU\".",
+      "default": []
+    },
+    "locationKeywords": {
+      "title": "City or state",
+      "type": "array",
+      "editor": "stringList",
+      "description": "City or state/province contains one of these, e.g. \"Texas\", \"London\".",
+      "default": []
+    },
+    "currencies": {
+      "title": "Currencies",
+      "type": "array",
+      "editor": "stringList",
+      "description": "e.g. \"USD\", \"EUR\".",
+      "default": []
+    },
+    "shipsTo": {
+      "title": "Ships to",
+      "type": "array",
+      "editor": "stringList",
+      "description": "Stores that ship to at least one of these countries, e.g. \"CA\".",
+      "default": []
+    },
+    "languages": {
+      "title": "Site languages",
+      "type": "array",
+      "editor": "stringList",
+      "description": "Storefront language codes, e.g. \"en\", \"de\".",
+      "default": []
+    },
+    "minProducts": {
+      "title": "Minimum products",
+      "type": "integer",
+      "minimum": 0,
+      "description": "Only stores with at least this many published products."
+    },
+    "maxProducts": {
+      "title": "Maximum products",
+      "type": "integer",
+      "minimum": 0,
+      "description": "Only stores with at most this many products, e.g. 200 for small shops."
+    },
+    "minMedianPrice": {
+      "title": "Minimum typical price",
+      "type": "integer",
+      "minimum": 0,
+      "description": "Median product price at least this much, in the store's own currency."
+    },
+    "maxMedianPrice": {
+      "title": "Maximum typical price",
+      "type": "integer",
+      "minimum": 0,
+      "description": "Median product price at most this much, in the store's own currency."
+    },
+    "activeWithinDays": {
+      "title": "Added a product within (days)",
+      "type": "integer",
+      "minimum": 1,
+      "description": "Only active stores: published a product in the last N days."
+    },
+    "minProductsAddedLast30Days": {
+      "title": "Minimum products added (30 days)",
+      "type": "integer",
+      "minimum": 1,
+      "description": "Stores growing their catalog: at least this many products published in the last 30 days."
+    },
+    "requireEmail": {
+      "title": "Has an email",
+      "type": "boolean",
+      "default": false,
+      "description": "Only stores that publish an email address on their homepage or contact page."
+    },
+    "requirePhone": {
+      "title": "Has a phone",
+      "type": "boolean",
+      "default": false,
+      "description": "Only stores that publish a phone number."
+    },
+    "requireSocials": {
+      "title": "Has these social profiles",
+      "type": "array",
+      "editor": "select",
+      "items": {
+        "type": "string",
+        "enum": [
+          "instagram",
+          "facebook",
+          "tiktok",
+          "youtube",
+          "pinterest",
+          "twitter",
+          "linkedin"
+        ]
+      },
+      "default": [],
+      "description": "Only stores linking to a profile on each selected network."
+    },
+    "apps": {
+      "title": "Uses any of these apps",
+      "type": "array",
+      "editor": "select",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Klaviyo",
+          "Omnisend",
+          "Mailchimp",
+          "Privy",
+          "Attentive",
+          "Postscript",
+          "Judge.me",
+          "Yotpo",
+          "Loox",
+          "Okendo",
+          "Stamped",
+          "ReCharge",
+          "Rebuy",
+          "Smile.io",
+          "LoyaltyLion",
+          "Gorgias",
+          "Tidio",
+          "Zendesk",
+          "Afterpay",
+          "Klarna",
+          "PageFly",
+          "GemPages",
+          "Shogun",
+          "Weglot",
+          "Route",
+          "AfterShip",
+          "Hotjar",
+          "Meta Pixel",
+          "TikTok Pixel",
+          "Google Analytics"
+        ]
+      },
+      "default": [],
+      "description": "Detected from the scripts on the store's homepage."
+    },
+    "themes": {
+      "title": "Theme",
+      "type": "array",
+      "editor": "stringList",
+      "default": [],
+      "description": "Theme name contains one of these, e.g. \"Dawn\", \"Impulse\"."
+    },
+    "foundWithinDays": {
+      "title": "Found within (days)",
+      "type": "integer",
+      "minimum": 1,
+      "description": "Only stores our index found in the last N days."
+    },
+    "onlyNewSinceLastRun": {
+      "title": "Only stores new since this search last ran",
+      "type": "boolean",
+      "default": false,
+      "description": "For scheduled runs: return only stores the index found since this same search last ran. The Actor remembers each search in a key-value store named <code>shopify-stores-monitor</code> in your account; changing any filter starts a new history."
+    },
+    "monitorName": {
+      "title": "Search name (optional)",
+      "type": "string",
+      "editor": "textfield",
+      "description": "Only needed to keep two searches with identical filters separate, e.g. one per client."
+    },
+    "sortBy": {
+      "title": "Sort by",
+      "type": "string",
+      "editor": "select",
+      "enum": [
+        "newestFound",
+        "mostProducts",
+        "mostAddedLast30Days",
+        "newestProduct"
+      ],
+      "enumTitles": [
+        "Newest found first (fastest)",
+        "Most products",
+        "Most products added in 30 days",
+        "Most recently active"
+      ],
+      "default": "newestFound",
+      "description": "Which stores come first. The maximum below keeps the top of this list."
+    },
+    "maxResults": {
+      "title": "Maximum stores",
+      "type": "integer",
+      "default": 500,
+      "minimum": 1,
+      "maximum": 1000000,
+      "description": "Hard cap on results, and your main cost control: you are charged per store returned."
+    }
+  }
+}

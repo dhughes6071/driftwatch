@@ -1,0 +1,21 @@
+{
+  "actorSpecification": 1,
+  "name": "shopify-store-leads",
+  "title": "Shopify Store Leads — Find Stores by Niche, Country & Apps",
+  "description": "Live Shopify stores, re-checked every 2 weeks: name, country, city, currency, product count and prices, newest products, theme, apps, and the emails, phones and socials each store publishes. Filter by niche, country, size, activity and apps, or get only new stores.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "dockerfile": "./Dockerfile",
+  "readme": "./ACTOR.md",
+  "input": "./input_schema.json",
+  "storages": {
+    "dataset": "./dataset_schema.json"
+  },
+  "environmentVariables": {
+    "SHOPIFY_MANIFEST_URL": "@shopifyManifestUrl"
+  },
+  "minMemoryMbytes": 512,
+  "maxMemoryMbytes": 4096,
+  "output": "./output_schema.json",
+  "defaultMemoryMbytes": 1024
+}

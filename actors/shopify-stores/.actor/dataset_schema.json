@@ -1,0 +1,74 @@
+{
+  "actorSpecification": 1,
+  "views": {
+    "overview": {
+      "title": "Shopify stores",
+      "transformation": {
+        "fields": [
+          "name",
+          "url",
+          "country",
+          "city",
+          "productCount",
+          "priceMedian",
+          "currency",
+          "productsAddedLast30Days",
+          "emails",
+          "phones",
+          "instagram",
+          "theme",
+          "apps"
+        ]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "name": {
+            "label": "Store"
+          },
+          "url": {
+            "label": "Website",
+            "format": "link"
+          },
+          "country": {
+            "label": "Country"
+          },
+          "city": {
+            "label": "City"
+          },
+          "productCount": {
+            "label": "Products",
+            "format": "number"
+          },
+          "priceMedian": {
+            "label": "Typical price",
+            "format": "number"
+          },
+          "currency": {
+            "label": "Currency"
+          },
+          "productsAddedLast30Days": {
+            "label": "New products (30d)",
+            "format": "number"
+          },
+          "emails": {
+            "label": "Emails"
+          },
+          "phones": {
+            "label": "Phones"
+          },
+          "instagram": {
+            "label": "Instagram",
+            "format": "link"
+          },
+          "theme": {
+            "label": "Theme"
+          },
+          "apps": {
+            "label": "Apps"
+          }
+        }
+      }
+    }
+  }
+}

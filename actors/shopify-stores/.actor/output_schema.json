@@ -1,0 +1,19 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "Shopify Store Leads output",
+  "description": "One record per store in the default dataset, plus a SUMMARY record describing the run.",
+  "properties": {
+    "stores": {
+      "type": "string",
+      "title": "Shopify stores",
+      "description": "Every store delivered: identity, location, catalog, activity, theme, apps and public contact details.",
+      "template": "{{links.apiDefaultDatasetUrl}}/items"
+    },
+    "summary": {
+      "type": "string",
+      "title": "Run summary",
+      "description": "Stores matched and returned, index date, and why the run stopped.",
+      "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/SUMMARY"
+    }
+  }
+}
