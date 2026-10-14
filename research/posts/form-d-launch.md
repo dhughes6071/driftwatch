@@ -9,7 +9,8 @@ the numbers on the day you post.
 
 The free sample is on Kaggle:
 https://www.kaggle.com/datasets/dhughes6071/us-private-funding-rounds-sec-form-d-oct-2026
-(public since 14 Oct 2026).
+(public since 14 Oct 2026). Starter notebook:
+https://www.kaggle.com/code/dhughes6071/who-just-raised-money-us-private-rounds-form-d
 
 **Before posting:**
 - Read each subreddit's rules on self-promotion and flair.
@@ -43,6 +44,8 @@ https://www.kaggle.com/datasets/dhughes6071/us-private-funding-rounds-sec-form-d
 > - a link to the original filing on every row
 >
 > Dataset: https://www.kaggle.com/datasets/dhughes6071/us-private-funding-rounds-sec-form-d-oct-2026
+> Starter notebook (sectors, round sizes, SAFEs, the biggest raises):
+> https://www.kaggle.com/code/dhughes6071/who-just-raised-money-us-private-rounds-form-d
 >
 > A few things that stood out:
 > - 1,083 of the companies reported money already raised. The median was about $1.2M, and 581

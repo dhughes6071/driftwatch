@@ -1,7 +1,9 @@
 # Kaggle dataset page: Form D sample (published 14 Oct 2026)
 
 **Live:** https://www.kaggle.com/datasets/dhughes6071/us-private-funding-rounds-sec-form-d-oct-2026
-(public, CC0, usability 5.9 at publication)
+(public, CC0). Starter notebook (public, built by `build_kaggle_form_d_notebook.py`):
+https://www.kaggle.com/code/dhughes6071/who-just-raised-money-us-private-rounds-form-d
+Cover image for the dataset: `kaggle-form-d-cover.png` (upload it in Settings → Edit Image).
 
 **Title** (49 characters; Kaggle's limit is 50)
 > US Private Funding Rounds - SEC Form D (Oct 2026)
