@@ -1,0 +1,19 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "Recently Funded Companies output",
+  "description": "One record per Form D filing in the default dataset, plus a SUMMARY record describing the run.",
+  "properties": {
+    "filings": {
+      "type": "string",
+      "title": "Funded companies",
+      "description": "Every filing delivered, one record each: company, address, phone, amount raised, round details and executives.",
+      "template": "{{links.apiDefaultDatasetUrl}}/items"
+    },
+    "summary": {
+      "type": "string",
+      "title": "Run summary",
+      "description": "Filings returned and scanned, the date range, and why the run stopped.",
+      "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/SUMMARY"
+    }
+  }
+}

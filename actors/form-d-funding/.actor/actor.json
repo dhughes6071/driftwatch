@@ -1,0 +1,18 @@
+{
+  "actorSpecification": 1,
+  "name": "sec-form-d-funding-tracker",
+  "title": "Recently Funded Companies — SEC Form D Startup Funding Tracker",
+  "description": "Every US company that just raised money, from SEC Form D filings: ~290 new raises a week. Amount raised, industry, address, phone and the executives' names and titles. Filter by sector, state and amount; funds left out by default. Official SEC data, no login or proxies.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "dockerfile": "./Dockerfile",
+  "readme": "./ACTOR.md",
+  "input": "./input_schema.json",
+  "storages": {
+    "dataset": "./dataset_schema.json"
+  },
+  "minMemoryMbytes": 256,
+  "maxMemoryMbytes": 2048,
+  "output": "./output_schema.json",
+  "defaultMemoryMbytes": 512
+}

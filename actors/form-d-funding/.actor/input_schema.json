@@ -1,0 +1,192 @@
+{
+  "title": "Recently Funded Companies (SEC Form D)",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "daysBack": {
+      "title": "Filed in the last (days)",
+      "type": "integer",
+      "description": "How far back to look. Companies must file Form D within 15 days of their first sale, so the last 7 days is the freshest view of who just raised.",
+      "default": 7,
+      "minimum": 1,
+      "maximum": 365
+    },
+    "companyType": {
+      "title": "Companies or funds",
+      "type": "string",
+      "description": "About 6 in 10 Form D filings are investment funds (VC, private equity, hedge and real-estate funds). They are left out by default so you get operating companies.",
+      "editor": "select",
+      "enum": [
+        "companies",
+        "funds",
+        "all"
+      ],
+      "enumTitles": [
+        "Operating companies (funds left out)",
+        "Investment funds only",
+        "Both"
+      ],
+      "default": "companies"
+    },
+    "sectors": {
+      "title": "Sectors",
+      "type": "array",
+      "description": "Only companies in these sectors, as the company chose on the form. Leave empty for all.",
+      "editor": "select",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Technology",
+          "Health Care",
+          "Real Estate",
+          "Financial Services",
+          "Energy",
+          "Business Services",
+          "Manufacturing",
+          "Retail",
+          "Restaurants",
+          "Travel",
+          "Agriculture",
+          "Other"
+        ]
+      },
+      "default": []
+    },
+    "states": {
+      "title": "States",
+      "type": "array",
+      "description": "Only companies whose business address is in these US states (two-letter codes). Leave empty for everywhere, including companies abroad.",
+      "editor": "select",
+      "items": {
+        "type": "string",
+        "enum": [
+          "AL",
+          "AK",
+          "AZ",
+          "AR",
+          "CA",
+          "CO",
+          "CT",
+          "DE",
+          "DC",
+          "FL",
+          "GA",
+          "HI",
+          "ID",
+          "IL",
+          "IN",
+          "IA",
+          "KS",
+          "KY",
+          "LA",
+          "ME",
+          "MD",
+          "MA",
+          "MI",
+          "MN",
+          "MS",
+          "MO",
+          "MT",
+          "NE",
+          "NV",
+          "NH",
+          "NJ",
+          "NM",
+          "NY",
+          "NC",
+          "ND",
+          "OH",
+          "OK",
+          "OR",
+          "PA",
+          "RI",
+          "SC",
+          "SD",
+          "TN",
+          "TX",
+          "UT",
+          "VT",
+          "VA",
+          "WA",
+          "WV",
+          "WI",
+          "WY",
+          "PR"
+        ]
+      },
+      "default": []
+    },
+    "minAmountRaised": {
+      "title": "Minimum amount raised (USD)",
+      "type": "integer",
+      "description": "Only filings reporting at least this much already sold in the round, e.g. 1000000.",
+      "minimum": 0
+    },
+    "minOfferingAmount": {
+      "title": "Minimum round size (USD)",
+      "type": "integer",
+      "description": "Only rounds whose stated target is at least this much. Rounds with no fixed size (\"indefinite\") are kept.",
+      "minimum": 0
+    },
+    "incorporatedWithinYears": {
+      "title": "Founded within (years)",
+      "type": "integer",
+      "description": "Only young companies: incorporated in the last N years. Good for finding startups.",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "companyKeywords": {
+      "title": "Company name contains",
+      "type": "array",
+      "description": "Only companies whose name contains one of these, e.g. \"AI\", \"Therapeutics\", \"Labs\".",
+      "editor": "stringList",
+      "default": []
+    },
+    "includeAmendments": {
+      "title": "Include amendments",
+      "type": "boolean",
+      "description": "Also return Form D/A filings: yearly renewals and corrections of an earlier notice. Off by default, so you see new raises.",
+      "default": false
+    },
+    "latestPerCompany": {
+      "title": "One row per company",
+      "type": "boolean",
+      "description": "When a company filed more than once in the period, return only its newest filing.",
+      "default": true
+    },
+    "onlyNewSinceLastRun": {
+      "title": "Only filings new since this search last ran",
+      "type": "boolean",
+      "description": "For scheduled runs: skip every filing this same search has already delivered, so you never pay twice for the same company. The Actor remembers each search in a key-value store named <code>form-d-funding-monitor</code> in your account; changing any filter (other than the date range) starts a new history.",
+      "default": false
+    },
+    "monitorName": {
+      "title": "Search name (optional)",
+      "type": "string",
+      "description": "Only needed to keep two searches with identical filters separate, e.g. one per client.",
+      "editor": "textfield"
+    },
+    "filedFrom": {
+      "title": "From date (optional)",
+      "type": "string",
+      "description": "An exact start date, YYYY-MM-DD, instead of 'Filed in the last (days)'. SEC search covers filings from 2001 onwards.",
+      "editor": "textfield",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "filedTo": {
+      "title": "To date (optional)",
+      "type": "string",
+      "description": "An exact end date, YYYY-MM-DD. Defaults to today.",
+      "editor": "textfield",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "maxResults": {
+      "title": "Maximum results",
+      "type": "integer",
+      "description": "Hard cap on results for the whole run, and your main cost control: you are charged per filing returned. Newest filings come first.",
+      "default": 200,
+      "minimum": 1,
+      "maximum": 100000
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "actorSpecification": 1,
+  "views": {
+    "overview": {
+      "title": "Funded companies",
+      "transformation": {
+        "fields": [
+          "companyName",
+          "filedAt",
+          "sector",
+          "industry",
+          "city",
+          "state",
+          "totalAmountSold",
+          "totalOfferingAmount",
+          "executivesText",
+          "phone",
+          "yearOfIncorporation",
+          "formUrl"
+        ]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "companyName": {
+            "label": "Company"
+          },
+          "filedAt": {
+            "label": "Filed"
+          },
+          "sector": {
+            "label": "Sector"
+          },
+          "industry": {
+            "label": "Industry"
+          },
+          "city": {
+            "label": "City"
+          },
+          "state": {
+            "label": "State"
+          },
+          "totalAmountSold": {
+            "label": "Raised (USD)",
+            "format": "number"
+          },
+          "totalOfferingAmount": {
+            "label": "Round size (USD)",
+            "format": "number"
+          },
+          "executivesText": {
+            "label": "Executives"
+          },
+          "phone": {
+            "label": "Phone"
+          },
+          "yearOfIncorporation": {
+            "label": "Founded"
+          },
+          "formUrl": {
+            "label": "Filing",
+            "format": "link"
+          }
+        }
+      }
+    }
+  }
+}

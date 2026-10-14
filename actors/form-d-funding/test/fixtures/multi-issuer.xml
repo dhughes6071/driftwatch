@@ -1,0 +1,333 @@
+<?xml version="1.0"?>
+<edgarSubmission>
+
+    <schemaVersion>X0708</schemaVersion>
+
+    <submissionType>D/A</submissionType>
+
+    <testOrLive>LIVE</testOrLive>
+
+    <primaryIssuer>
+        <cik>0001618796</cik>
+        <entityName>VERGER CAPITAL FUND LLC</entityName>
+        <issuerAddress>
+            <street1>C/O VERGER CAPITAL MANAGEMENT LLC</street1>
+            <street2>100 N MAIN ST, SUITE 2300</street2>
+            <city>WINSTON-SALEM</city>
+            <stateOrCountry>NC</stateOrCountry>
+            <stateOrCountryDescription>NORTH CAROLINA</stateOrCountryDescription>
+            <zipCode>27101</zipCode>
+        </issuerAddress>
+        <issuerPhoneNumber>336-934-4101</issuerPhoneNumber>
+        <jurisdictionOfInc>DELAWARE</jurisdictionOfInc>
+        <issuerPreviousNameList>
+            <value>None</value>
+        </issuerPreviousNameList>
+        <edgarPreviousNameList>
+            <value>None</value>
+        </edgarPreviousNameList>
+        <entityType>Limited Liability Company</entityType>
+        <yearOfInc>
+            <overFiveYears>true</overFiveYears>
+        </yearOfInc>
+    </primaryIssuer>
+
+    <issuerList>
+        <issuer>
+            <cik>0001618797</cik>
+            <entityName>VERGER FUND II LLC</entityName>
+            <issuerAddress>
+                <street1>C/O VERGER CAPITAL MANAGEMENT LLC</street1>
+                <street2>100 N MAIN ST, SUITE 2300</street2>
+                <city>WINSTON-SALEM</city>
+                <stateOrCountry>NC</stateOrCountry>
+                <stateOrCountryDescription>NORTH CAROLINA</stateOrCountryDescription>
+                <zipCode>27101</zipCode>
+            </issuerAddress>
+            <issuerPhoneNumber>336-934-4101</issuerPhoneNumber>
+            <jurisdictionOfInc>DELAWARE</jurisdictionOfInc>
+            <issuerPreviousNameList>
+                <value>None</value>
+            </issuerPreviousNameList>
+            <edgarPreviousNameList>
+                <value>None</value>
+            </edgarPreviousNameList>
+            <entityType>Limited Liability Company</entityType>
+            <yearOfInc>
+                <overFiveYears>true</overFiveYears>
+            </yearOfInc>
+        </issuer>
+    </issuerList>
+
+    <relatedPersonsList>
+        <relatedPersonInfo>
+            <relatedPersonName>
+                <firstName>James</firstName>
+                <middleName>Joseph</middleName>
+                <lastName>Dunn</lastName>
+            </relatedPersonName>
+            <relatedPersonAddress>
+                <street1>Verger Capital Management LLC</street1>
+                <street2>100 N Main St, Suite 2300</street2>
+                <city>Winston-Salem</city>
+                <stateOrCountry>NC</stateOrCountry>
+                <stateOrCountryDescription>NORTH CAROLINA</stateOrCountryDescription>
+                <zipCode>27101</zipCode>
+            </relatedPersonAddress>
+            <relatedPersonRelationshipList>
+                <relationship>Executive Officer</relationship>
+            </relatedPersonRelationshipList>
+            <relationshipClarification></relationshipClarification>
+        </relatedPersonInfo>
+        <relatedPersonInfo>
+            <relatedPersonName>
+                <firstName>Craig</firstName>
+                <middleName>Owen</middleName>
+                <lastName>Thomas</lastName>
+            </relatedPersonName>
+            <relatedPersonAddress>
+                <street1>Verger Capital Management LLC</street1>
+                <street2>100 N Main St, Suite 2300</street2>
+                <city>Winston-Salem</city>
+                <stateOrCountry>NC</stateOrCountry>
+                <stateOrCountryDescription>NORTH CAROLINA</stateOrCountryDescription>
+                <zipCode>27101</zipCode>
+            </relatedPersonAddress>
+            <relatedPersonRelationshipList>
+                <relationship>Executive Officer</relationship>
+            </relatedPersonRelationshipList>
+            <relationshipClarification></relationshipClarification>
+        </relatedPersonInfo>
+        <relatedPersonInfo>
+            <relatedPersonName>
+                <firstName>Vicki</firstName>
+                <middleName>Jennings</middleName>
+                <lastName>West</lastName>
+            </relatedPersonName>
+            <relatedPersonAddress>
+                <street1>Verger Capital Management LLC</street1>
+                <street2>100 N Main St, Suite 2300</street2>
+                <city>Winston-Salem</city>
+                <stateOrCountry>NC</stateOrCountry>
+                <stateOrCountryDescription>NORTH CAROLINA</stateOrCountryDescription>
+                <zipCode>27101</zipCode>
+            </relatedPersonAddress>
+            <relatedPersonRelationshipList>
+                <relationship>Executive Officer</relationship>
+            </relatedPersonRelationshipList>
+            <relationshipClarification></relationshipClarification>
+        </relatedPersonInfo>
+    </relatedPersonsList>
+
+    <offeringData>
+        <industryGroup>
+            <industryGroupType>Pooled Investment Fund</industryGroupType>
+            <investmentFundInfo>
+                <investmentFundType>Hedge Fund</investmentFundType>
+                <is40Act>false</is40Act>
+            </investmentFundInfo>
+        </industryGroup>
+        <issuerSize>
+            <aggregateNetAssetValueRange>Decline to Disclose</aggregateNetAssetValueRange>
+        </issuerSize>
+        <federalExemptionsExclusions>
+            <item>06b</item>
+            <item>3C</item>
+            <item>3C.1</item>
+        </federalExemptionsExclusions>
+        <typeOfFiling>
+            <newOrAmendment>
+                <isAmendment>true</isAmendment>
+                <previousAccessionNumber>0001398344-21-018528</previousAccessionNumber>
+            </newOrAmendment>
+            <dateOfFirstSale>
+                <value>2014-08-22</value>
+            </dateOfFirstSale>
+        </typeOfFiling>
+        <durationOfOffering>
+            <moreThanOneYear>true</moreThanOneYear>
+        </durationOfOffering>
+        <typesOfSecuritiesOffered>
+            <isPooledInvestmentFundType>true</isPooledInvestmentFundType>
+        </typesOfSecuritiesOffered>
+        <businessCombinationTransaction>
+            <isBusinessCombinationTransaction>false</isBusinessCombinationTransaction>
+            <clarificationOfResponse></clarificationOfResponse>
+        </businessCombinationTransaction>
+        <minimumInvestmentAccepted>0</minimumInvestmentAccepted>
+        <salesCompensationList>
+            <recipient>
+                <recipientName>Patrick Marshall Decker</recipientName>
+                <recipientCRDNumber>4640613</recipientCRDNumber>
+                <associatedBDName>Foreside Fund Services, LLC</associatedBDName>
+                <associatedBDCRDNumber>46106</associatedBDCRDNumber>
+                <recipientAddress>
+                    <street1>C/O VERGER CAPITAL MANAGEMENT LLC</street1>
+                    <street2>100 N Main St, Suite 2300</street2>
+                    <city>WINSTON-SALEM</city>
+                    <stateOrCountry>NC</stateOrCountry>
+                    <stateOrCountryDescription>NORTH CAROLINA</stateOrCountryDescription>
+                    <zipCode>27101</zipCode>
+                </recipientAddress>
+                <statesOfSolicitationList>
+                    <state>DE</state>
+                    <description>DELAWARE</description>
+                    <state>TX</state>
+                    <description>TEXAS</description>
+                    <state>FL</state>
+                    <description>FLORIDA</description>
+                    <state>NY</state>
+                    <description>NEW YORK</description>
+                    <state>VA</state>
+                    <description>VIRGINIA</description>
+                    <state>SC</state>
+                    <description>SOUTH CAROLINA</description>
+                    <state>CT</state>
+                    <description>CONNECTICUT</description>
+                    <state>PA</state>
+                    <description>PENNSYLVANIA</description>
+                    <state>MA</state>
+                    <description>MASSACHUSETTS</description>
+                    <state>LA</state>
+                    <description>LOUISIANA</description>
+                    <state>NC</state>
+                    <description>NORTH CAROLINA</description>
+                    <state>MD</state>
+                    <description>MARYLAND</description>
+                    <state>RI</state>
+                    <description>RHODE ISLAND</description>
+                    <state>IA</state>
+                    <description>IOWA</description>
+                    <state>ME</state>
+                    <description>MAINE</description>
+                    <state>OH</state>
+                    <description>OHIO</description>
+                    <state>GA</state>
+                    <description>GEORGIA</description>
+                    <state>NH</state>
+                    <description>NEW HAMPSHIRE</description>
+                    <state>TN</state>
+                    <description>TENNESSEE</description>
+                    <state>NJ</state>
+                    <description>NEW JERSEY</description>
+                    <state>CA</state>
+                    <description>CALIFORNIA</description>
+                    <state>VT</state>
+                    <description>VERMONT</description>
+                    <state>DC</state>
+                    <description>DISTRICT OF COLUMBIA</description>
+                    <state>UT</state>
+                    <description>UTAH</description>
+                </statesOfSolicitationList>
+                <foreignSolicitation>false</foreignSolicitation>
+            </recipient>
+            <recipient>
+                <recipientName>Wesley Michelle Carroccio</recipientName>
+                <recipientCRDNumber>4514213</recipientCRDNumber>
+                <associatedBDName>Foreside Fund Services, LLC</associatedBDName>
+                <associatedBDCRDNumber>46106</associatedBDCRDNumber>
+                <recipientAddress>
+                    <street1>C/O VERGER CAPITAL MANAGEMENT LLC</street1>
+                    <street2>100 N Main St, Suite 2300</street2>
+                    <city>WINSTON-SALEM</city>
+                    <stateOrCountry>NC</stateOrCountry>
+                    <stateOrCountryDescription>NORTH CAROLINA</stateOrCountryDescription>
+                    <zipCode>27101</zipCode>
+                </recipientAddress>
+                <statesOfSolicitationList>
+                    <state>DE</state>
+                    <description>DELAWARE</description>
+                    <state>TX</state>
+                    <description>TEXAS</description>
+                    <state>FL</state>
+                    <description>FLORIDA</description>
+                    <state>NY</state>
+                    <description>NEW YORK</description>
+                    <state>VA</state>
+                    <description>VIRGINIA</description>
+                    <state>SC</state>
+                    <description>SOUTH CAROLINA</description>
+                    <state>CT</state>
+                    <description>CONNECTICUT</description>
+                    <state>PA</state>
+                    <description>PENNSYLVANIA</description>
+                    <state>MA</state>
+                    <description>MASSACHUSETTS</description>
+                    <state>LA</state>
+                    <description>LOUISIANA</description>
+                    <state>NC</state>
+                    <description>NORTH CAROLINA</description>
+                    <state>MD</state>
+                    <description>MARYLAND</description>
+                    <state>RI</state>
+                    <description>RHODE ISLAND</description>
+                    <state>IA</state>
+                    <description>IOWA</description>
+                    <state>ME</state>
+                    <description>MAINE</description>
+                    <state>OH</state>
+                    <description>OHIO</description>
+                    <state>GA</state>
+                    <description>GEORGIA</description>
+                    <state>NH</state>
+                    <description>NEW HAMPSHIRE</description>
+                    <state>TN</state>
+                    <description>TENNESSEE</description>
+                    <state>NJ</state>
+                    <description>NEW JERSEY</description>
+                    <state>CA</state>
+                    <description>CALIFORNIA</description>
+                    <state>VT</state>
+                    <description>VERMONT</description>
+                    <state>DC</state>
+                    <description>DISTRICT OF COLUMBIA</description>
+                    <state>UT</state>
+                    <description>UTAH</description>
+                </statesOfSolicitationList>
+                <foreignSolicitation>false</foreignSolicitation>
+            </recipient>
+        </salesCompensationList>
+        <offeringSalesAmounts>
+            <totalOfferingAmount>Indefinite</totalOfferingAmount>
+            <totalAmountSold>2025482867</totalAmountSold>
+            <totalRemaining>Indefinite</totalRemaining>
+            <clarificationOfResponse>Verger Fund I and Verger Fund II are feeder funds that invest their proceeds in Verger Capital Fund LLC, the master fund. Verger Fund I is a single investor fund. Verger Fund II has 7 investors with total amount sold of $920,988,616.</clarificationOfResponse>
+        </offeringSalesAmounts>
+        <investors>
+            <hasNonAccreditedInvestors>false</hasNonAccreditedInvestors>
+            <totalNumberAlreadyInvested>8</totalNumberAlreadyInvested>
+        </investors>
+        <salesCommissionsFindersFees>
+            <salesCommissions>
+                <dollarAmount>84830</dollarAmount>
+            </salesCommissions>
+            <findersFees>
+                <dollarAmount>0</dollarAmount>
+            </findersFees>
+            <clarificationOfResponse>2018 - $4,640; 2019 - $31,447; 2020 - $23,311; 2021 - $25,432</clarificationOfResponse>
+        </salesCommissionsFindersFees>
+        <useOfProceeds>
+            <grossProceedsUsed>
+                <dollarAmount>0</dollarAmount>
+            </grossProceedsUsed>
+            <clarificationOfResponse></clarificationOfResponse>
+        </useOfProceeds>
+        <signatureBlock>
+            <authorizedRepresentative>false</authorizedRepresentative>
+            <signature>
+                <issuerName>VERGER CAPITAL FUND LLC</issuerName>
+                <signatureName>/s/ Vicki J. West</signatureName>
+                <nameOfSigner>Vicki J. West</nameOfSigner>
+                <signatureTitle>Chief Operating Officer</signatureTitle>
+                <signatureDate>2026-10-13</signatureDate>
+            </signature>
+            <signature>
+                <issuerName>VERGER FUND II LLC</issuerName>
+                <signatureName>/s/ Vicki J. West</signatureName>
+                <nameOfSigner>Vicki J. West</nameOfSigner>
+                <signatureTitle>Chief Operating Officer</signatureTitle>
+                <signatureDate>2026-10-13</signatureDate>
+            </signature>
+        </signatureBlock>
+    </offeringData>
+</edgarSubmission>
