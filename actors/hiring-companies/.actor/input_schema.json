@@ -1,0 +1,179 @@
+{
+  "title": "Companies Hiring For Any Role",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "titleKeywords": {
+      "title": "Role keywords",
+      "type": "array",
+      "description": "Companies with open roles whose title contains one of these, e.g. \"salesforce\", \"data engineer\", \"SDR\". Short keywords (3 letters or fewer) match whole words only.",
+      "editor": "stringList",
+      "prefill": [
+        "salesforce"
+      ]
+    },
+    "titleExcludeKeywords": {
+      "title": "Exclude title keywords",
+      "type": "array",
+      "description": "Drop roles whose title contains any of these, e.g. \"intern\", \"senior\".",
+      "editor": "stringList",
+      "default": []
+    },
+    "locationKeywords": {
+      "title": "Location keywords",
+      "type": "array",
+      "description": "Only count roles where any listed location (or the country) contains one of these, e.g. \"United States\", \"Texas\", \"London\".",
+      "editor": "stringList",
+      "default": []
+    },
+    "remoteOnly": {
+      "title": "Remote roles only",
+      "type": "boolean",
+      "description": "Only count roles whose location or workplace label says remote.",
+      "default": false
+    },
+    "postedWithinDays": {
+      "title": "Posted within (days)",
+      "type": "integer",
+      "description": "Only count matching roles posted in the last N days, e.g. 30 for companies actively hiring for it now.",
+      "minimum": 1,
+      "maximum": 365
+    },
+    "minMatchingJobs": {
+      "title": "Minimum matching roles",
+      "type": "integer",
+      "description": "Only companies with at least this many open roles matching your search.",
+      "default": 1,
+      "minimum": 1
+    },
+    "minTotalOpenJobs": {
+      "title": "Minimum company openings",
+      "type": "integer",
+      "description": "Only companies with at least this many open roles in total (any role). A rough company-size filter.",
+      "minimum": 1
+    },
+    "maxTotalOpenJobs": {
+      "title": "Maximum company openings",
+      "type": "integer",
+      "description": "Only companies with at most this many open roles in total, e.g. 300 to skip the giants and find mid-size companies.",
+      "minimum": 1
+    },
+    "sortBy": {
+      "title": "Sort by",
+      "type": "string",
+      "editor": "select",
+      "enum": [
+        "matchingJobs",
+        "newMatchingJobs",
+        "hiringGrowth",
+        "totalOpenJobs"
+      ],
+      "enumTitles": [
+        "Most matching roles",
+        "Most new matching roles (30 days)",
+        "Fastest hiring growth",
+        "Most openings overall"
+      ],
+      "default": "matchingJobs",
+      "description": "Which companies come first. The maximum below keeps the top of this list."
+    },
+    "companyKeywords": {
+      "title": "Companies",
+      "type": "array",
+      "description": "Only companies whose name contains one of these, e.g. to check a list of target accounts.",
+      "editor": "stringList",
+      "default": []
+    },
+    "sources": {
+      "title": "Career-site systems",
+      "type": "array",
+      "description": "Limit to some systems. Leave empty for all.",
+      "editor": "select",
+      "items": {
+        "type": "string",
+        "enum": [
+          "workday",
+          "oracle",
+          "smartrecruiters",
+          "greenhouse",
+          "ashby",
+          "lever",
+          "bamboohr",
+          "breezy",
+          "personio",
+          "rippling",
+          "teamtailor",
+          "recruitee",
+          "ukg",
+          "workable",
+          "jobvite"
+        ],
+        "enumTitles": [
+          "Workday",
+          "Oracle Recruiting Cloud",
+          "SmartRecruiters",
+          "Greenhouse",
+          "Ashby",
+          "Lever",
+          "BambooHR",
+          "Breezy HR",
+          "Personio",
+          "Rippling",
+          "Teamtailor",
+          "Recruitee",
+          "UKG Pro (UltiPro)",
+          "Workable",
+          "Jobvite"
+        ]
+      },
+      "default": []
+    },
+    "onlyWithSalary": {
+      "title": "Only jobs that state pay",
+      "type": "boolean",
+      "description": "Only count roles whose posting states pay.",
+      "default": false
+    },
+    "minAnnualSalary": {
+      "title": "Minimum yearly pay",
+      "type": "integer",
+      "description": "Only count roles whose pay range reaches at least this much per year, in the job's own currency.",
+      "minimum": 0
+    },
+    "salaryCurrencies": {
+      "title": "Pay currencies",
+      "type": "array",
+      "description": "Only roles paying in these currencies, e.g. \"USD\", \"GBP\", \"EUR\". Implies 'only jobs that state pay'.",
+      "editor": "stringList",
+      "default": []
+    },
+    "maxRoleAgeDays": {
+      "title": "Ignore roles older than (days)",
+      "type": "integer",
+      "description": "Some career sites never take old ads down. Roles posted longer ago than this are left out of every count. Set 0 to keep everything.",
+      "default": 365,
+      "minimum": 0,
+      "maximum": 3650
+    },
+    "onlyNewSinceLastRun": {
+      "title": "Only companies with new matching roles since last run",
+      "type": "boolean",
+      "description": "For scheduled runs: return only companies that posted a matching role since this same search last ran, i.e. fresh hiring signals. The Actor remembers each search in a key-value store named <code>hiring-companies-monitor</code> in your account; changing any filter starts a new history.",
+      "default": false
+    },
+    "monitorName": {
+      "title": "Search name (optional)",
+      "type": "string",
+      "description": "Only needed to keep two searches with identical filters separate, e.g. one per client.",
+      "editor": "textfield"
+    },
+    "maxCompanies": {
+      "title": "Maximum companies",
+      "type": "integer",
+      "description": "Hard cap on results, and your main cost control: you are charged per company returned. The top companies by the chosen sort come first.",
+      "default": 200,
+      "minimum": 1,
+      "maximum": 50000
+    }
+  }
+}

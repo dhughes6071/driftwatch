@@ -1,0 +1,63 @@
+{
+  "actorSpecification": 1,
+  "views": {
+    "overview": {
+      "title": "Companies hiring",
+      "transformation": {
+        "fields": [
+          "companyName",
+          "matchingJobs",
+          "matchingJobsNewLast30Days",
+          "totalOpenJobs",
+          "hiringGrowth",
+          "sampleTitles",
+          "salaryMax",
+          "salaryCurrency",
+          "ats",
+          "careerSiteUrl"
+        ]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "companyName": {
+            "label": "Company"
+          },
+          "matchingJobs": {
+            "label": "Matching roles",
+            "format": "number"
+          },
+          "matchingJobsNewLast30Days": {
+            "label": "New (30 days)",
+            "format": "number"
+          },
+          "totalOpenJobs": {
+            "label": "All openings",
+            "format": "number"
+          },
+          "hiringGrowth": {
+            "label": "Hiring growth",
+            "format": "number"
+          },
+          "sampleTitles": {
+            "label": "Example roles"
+          },
+          "salaryMax": {
+            "label": "Top pay",
+            "format": "number"
+          },
+          "salaryCurrency": {
+            "label": "Currency"
+          },
+          "ats": {
+            "label": "Hiring system"
+          },
+          "careerSiteUrl": {
+            "label": "Careers page",
+            "format": "link"
+          }
+        }
+      }
+    }
+  }
+}

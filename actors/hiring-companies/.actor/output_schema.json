@@ -1,0 +1,19 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "Companies Hiring output",
+  "description": "One record per company in the default dataset, plus a SUMMARY record describing the run.",
+  "properties": {
+    "companies": {
+      "type": "string",
+      "title": "Companies hiring",
+      "description": "Every company delivered: matching roles, new roles, total openings, hiring growth, departments, locations, pay and example roles.",
+      "template": "{{links.apiDefaultDatasetUrl}}/items"
+    },
+    "summary": {
+      "type": "string",
+      "title": "Run summary",
+      "description": "Companies and roles matched, index date, and why the run stopped.",
+      "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/SUMMARY"
+    }
+  }
+}

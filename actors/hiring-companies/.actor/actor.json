@@ -1,0 +1,21 @@
+{
+  "actorSpecification": 1,
+  "name": "companies-hiring-leads",
+  "title": "Companies Hiring For Any Role — Hiring Signals & Sales Leads",
+  "description": "Find every company hiring for a role, e.g. Salesforce admins or data engineers: one row per company with matching roles, new roles this week and month, total openings, hiring growth, departments, locations and pay. 19,000+ companies' career sites, updated daily.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "dockerfile": "./Dockerfile",
+  "readme": "./ACTOR.md",
+  "input": "./input_schema.json",
+  "storages": {
+    "dataset": "./dataset_schema.json"
+  },
+  "environmentVariables": {
+    "CAREER_MANIFEST_URL": "@careerManifestUrl"
+  },
+  "minMemoryMbytes": 512,
+  "maxMemoryMbytes": 4096,
+  "output": "./output_schema.json",
+  "defaultMemoryMbytes": 1024
+}
