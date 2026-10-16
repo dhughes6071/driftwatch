@@ -109,13 +109,17 @@ export async function discover(db: Db, o: DiscoverOptions) {
     );
     checked += batch.length;
     const at = now();
+    // IMMEDIATE takes the write lock up front. A default (deferred) transaction
+    // reads first and then upgrades to a write, and if the enrich process wrote
+    // in between, SQLite fails the upgrade at once with SQLITE_BUSY -- no
+    // busy_timeout applies (crashed this way on 16 Oct 2026, 3M domains in).
     db.transaction(() => {
       for (const d of hits) {
         if (!exists.get(d)) newStores++;
         upsert.run(d, source, at, at, at);
       }
       saveProgress.run(source, position, 0, at);
-    })();
+    }).immediate();
     found += hits.length;
     batch = [];
   };

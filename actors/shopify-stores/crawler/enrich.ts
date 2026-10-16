@@ -261,7 +261,7 @@ export async function enrich(db: Db, o: EnrichOptions) {
     // Hand out a store only once per run: push its next_check an hour ahead while it is queued.
     const rows = due.all(new Date(Date.now() - ROBOTS_DAYS * DAY).toISOString(), new Date().toISOString(), 1000) as typeof queue;
     const busy = new Date(Date.now() + 3_600_000).toISOString();
-    db.transaction(() => rows.forEach((r) => retryLater.run(busy, r.domain)))();
+    db.transaction(() => rows.forEach((r) => retryLater.run(busy, r.domain))).immediate();
     queue.push(...rows);
   };
 
