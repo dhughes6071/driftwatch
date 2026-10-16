@@ -50,8 +50,12 @@ export interface Company {
   totalOpenJobs: number;
   newJobsLast7Days: number;
   newJobsLast30Days: number;
-  /** Share of all open roles posted in the last 30 days (0-1): how fast the company is hiring right now. */
-  hiringGrowth: number;
+  /**
+   * Share of open roles posted in the last 30 days (0-1): how fast the company
+   * is hiring right now. Counts only roles whose age is known (see roleAge);
+   * null when fewer than half of the company's roles have a known age.
+   */
+  hiringGrowth: number | null;
   matchingRemoteJobs: number;
   /** Most common departments and locations among the matching roles, with counts. */
   topDepartments: Array<{ name: string; jobs: number }>;
@@ -74,6 +78,12 @@ interface Acc {
   ats: string;
   firstUrl: string;
   total: number;
+  /** Earliest firstSeenAt across the company's roles: when the index started watching it. */
+  firstSeen: string;
+  /** Roles with a posting date. */
+  dated: number;
+  /** Undated roles, as [firstSeenAt, matches the search]: their age is settled in results(). */
+  undated: Array<[string, boolean]>;
   new7: number;
   new30: number;
   matching: number;
@@ -95,6 +105,20 @@ const TOP = 5;
 
 /** The date a role counts from: when posted, or when we first saw it if the site gives no date. */
 const when = (j: IndexJob) => j.postedAt ?? j.firstSeenAt;
+
+/**
+ * Is a role new within a window? Dated roles go by their posting date. An
+ * undated role's first-seen date only proves its age when the index was
+ * already watching the company before the window opened; otherwise every
+ * role the first crawl found looks brand new (on 16 Oct 2026 the index was
+ * 19 days old, and JBS USA showed 439 of 439 undated roles as "new this
+ * month"). Returns null when the age is unknown.
+ */
+export function roleAge(postedAt: string | null, firstSeenAt: string, companyFirstSeen: string, cut: string): boolean | null {
+  if (postedAt) return postedAt >= cut;
+  if (companyFirstSeen >= cut) return null;
+  return firstSeenAt >= cut;
+}
 
 export class CompanyRollup {
   private accs = new Map<string, Acc>();
@@ -129,21 +153,26 @@ export class CompanyRollup {
     if (!a) {
       a = {
         company: j.company, companyName: j.companyName, ats: j.ats, firstUrl: j.url,
-        total: 0, new7: 0, new30: 0, matching: 0, m7: 0, m30: 0, mSince: 0, latest: null, remote: 0,
+        total: 0, firstSeen: j.firstSeenAt, dated: 0, undated: [], new7: 0, new30: 0, matching: 0, m7: 0, m30: 0, mSince: 0, latest: null, remote: 0,
         depts: new Map(), locs: new Map(), countries: new Set(), pay: new Map(), samples: [],
       };
       this.accs.set(key, a);
     }
-    const w = when(j);
+    const matched = this.match(j);
     a.total++;
-    if (w >= this.cut7) a.new7++;
-    if (w >= this.cut30) a.new30++;
-    if (!this.match(j)) return;
+    if (j.firstSeenAt < a.firstSeen) a.firstSeen = j.firstSeenAt;
+    // Undated roles wait for results(), when the company's first appearance is known.
+    if (j.postedAt) {
+      a.dated++;
+      if (j.postedAt >= this.cut7) a.new7++;
+      if (j.postedAt >= this.cut30) a.new30++;
+      if (matched && j.postedAt >= this.cut7) a.m7++;
+      if (matched && j.postedAt >= this.cut30) a.m30++;
+    } else a.undated.push([j.firstSeenAt, matched]);
+    if (!matched) return;
 
     this.jobsMatched++;
     a.matching++;
-    if (w >= this.cut7) a.m7++;
-    if (w >= this.cut30) a.m30++;
     if (this.seenAfter && j.firstSeenAt > this.seenAfter) a.mSince++;
     if (!a.latest || (j.postedAt && j.postedAt > a.latest)) a.latest = j.postedAt ?? a.latest;
     if (j.remote) a.remote++;
@@ -178,7 +207,7 @@ export class CompanyRollup {
       if (f.minTotalOpenJobs && a.total < f.minTotalOpenJobs) continue;
       if (f.maxTotalOpenJobs && a.total > f.maxTotalOpenJobs) continue;
       if (f.seenAfter && a.mSince === 0) continue;
-      rows.push(toCompany(a, !!f.seenAfter));
+      rows.push(toCompany(a, !!f.seenAfter, this.cut7, this.cut30));
     }
     const sortBy = f.sortBy ?? "matchingJobs";
     rows.sort((x, y) => key(y, sortBy) - key(x, sortBy) || y.matchingJobs - x.matchingJobs || x.companyName.localeCompare(y.companyName));
@@ -192,7 +221,8 @@ function key(c: Company, s: SortBy): number {
       return c.matchingJobsNewLast30Days;
     case "hiringGrowth":
       // Tiny companies swing to 100% with one new role; weight by size so the list leads with real momentum.
-      return c.hiringGrowth * Math.log10(10 + c.totalOpenJobs);
+      // Unknown growth sorts last.
+      return c.hiringGrowth == null ? -1 : c.hiringGrowth * Math.log10(10 + c.totalOpenJobs);
     case "totalOpenJobs":
       return c.totalOpenJobs;
     default:
@@ -213,7 +243,22 @@ function top(m: Map<string, number>) {
     .map(([name, jobs]) => ({ name, jobs }));
 }
 
-function toCompany(a: Acc, withSince: boolean): Company {
+function toCompany(a: Acc, withSince: boolean, cut7: string, cut30: string): Company {
+  let { new7, new30, m7, m30 } = a;
+  let known30 = a.dated;
+  for (const [seen, matched] of a.undated) {
+    if (roleAge(null, seen, a.firstSeen, cut7)) {
+      new7++;
+      if (matched) m7++;
+    }
+    const age30 = roleAge(null, seen, a.firstSeen, cut30);
+    if (age30 === null) continue;
+    known30++;
+    if (age30) {
+      new30++;
+      if (matched) m30++;
+    }
+  }
   let cur: string | null = null;
   let pay: [number, number, number] | null = null;
   for (const [c, p] of a.pay) if (!pay || p[2] > pay[2]) [cur, pay] = [c, p];
@@ -224,14 +269,14 @@ function toCompany(a: Acc, withSince: boolean): Company {
     ats: a.ats,
     careerSiteUrl: careerSiteUrl(a.ats, a.company, a.firstUrl),
     matchingJobs: a.matching,
-    matchingJobsNewLast7Days: a.m7,
-    matchingJobsNewLast30Days: a.m30,
+    matchingJobsNewLast7Days: m7,
+    matchingJobsNewLast30Days: m30,
     ...(withSince ? { matchingJobsNewSinceLastRun: a.mSince } : {}),
     latestMatchingPostedAt: a.latest,
     totalOpenJobs: a.total,
-    newJobsLast7Days: a.new7,
-    newJobsLast30Days: a.new30,
-    hiringGrowth: a.total ? Math.round((a.new30 / a.total) * 100) / 100 : 0,
+    newJobsLast7Days: new7,
+    newJobsLast30Days: new30,
+    hiringGrowth: known30 && known30 * 2 >= a.total ? Math.round((new30 / known30) * 100) / 100 : null,
     matchingRemoteJobs: a.remote,
     topDepartments: top(a.depts),
     topLocations: top(a.locs),

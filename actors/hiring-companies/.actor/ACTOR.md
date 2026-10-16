@@ -59,7 +59,11 @@ Here, all 12 Salesforce roles were posted this month, and 64% of ICF's 397 openi
   company in the index and tells you who is hiring, one row each.
 - **Size and momentum in every row.** Matching roles and *all* openings, plus how many are
   new in the last 7 and 30 days. `hiringGrowth` is the share of a company's openings posted in
-  the last 30 days, so you can sort for companies in a hiring push.
+  the last 30 days, so you can sort for companies in a hiring push. Ages come from the posting
+  date; a role without one counts only once we've watched the company's site for the whole
+  window, so a company new to the index doesn't look like it posted everything this month.
+  When fewer than half of a company's roles have a known age, `hiringGrowth` is empty and the
+  company sorts last for growth.
 - **Ghost listings filtered out.** Some career sites never take old ads down. Roles posted
   more than a year ago are left out of every count by default (`maxRoleAgeDays`).
 - **Only new signals, on a schedule.** With `onlyNewSinceLastRun`, each scheduled run returns
@@ -110,7 +114,7 @@ index is scanned on every run at no extra cost; you pay only for the companies r
 | `matchingJobsNewSinceLastRun` | With `onlyNewSinceLastRun`: matching roles added since the last run |
 | `latestMatchingPostedAt` | Newest matching posting |
 | `totalOpenJobs` / `newJobsLast7Days` / `newJobsLast30Days` | All open roles at the company, and how many are new |
-| `hiringGrowth` | Share of all openings posted in the last 30 days (0–1) |
+| `hiringGrowth` | Share of openings posted in the last 30 days (0–1), among roles of known age; empty when too few roles are dated |
 | `matchingRemoteJobs` | Matching roles marked remote |
 | `topDepartments` / `topLocations` / `countries` | Where the matching roles sit |
 | `salaryMin` / `salaryMax` / `salaryCurrency` / `matchingJobsWithSalary` | Yearly pay range across matching roles that state it |

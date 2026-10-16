@@ -83,6 +83,57 @@ test("stale roles are left out of every count", () => {
   assert.ok(keepAll.results({ maxCompanies: 10 }).companies.some((c) => c.companyId === "ghost"));
 });
 
+test("undated roles only count as new once the index has watched the company for the whole window", () => {
+  // Jobvite-style board, no posting dates. The index first saw the company 10 days ago:
+  // its first crawl's roles have an unknown age, not "new this month".
+  const fresh = [
+    ...Array.from({ length: 8 }, (_, i) => job({ id: `f${i}`, company: "jbs", companyName: "JBS", ats: "jobvite", title: "Salesforce Analyst", postedAt: null, firstSeenAt: day(10) })),
+    job({ id: "f8", company: "jbs", companyName: "JBS", ats: "jobvite", title: "Line Worker", postedAt: null, firstSeenAt: day(2) }),
+  ];
+  // Same board, but watched for 60 days: first-seen dates now prove age.
+  const watched = [
+    ...Array.from({ length: 6 }, (_, i) => job({ id: `w${i}`, company: "old", companyName: "Old", ats: "jobvite", title: "Salesforce Analyst", postedAt: null, firstSeenAt: day(60) })),
+    job({ id: "w6", company: "old", companyName: "Old", ats: "jobvite", title: "Salesforce Analyst", postedAt: null, firstSeenAt: day(20) }),
+    job({ id: "w7", company: "old", companyName: "Old", ats: "jobvite", title: "Line Worker", postedAt: null, firstSeenAt: day(3) }),
+  ];
+  const r = rollup([...fresh, ...watched, ...jobs], []);
+  const by = (id: string) => r.results({ maxCompanies: 10 }).companies.find((c) => c.companyId === id)!;
+
+  const jbs = by("jbs");
+  assert.equal(jbs.newJobsLast30Days, 0);
+  assert.equal(jbs.hiringGrowth, null);
+  // Watched for 10 days: the 7-day window is covered, the role seen 2 days ago is new this week.
+  assert.equal(jbs.newJobsLast7Days, 1);
+
+  const old = by("old");
+  assert.equal(old.newJobsLast30Days, 2);
+  assert.equal(old.newJobsLast7Days, 1);
+  assert.equal(old.hiringGrowth, 0.25);
+
+  // Matching counts follow the same rule.
+  const m = rollup([...fresh, ...watched], ["salesforce"]).results({ maxCompanies: 10 }).companies;
+  assert.equal(m.find((c) => c.companyId === "jbs")!.matchingJobsNewLast30Days, 0);
+  assert.equal(m.find((c) => c.companyId === "old")!.matchingJobsNewLast30Days, 1);
+
+  // Unknown growth sorts last, after a company with any known growth.
+  const sorted = r.results({ maxCompanies: 10, sortBy: "hiringGrowth" }).companies.map((c) => c.companyId);
+  assert.equal(sorted.at(-1), "jbs");
+});
+
+test("growth counts only roles of known age, and needs at least half of them", () => {
+  const mixed = [
+    // 3 dated (2 new), 1 undated from the first crawl: growth 2/3 over known-age roles.
+    job({ id: "a", postedAt: day(1) }), job({ id: "b", postedAt: day(5) }), job({ id: "c", postedAt: day(200), firstSeenAt: day(5) }),
+    job({ id: "d", postedAt: null, firstSeenAt: day(5) }),
+    // 1 dated, 2 undated of unknown age: too few known to say.
+    job({ id: "e", company: "thin", postedAt: day(1) }),
+    job({ id: "f", company: "thin", postedAt: null, firstSeenAt: day(5) }), job({ id: "g", company: "thin", postedAt: null, firstSeenAt: day(5) }),
+  ];
+  const cs = rollup(mixed, []).results({ maxCompanies: 10 }).companies;
+  assert.equal(cs.find((c) => c.companyId === "acme")!.hiringGrowth, 0.67);
+  assert.equal(cs.find((c) => c.companyId === "thin")!.hiringGrowth, null);
+});
+
 test("keeps the 5 newest sample roles", () => {
   const many = Array.from({ length: 12 }, (_, i) => job({ id: `m${i}`, title: `Salesforce ${i}`, postedAt: day(i) }));
   const [c] = rollup(many, ["salesforce"]).results({ maxCompanies: 1 }).companies;
