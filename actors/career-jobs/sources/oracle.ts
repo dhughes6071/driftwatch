@@ -66,14 +66,15 @@ export async function listPage(s: OracleSite, offset: number, limit = PAGE) {
   return item ? { total: item.TotalJobsCount ?? 0, rows: item.requisitionList ?? [] } : null;
 }
 
-/** Every posting on a site. Null when the site does not answer at all. */
+/** Every posting on a site. Null when the site, or any page of it, does not answer (a short list would read as closures). */
 export async function listAll(s: OracleSite): Promise<OraclePosting[] | null> {
   const first = await listPage(s, 0);
   if (!first) return null;
   const out = [...first.rows];
   for (let offset = PAGE; offset < first.total; offset += PAGE) {
     const next = await listPage(s, offset);
-    if (!next || next.rows.length === 0) break;
+    if (!next) return null;
+    if (next.rows.length === 0) break;
     out.push(...next.rows);
   }
   return out;

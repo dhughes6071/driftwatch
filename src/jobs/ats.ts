@@ -115,6 +115,12 @@ function toText(html: string | undefined | null): string {
 
 export const REMOTE_RE = /\bremote\b|\bwork from home\b|\bwfh\b|\bdistributed\b|\banywhere\b/i;
 
+/** A list request that failed: [] normally, an error when the caller asked to be told. */
+function unavailable(ats: string, slug: string, strict: boolean): Job[] {
+  if (strict) throw new Error(`${ats}:${slug}: job list did not load`);
+  return [];
+}
+
 // ------------------------------------------------------------------ greenhouse
 
 interface GhJob {
@@ -142,12 +148,12 @@ export type Prefilter = (j: { title: string; location: string | null; postedAt: 
 /** At or below this many matches, fetch each matching job instead of the company's full list. */
 const GH_PER_JOB_MAX = 15;
 
-async function fetchGreenhouse(slug: string, prefilter?: Prefilter): Promise<Job[]> {
+async function fetchGreenhouse(slug: string, prefilter?: Prefilter, strict = false): Promise<Job[]> {
   const base = `https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(slug)}/jobs`;
   let rows: GhJob[] | undefined;
   if (prefilter) {
     const light = (await getJson<{ jobs?: GhJob[] }>(`${base}?pay_transparency=true`))?.jobs;
-    if (!light) return [];
+    if (!light) return unavailable("greenhouse", slug, strict);
     const hits = light.filter((j) =>
       prefilter({ title: j.title.trim(), location: j.location?.name ?? null, postedAt: j.first_published ?? j.updated_at ?? null }),
     );
@@ -158,7 +164,7 @@ async function fetchGreenhouse(slug: string, prefilter?: Prefilter): Promise<Job
     }
   }
   rows ??= (await getJson<{ jobs?: GhJob[] }>(`${base}?content=true&pay_transparency=true`))?.jobs;
-  if (!rows) return [];
+  if (!rows) return unavailable("greenhouse", slug, strict);
 
   return rows.map((j) => {
     const loc = j.location?.name ?? null;
@@ -230,11 +236,11 @@ export function leverDescription(j: Pick<LeverJob, "descriptionPlain" | "lists" 
     .slice(0, MAX_DESC);
 }
 
-async function fetchLever(slug: string): Promise<Job[]> {
+async function fetchLever(slug: string, strict = false): Promise<Job[]> {
   const data = await getJson<LeverJob[]>(
     `https://api.lever.co/v0/postings/${encodeURIComponent(slug)}?mode=json`,
   );
-  if (!Array.isArray(data)) return [];
+  if (!Array.isArray(data)) return unavailable("lever", slug, strict);
 
   return data.map((j) => {
     const loc = j.categories?.location ?? null;
@@ -275,11 +281,11 @@ interface AshbyJob {
   isRemote?: boolean;
 }
 
-async function fetchAshby(slug: string): Promise<Job[]> {
+async function fetchAshby(slug: string, strict = false): Promise<Job[]> {
   const data = await getJson<{ jobs?: AshbyJob[] }>(
     `https://api.ashbyhq.com/posting-api/job-board/${encodeURIComponent(slug)}?includeCompensation=true`,
   );
-  if (!data?.jobs) return [];
+  if (!data?.jobs) return unavailable("ashby", slug, strict);
 
   return data.jobs.map((j) => ({
     id: `ashby:${slug}:${j.id}`,
@@ -314,14 +320,15 @@ interface WkJob {
   type?: string;
 }
 
-async function fetchWorkable(slug: string): Promise<Job[]> {
+async function fetchWorkable(slug: string, strict = false): Promise<Job[]> {
   // NOTE: as of 2026-08-07 this endpoint serves HTML, not JSON, for every
   // account tested. getJson returns null on a parse failure, so this adapter
   // yields nothing rather than misbehaving. Left in place in case it returns.
   const data = await getJson<{ jobs?: WkJob[] } | WkJob[]>(
     `https://apply.workable.com/api/v1/widget/accounts/${encodeURIComponent(slug)}`,
   );
-  const jobs = Array.isArray(data) ? data : (data?.jobs ?? []);
+  if (!data) return unavailable("workable", slug, strict);
+  const jobs = Array.isArray(data) ? data : (data.jobs ?? []);
   if (!Array.isArray(jobs)) return [];
 
   return jobs.map((j) => {
@@ -350,7 +357,7 @@ async function fetchWorkable(slug: string): Promise<Job[]> {
 
 // ------------------------------------------------------------------ public API
 
-const FETCHERS: Record<Ats, (slug: string) => Promise<Job[]>> = {
+const FETCHERS: Record<Ats, (slug: string, strict?: boolean) => Promise<Job[]>> = {
   greenhouse: fetchGreenhouse,
   lever: fetchLever,
   ashby: fetchAshby,
@@ -362,9 +369,13 @@ const FETCHERS: Record<Ats, (slug: string) => Promise<Job[]>> = {
  * All open jobs at one company. With a `prefilter`, systems that can list
  * jobs without their descriptions (Greenhouse) may skip companies -- or jobs
  * -- that fail it, so only use one when the caller filters the same way.
+ *
+ * A board that does not answer comes back as [] -- unless `strict`, when it
+ * throws instead. The daily crawl needs that difference: "no roles open" and
+ * "site down" must not look the same, or an outage reads as every role closed.
  */
-export async function fetchCompany(ats: Ats, slug: string, prefilter?: Prefilter): Promise<Job[]> {
-  const jobs = ats === "greenhouse" ? await fetchGreenhouse(slug, prefilter) : await FETCHERS[ats](slug);
+export async function fetchCompany(ats: Ats, slug: string, prefilter?: Prefilter, strict = false): Promise<Job[]> {
+  const jobs = ats === "greenhouse" ? await fetchGreenhouse(slug, prefilter, strict) : await FETCHERS[ats](slug, strict);
   log.debug("ats fetch", { ats, slug, jobs: jobs.length });
   return jobs;
 }
