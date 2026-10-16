@@ -228,6 +228,8 @@ export interface EnrichOptions {
   concurrency: number;
   /** Cap on requests per second across all stores. */
   requestsPerSecond: number;
+  /** Keep waiting for newly discovered stores until the time budget ends, instead of stopping when none are due. */
+  follow?: boolean;
   http?: Http;
 }
 
@@ -273,7 +275,12 @@ export async function enrich(db: Db, o: EnrichOptions) {
       }
       if (!queue.length) refill();
       const s = queue.shift();
-      if (!s) return;
+      if (!s) {
+        if (!o.follow) return;
+        // Discovery is still adding stores in the background: look again in a minute.
+        await new Promise((r) => setTimeout(r, 60_000));
+        continue;
+      }
       const r = await checkStore(s.domain, s.first_seen, http, (st) => {
         const msg = throttle.record(st);
         // The request rate follows the throttle both ways: down when refused, back up as it recovers.
@@ -328,6 +335,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     maxStores: Number(arg("max") ?? Infinity),
     concurrency: Number(arg("concurrency") ?? 10),
     requestsPerSecond: Number(arg("rps") ?? 8),
+    follow: process.argv.includes("--follow"),
   });
   db.close();
   if (stats.stoppedForRefusals) process.exit(3);

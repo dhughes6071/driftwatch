@@ -1,7 +1,7 @@
 #!/bin/zsh
 # Daily Shopify store refresh: discover more stores, check the stores that are
-# due, then publish to Apify. Run by launchd at 10:00, finishing by about 02:00 (com.x402.shopify-stores.plist),
-# well clear of the 03:30 career-jobs crawl. Safe to run by hand too.
+# due, then publish to Apify. Run by launchd at 10:00 (com.x402.shopify-stores.plist),
+# finishing by about 02:00, well clear of the 03:30 career-jobs crawl. Safe to run by hand too.
 set -u
 ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$ROOT"
@@ -36,7 +36,9 @@ S=actors/shopify-stores/crawler
   # 10:00 + 16 h = 02:00, clear of the 03:30 career-jobs crawl. 8 requests/s is
   # the sustained rate Shopify tolerated on 14 Oct 2026 (25/s was refused).
   echo "=== $(date) enrich (up to 16 h)"
-  "$NODE" --experimental-strip-types $S/enrich.ts --hours 16 --rps 8
+  # --follow: keep checking stores as discovery finds them, for the whole window.
+  if [ -n "${DISCOVER_PID:-}" ]; then FOLLOW=--follow; else FOLLOW=; fi
+  "$NODE" --experimental-strip-types $S/enrich.ts --hours 16 --rps 8 $FOLLOW
   rc=$?
   if [ $rc -eq 3 ]; then notify "Shopify refused too many requests; enrichment stopped early"; elif [ $rc -ne 0 ]; then notify "enrichment failed"; fi
   if [ -n "${DISCOVER_PID:-}" ]; then wait $DISCOVER_PID || notify "discovery failed"; fi

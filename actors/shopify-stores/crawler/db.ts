@@ -30,6 +30,9 @@ export function openDb(path = DB_PATH) {
   mkdirSync(dirname(path), { recursive: true });
   const db = new Database(path);
   db.pragma("journal_mode = WAL");
+  // Discovery and enrichment run at the same time and both write: wait for the
+  // other's short transaction instead of failing with SQLITE_BUSY.
+  db.pragma("busy_timeout = 30000");
   db.exec(`
     CREATE TABLE IF NOT EXISTS stores (
       domain      TEXT PRIMARY KEY,
