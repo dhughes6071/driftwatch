@@ -95,11 +95,13 @@ export async function publish() {
   // SQL does the newest-first sort (same order as compareNewestFirst), so
   // only one shard is ever in memory.
   const rows = db
-    .prepare("SELECT light, chunk, description FROM jobs WHERE last_seen >= ? ORDER BY posted_at IS NULL, posted_at DESC")
-    .iterate(liveSince) as IterableIterator<{ light: string; chunk: string | null; description: string | null }>;
+    .prepare("SELECT light, chunk, description, first_seen FROM jobs WHERE last_seen >= ? ORDER BY posted_at IS NULL, posted_at DESC")
+    .iterate(liveSince) as IterableIterator<{ light: string; chunk: string | null; description: string | null; first_seen: string }>;
   let withSalary = 0;
   for (const row of rows) {
-    const j: IndexJob = { ...(JSON.parse(row.light) as IndexJob), d: row.chunk };
+    // first_seen is the source of truth: light rows written before the crawl
+    // kept it carry the date of the latest crawl instead.
+    const j: IndexJob = { ...(JSON.parse(row.light) as IndexJob), firstSeenAt: row.first_seen, d: row.chunk };
     // Structured pay (Ashby) wins; otherwise read it from the description.
     if (j.salarySource !== "structured") Object.assign(j, salaryFields(extractSalary(row.description, j.country)));
     if (j.salaryMin != null) withSalary++;
