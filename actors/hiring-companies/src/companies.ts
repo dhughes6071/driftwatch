@@ -52,8 +52,9 @@ export interface Company {
   newJobsLast30Days: number;
   /**
    * Share of open roles posted in the last 30 days (0-1): how fast the company
-   * is hiring right now. Counts only roles whose age is known (see roleAge);
+   * is hiring right now. Counts only roles whose age is known (see knownAge);
    * null when fewer than half of the company's roles have a known age.
+   * Bulk-dated roles already open on the index's first crawl (see bulkDays) never count as new.
    */
   hiringGrowth: number | null;
   matchingRemoteJobs: number;
@@ -80,15 +81,14 @@ interface Acc {
   total: number;
   /** Earliest firstSeenAt across the company's roles: when the index started watching it. */
   firstSeen: string;
-  /** Roles with a posting date. */
-  dated: number;
-  /** Undated roles, as [firstSeenAt, matches the search]: their age is settled in results(). */
-  undated: Array<[string, boolean]>;
-  new7: number;
-  new30: number;
+  /** Roles per posting day, to spot bulk re-posts. */
+  days: Map<string, number>;
+  /**
+   * Every role's age facts, settled in results() once the whole company is known.
+   * Key: posting day ("" if undated) | first-seen day | matches | new in 7 days | new in 30 days.
+   */
+  ages: Map<string, number>;
   matching: number;
-  m7: number;
-  m30: number;
   mSince: number;
   latest: string | null;
   remote: number;
@@ -107,18 +107,42 @@ const TOP = 5;
 const when = (j: IndexJob) => j.postedAt ?? j.firstSeenAt;
 
 /**
- * Is a role new within a window? Dated roles go by their posting date. An
- * undated role's first-seen date only proves its age when the index was
- * already watching the company before the window opened; otherwise every
- * role the first crawl found looks brand new (on 16 Oct 2026 the index was
- * 19 days old, and JBS USA showed 439 of 439 undated roles as "new this
- * month"). Returns null when the age is unknown.
+ * How new a role is for the 7/30-day counts. A role cannot be newer than the
+ * day the index first saw it: a site that re-posts an old opening under the
+ * same id moves postedAt forward, but firstSeenAt keeps the real age.
  */
-export function roleAge(postedAt: string | null, firstSeenAt: string, companyFirstSeen: string, cut: string): boolean | null {
-  if (postedAt) return postedAt >= cut;
-  if (companyFirstSeen >= cut) return null;
-  return firstSeenAt >= cut;
+const ageFrom = (j: IndexJob) => (j.postedAt && j.postedAt < j.firstSeenAt ? j.postedAt : j.firstSeenAt);
+
+/** A posting day holding more than this share of a company's roles (and at least BULK_MIN of them) is a bulk re-post. */
+export const BULK_SHARE = 0.4;
+export const BULK_MIN = 20;
+/** Roles first seen on the company's first two crawl days were already open when the index started watching. */
+const FIRST_CRAWL_DAYS = 2;
+
+/**
+ * Posting days that look like a bulk re-post or system migration rather than
+ * real hiring: one day holds over 40% of the company's roles, 20 or more. On
+ * 16 Oct 2026 Adobe had 230 of 329 roles dated 18 Sep and Snap 191 of 392
+ * dated 25 Sep, all already open when the index first crawled them; read at
+ * face value they made both look like they had hired their whole team this
+ * month. Roles on such a day that the index saw appear later (LCBO's 455
+ * holiday roles, posted weeks after we started watching it) are real new roles.
+ */
+export function bulkDays(days: Map<string, number>, total: number): Set<string> {
+  const out = new Set<string>();
+  for (const [d, n] of days) if (n >= BULK_MIN && n > total * BULK_SHARE) out.add(d);
+  return out;
 }
+
+/**
+ * Can we tell whether a role is new within a window? Dated roles go by their
+ * posting date. An undated role's first-seen date only proves its age when
+ * the index was already watching the company before the window opened;
+ * otherwise every role the first crawl found looks brand new (on 16 Oct 2026
+ * the index was 19 days old, and JBS USA showed 439 of 439 undated roles as
+ * "new this month").
+ */
+const knownAge = (dated: boolean, companyFirstSeen: string, cut: string) => dated || companyFirstSeen < cut;
 
 export class CompanyRollup {
   private accs = new Map<string, Acc>();
@@ -153,7 +177,7 @@ export class CompanyRollup {
     if (!a) {
       a = {
         company: j.company, companyName: j.companyName, ats: j.ats, firstUrl: j.url,
-        total: 0, firstSeen: j.firstSeenAt, dated: 0, undated: [], new7: 0, new30: 0, matching: 0, m7: 0, m30: 0, mSince: 0, latest: null, remote: 0,
+        total: 0, firstSeen: j.firstSeenAt, days: new Map(), ages: new Map(), matching: 0, mSince: 0, latest: null, remote: 0,
         depts: new Map(), locs: new Map(), countries: new Set(), pay: new Map(), samples: [],
       };
       this.accs.set(key, a);
@@ -161,14 +185,11 @@ export class CompanyRollup {
     const matched = this.match(j);
     a.total++;
     if (j.firstSeenAt < a.firstSeen) a.firstSeen = j.firstSeenAt;
-    // Undated roles wait for results(), when the company's first appearance is known.
-    if (j.postedAt) {
-      a.dated++;
-      if (j.postedAt >= this.cut7) a.new7++;
-      if (j.postedAt >= this.cut30) a.new30++;
-      if (matched && j.postedAt >= this.cut7) a.m7++;
-      if (matched && j.postedAt >= this.cut30) a.m30++;
-    } else a.undated.push([j.firstSeenAt, matched]);
+    // Ages wait for results(), when the company's first appearance and bulk days are known.
+    const pd = j.postedAt ? j.postedAt.slice(0, 10) : "";
+    if (pd) bump(a.days, pd);
+    const from = ageFrom(j);
+    bump(a.ages, `${pd}|${j.firstSeenAt.slice(0, 10)}|${+matched}|${+(from >= this.cut7)}|${+(from >= this.cut30)}`);
     if (!matched) return;
 
     this.jobsMatched++;
@@ -244,19 +265,26 @@ function top(m: Map<string, number>) {
 }
 
 function toCompany(a: Acc, withSince: boolean, cut7: string, cut30: string): Company {
-  let { new7, new30, m7, m30 } = a;
-  let known30 = a.dated;
-  for (const [seen, matched] of a.undated) {
-    if (roleAge(null, seen, a.firstSeen, cut7)) {
-      new7++;
-      if (matched) m7++;
+  let new7 = 0, new30 = 0, m7 = 0, m30 = 0, known30 = 0;
+  const bulk = bulkDays(a.days, a.total);
+  const firstCrawlEnd = new Date(Date.parse(a.firstSeen) + FIRST_CRAWL_DAYS * 86_400_000).toISOString().slice(0, 10);
+  for (const [k, n] of a.ages) {
+    const [pd, seenDay, matched, in7, in30] = k.split("|");
+    if (bulk.has(pd) && seenDay < firstCrawlEnd) {
+      // On a bulk-dated day and already open when the index started watching: its date says nothing
+      // about its age, so it counts towards the company's size but never as new.
+      known30 += n;
+      continue;
     }
-    const age30 = roleAge(null, seen, a.firstSeen, cut30);
-    if (age30 === null) continue;
-    known30++;
-    if (age30) {
-      new30++;
-      if (matched) m30++;
+    if (in7 === "1" && knownAge(!!pd, a.firstSeen, cut7)) {
+      new7 += n;
+      if (matched === "1") m7 += n;
+    }
+    if (!knownAge(!!pd, a.firstSeen, cut30)) continue;
+    known30 += n;
+    if (in30 === "1") {
+      new30 += n;
+      if (matched === "1") m30 += n;
     }
   }
   let cur: string | null = null;

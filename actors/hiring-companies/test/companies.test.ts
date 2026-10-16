@@ -134,6 +134,51 @@ test("growth counts only roles of known age, and needs at least half of them", (
   assert.equal(cs.find((c) => c.companyId === "thin")!.hiringGrowth, null);
 });
 
+test("bulk-dated roles found on the first crawl don't count as new", () => {
+  const co = (company: string, n: number, p: Partial<IndexJob>, title = "Engineer") =>
+    Array.from({ length: n }, (_, i) => job({ id: `${company}${p.postedAt}${i}`, company, companyName: company, title, ...p }));
+  const all = [
+    // Adobe-style: 25 of 30 roles share one posting date, all already open on the index's first crawl.
+    ...co("reposter", 25, { postedAt: day(20), firstSeenAt: day(19) }, "Salesforce Admin"),
+    ...co("reposter", 5, { postedAt: day(3), firstSeenAt: day(3) }, "Salesforce Admin"),
+    // LCBO-style: a big batch on one day, but it appeared weeks after the index started watching.
+    ...co("seasonal", 5, { postedAt: day(60), firstSeenAt: day(18) }),
+    ...co("seasonal", 25, { postedAt: day(10), firstSeenAt: day(9) }),
+    // 19 on one day is below the 20-role floor: taken at face value.
+    ...co("small", 19, { postedAt: day(20), firstSeenAt: day(19) }),
+    ...co("small", 6, { postedAt: day(90), firstSeenAt: day(19) }),
+  ];
+  const by = (cs: ReturnType<CompanyRollup["results"]>["companies"], id: string) => cs.find((c) => c.companyId === id)!;
+  const cs = rollup(all, []).results({ maxCompanies: 10 }).companies;
+
+  const r = by(cs, "reposter");
+  assert.equal(r.totalOpenJobs, 30);
+  assert.equal(r.newJobsLast30Days, 5);
+  assert.equal(r.newJobsLast7Days, 5);
+  assert.equal(r.hiringGrowth, 0.17);
+  assert.equal(by(cs, "seasonal").newJobsLast30Days, 25);
+  assert.equal(by(cs, "seasonal").hiringGrowth, 0.83);
+  assert.equal(by(cs, "small").hiringGrowth, 0.76);
+
+  // Matching counts follow the same rule.
+  const m = by(rollup(all, ["salesforce"]).results({ maxCompanies: 10 }).companies, "reposter");
+  assert.equal(m.matchingJobs, 30);
+  assert.equal(m.matchingJobsNewLast30Days, 5);
+  assert.equal(m.matchingJobsNewLast7Days, 5);
+
+  // Seasonal outranks the bulk re-poster on growth.
+  const order = rollup(all, []).results({ maxCompanies: 10, sortBy: "hiringGrowth" }).companies.map((c) => c.companyId);
+  assert.ok(order.indexOf("seasonal") < order.indexOf("reposter"));
+});
+
+test("a re-posted role keeps the age of when the index first saw it", () => {
+  // Same job id, postedAt moved to 2 days ago; the index has listed it for 25 days.
+  const [c] = rollup([job({ id: "r", postedAt: day(2), firstSeenAt: day(25) }), job({ id: "o", postedAt: day(200), firstSeenAt: day(25) })], []).results({ maxCompanies: 1 }).companies;
+  assert.equal(c.newJobsLast7Days, 0);
+  assert.equal(c.newJobsLast30Days, 1);
+  assert.equal(c.latestMatchingPostedAt, day(2));
+});
+
 test("keeps the 5 newest sample roles", () => {
   const many = Array.from({ length: 12 }, (_, i) => job({ id: `m${i}`, title: `Salesforce ${i}`, postedAt: day(i) }));
   const [c] = rollup(many, ["salesforce"]).results({ maxCompanies: 1 }).companies;
