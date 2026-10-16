@@ -19,6 +19,7 @@ import { writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { openDb } from "./crawl.ts";
+import { LIVE_WHERE, liveParams, loadFailing } from "./company-runs.ts";
 import { extractSalary } from "../src/salary.ts";
 import { salaryFields, DESC_CHUNK_SIZE, SHARD_SIZE, type IndexJob, type Manifest, type ShardRef } from "../src/format.ts";
 
@@ -42,8 +43,11 @@ export async function publish() {
     | { started_at: string }
     | undefined;
   if (!lastRun) throw new Error("No finished crawl yet -- run crawl.ts first.");
-  // Live = seen in the latest crawl or the day before (grace for a flaky host).
-  const liveSince = new Date(Date.parse(lastRun.started_at) - 86_400_000).toISOString();
+  // Live = seen in the latest crawl or the day before (grace for a flaky host),
+  // plus the roles of a company whose site is failing, for up to a week.
+  const live = liveParams(lastRun.started_at);
+  const failing = loadFailing(db);
+  if (failing) log(`${failing} companies did not load in their latest crawl; their roles stay listed for up to a week`);
 
   // ---------------------------------------------------------- 1. new description chunks
   // Batch by batch: ~900k descriptions are several GB, far more than fits in
@@ -51,11 +55,11 @@ export async function publish() {
   const day = lastRun.started_at.slice(0, 10).replaceAll("-", "");
   let n = (db.prepare("SELECT DISTINCT chunk FROM jobs WHERE chunk LIKE ?").all(`desc-${day}-%`) as unknown[]).length;
   const nextBatch = db.prepare(
-    "SELECT id, description FROM jobs WHERE chunk IS NULL AND description IS NOT NULL AND last_seen >= ? LIMIT ?",
+    `SELECT id, description FROM jobs WHERE chunk IS NULL AND description IS NOT NULL AND ${LIVE_WHERE} LIMIT @limit`,
   );
   const setChunk = db.prepare("UPDATE jobs SET chunk = ? WHERE id = ?");
   for (;;) {
-    const slice = nextBatch.all(liveSince, DESC_CHUNK_SIZE) as Array<{ id: string; description: string }>;
+    const slice = nextBatch.all({ ...live, limit: DESC_CHUNK_SIZE }) as Array<{ id: string; description: string }>;
     if (slice.length === 0) break;
     const key = `desc-${day}-${String(n++).padStart(3, "0")}`;
     const body = gzipSync(JSON.stringify(Object.fromEntries(slice.map((r) => [r.id, r.description]))));
@@ -95,8 +99,8 @@ export async function publish() {
   // SQL does the newest-first sort (same order as compareNewestFirst), so
   // only one shard is ever in memory.
   const rows = db
-    .prepare("SELECT light, chunk, description, first_seen FROM jobs WHERE last_seen >= ? ORDER BY posted_at IS NULL, posted_at DESC")
-    .iterate(liveSince) as IterableIterator<{ light: string; chunk: string | null; description: string | null; first_seen: string }>;
+    .prepare(`SELECT light, chunk, description, first_seen FROM jobs WHERE ${LIVE_WHERE} ORDER BY posted_at IS NULL, posted_at DESC`)
+    .iterate(live) as IterableIterator<{ light: string; chunk: string | null; description: string | null; first_seen: string }>;
   let withSalary = 0;
   for (const row of rows) {
     // first_seen is the source of truth: light rows written before the crawl

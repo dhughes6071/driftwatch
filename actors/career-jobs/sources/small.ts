@@ -285,7 +285,7 @@ export const rippling: SmallSource<RipplingRow> = {
       const r = await getJson<{ items?: RipplingRow[]; totalPages?: number }>(
         `https://ats.rippling.com/api/v2/board/${encodeURIComponent(co)}/jobs?page=${page}&pageSize=100`,
       );
-      if (!r) return page === 0 ? null : [...out.values()];
+      if (!r) return null; // a later page too: a short list would read as closures
       // One row per job *location*: merge them back into one job.
       for (const it of r.items ?? []) {
         const prev = out.get(it.id);
@@ -498,7 +498,7 @@ export const ukg: SmallSource<UkgRow> = {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ opportunitySearch: { Top: 50, Skip: skip, QueryString: "", OrderBy: [], Filters: [] } }),
       });
-      if (!r) return skip === 0 ? null : out;
+      if (!r) return null; // a later page too: a short list would read as closures
       out.push(...(r.opportunities ?? []));
       if (!r.opportunities?.length || out.length >= (r.totalCount ?? 0)) break;
     }

@@ -26,6 +26,7 @@ import { fromStructuredPay } from "../src/salary.ts";
 import * as Oracle from "../sources/oracle.ts";
 import * as SmartR from "../sources/smartrecruiters.ts";
 import { SMALL_SOURCES, smallJobId } from "../sources/small.ts";
+import { CompanyRuns, companyRunsSchema, purgeClosed } from "./company-runs.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
@@ -68,6 +69,7 @@ export function openDb(path = DB_PATH) {
       started_at TEXT PRIMARY KEY, finished_at TEXT, stats TEXT
     );
   `);
+  companyRunsSchema(db);
   return db;
 }
 
@@ -114,6 +116,9 @@ export async function crawl() {
     newJobs: 0, detailFetches: 0, errors: 0,
   };
   const touchOnly = db.prepare("UPDATE jobs SET last_seen = ? WHERE id = ?");
+  // Whether each company's whole list loaded: a role missing from a list that
+  // did not fully load is not closed (see company-runs.ts).
+  const loaded = new CompanyRuns();
 
   const getDesc = db.prepare("SELECT description FROM jobs WHERE id = ?");
   const setDesc = db.prepare("UPDATE jobs SET description = ?, chunk = NULL WHERE id = ?");
@@ -146,15 +151,18 @@ export async function crawl() {
   log(`ATS: ${companies.length} companies`);
   await pool(companies, ATS_CONCURRENCY, async ({ ats, slug }) => {
     try {
-      const jobs = await fetchCompany(ats, slug);
+      // strict: a board that does not answer throws, rather than reading as "no roles".
+      const jobs = await fetchCompany(ats, slug, undefined, true);
       stats.atsCompanies++;
       for (const j of jobs) {
         stats.atsJobs++;
         save(fromAtsJob(j, names.get(`${ats}:${slug}`) ?? slug, startedAt), j.description || null);
         refreshDescription(j.id, j.description || null);
       }
+      loaded.mark(ats, slug, true);
     } catch {
       stats.errors++;
+      loaded.mark(ats, slug, false);
     }
     if (stats.atsCompanies % 500 === 0) log(`  ATS ${stats.atsCompanies}/${companies.length}, ${stats.atsJobs} jobs`);
   });
@@ -171,10 +179,12 @@ export async function crawl() {
 
   await pool(sites, WORKDAY_SITES, async (s) => {
     const site: Site = { host: s.host, tenant: s.tenant, site: s.site };
+    let pageFailed = false;
     try {
       const fresh: Array<{ id: string; posting: Parameters<typeof normalize>[1]; category: string | null }> = [];
       await client.collect(site, {
         concurrency: PER_SITE,
+        onPageFailed: () => void (pageFailed = true),
         onPosting: (posting, category) => {
           stats.workdayJobs++;
           const id = `workday:${site.tenant}:${posting.externalPath}`;
@@ -218,8 +228,11 @@ export async function crawl() {
         );
       });
       stats.workdaySites++;
+      if (pageFailed) stats.errors++;
+      loaded.mark("workday", site.tenant, !pageFailed);
     } catch {
       stats.errors++;
+      loaded.mark("workday", site.tenant, false);
     }
     if (stats.workdaySites % 200 === 0) {
       log(`  Workday ${stats.workdaySites}/${sites.length} sites, ${stats.workdayJobs} jobs, ${stats.newJobs} new`);
@@ -232,8 +245,10 @@ export async function crawl() {
   log(`Oracle: ${oracleSites.length} career sites`);
   await pool(oracleSites, 6, async (site) => {
     // One bad site or posting must never stop the run (a null title did, 27 Sep).
+    const company = Oracle.tenantOf(site);
     try {
       const postings = await Oracle.listAll(site);
+      loaded.mark("oracle", company, !!postings);
       if (!postings) return void stats.errors++;
       stats.oracleSites++;
       const fresh = postings.filter((p) => {
@@ -255,6 +270,7 @@ export async function crawl() {
       });
     } catch {
       stats.errors++;
+      loaded.mark("oracle", company, false);
     }
   });
 
@@ -264,6 +280,7 @@ export async function crawl() {
   await pool(srCompanies, 6, async ({ id: company }) => {
     try {
       const postings = await SmartR.listAll(company);
+      loaded.mark("smartrecruiters", company.toLowerCase(), !!postings);
       if (!postings) return void stats.errors++;
       stats.srCompanies++;
       const fresh = postings.filter((p) => {
@@ -285,6 +302,7 @@ export async function crawl() {
       });
     } catch {
       stats.errors++;
+      loaded.mark("smartrecruiters", company.toLowerCase(), false);
     }
   });
 
@@ -299,8 +317,10 @@ export async function crawl() {
     small[src.ats] = { companies: 0, jobs: 0 };
     log(`${src.ats}: ${companies.length} companies`);
     await pool(companies, 8, async ({ id: co, name }) => {
+      const company = (src.companyKey?.(co) ?? co).toLowerCase();
       try {
         const rows = await src.list(co);
+        loaded.mark(src.ats, company, !!rows);
         if (!rows) return void stats.errors++;
         small[src.ats].companies++;
         const fresh = rows.filter((p) => {
@@ -320,21 +340,35 @@ export async function crawl() {
         });
       } catch {
         stats.errors++;
+        loaded.mark(src.ats, company, false);
       }
     });
   }
 
-  // Roles gone for 3+ days are closed. (A day or two of grace absorbs a site
-  // that was briefly unreachable, so a flaky host does not empty and refill.)
-  const cutoff = new Date(Date.now() - 3 * 86_400_000).toISOString();
-  const purged = db.prepare("DELETE FROM jobs WHERE last_seen < ?").run(cutoff).changes;
+  // One company_runs row per company: did it load, and how many roles opened / closed.
+  const results = loaded.finish(db, startedAt);
+  const failed = results.filter((r) => !r.ok);
+  const companyStats = {
+    ok: results.length - failed.length,
+    failed: failed.length,
+    rolesKept: failed.reduce((n, r) => n + Math.max(0, r.expected - r.open), 0),
+    drops: failed.filter((r) => r.note === "drop").length,
+    dropsAccepted: results.filter((r) => r.note === "drop accepted").length,
+  };
+  for (const r of failed.sort((a, b) => b.expected - a.expected).slice(0, 15)) {
+    log(`  not loaded (${r.note}): ${r.ats}:${r.company} -- ${r.open} of ${r.expected} roles seen; the rest kept`);
+  }
+
+  // Roles gone for 3+ days are closed -- but only at companies whose list
+  // loaded; a failing company keeps its roles (company-runs.ts).
+  const purged = purgeClosed(db, new Date().toISOString());
 
   db.prepare("UPDATE runs SET finished_at = ?, stats = ? WHERE started_at = ?").run(
     new Date().toISOString(),
-    JSON.stringify({ ...stats, small, purged }),
+    JSON.stringify({ ...stats, small, companies: companyStats, purged }),
     startedAt,
   );
-  log(`Done: ${JSON.stringify({ ...stats, small, purged })}`);
+  log(`Done: ${JSON.stringify({ ...stats, small, companies: companyStats, purged })}`);
   db.close();
 }
 

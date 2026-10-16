@@ -54,7 +54,8 @@ export async function listAll(company: string): Promise<SrPosting[] | null> {
   const out = [...first.rows];
   for (let offset = PAGE; offset < first.total; offset += PAGE) {
     const next = await listPage(company, offset);
-    if (!next || next.rows.length === 0) break;
+    if (!next) return null; // a short list would read as closures
+    if (next.rows.length === 0) break;
     out.push(...next.rows);
   }
   return out;

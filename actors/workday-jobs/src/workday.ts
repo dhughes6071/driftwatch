@@ -252,6 +252,8 @@ export class WorkdayClient {
       concurrency?: number;
       onPosting: (posting: Posting, category: string | null) => boolean | void;
       onIncomplete?: (why: string) => void;
+      /** A list page that did not load (after retries): the walk is missing an unknown number of postings. */
+      onPageFailed?: () => void;
     },
   ): Promise<void> {
     const seen = new Set<string>();
@@ -279,6 +281,7 @@ export class WorkdayClient {
       depth: number,
     ): Promise<void> => {
       const first = await page(applied, 0);
+      if (!first && !stopped) opts.onPageFailed?.();
       if (!first || stopped) return;
       const total = first.total ?? 0;
       if (total === 0) return;
@@ -313,7 +316,14 @@ export class WorkdayClient {
       const offsets: number[] = [];
       for (let o = PAGE; o < last; o += PAGE) offsets.push(o);
       // Emit each page as it lands, so a caller that has enough stops the rest.
-      await Promise.all(offsets.map((o) => page(applied, o).then((r) => emit(r?.jobPostings ?? [], category))));
+      await Promise.all(
+        offsets.map((o) =>
+          page(applied, o).then((r) => {
+            if (!r && !stopped) opts.onPageFailed?.();
+            emit(r?.jobPostings ?? [], category);
+          }),
+        ),
+      );
     };
 
     await walk({}, null, 0);
