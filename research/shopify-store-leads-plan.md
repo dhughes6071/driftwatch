@@ -202,3 +202,15 @@ After the clean 10 minutes at 8 requests a second, two restarts at 8/s were refu
 4. **Proxies on Apify** would remove the limit but cost money. We'd ask first.
 
 **Next:** let tonight's crawl run adaptively, then use its real throughput to set the cycle length before installing the daily schedule.
+
+### Overnight result, 15 Oct 2026: 8 requests a second holds once the burst penalty clears
+
+- **The run:** 28,213 stores checked in 4.7 hours, at a **steady 1.7 stores a second**, with 191 refusals (0.7%, all single stores). It never slowed after 23:12. The earlier refusals were a temporary penalty for the 25/s burst, not the long-run limit.
+- **Capacity:**
+  - about 98k stores a day in the planned 16-hour window, so 1.4M stores every **about 14 days** is feasible as planned;
+  - Common Crawl discovery runs alongside it and never touches Shopify.
+- **Top-1M index:** 29,794 live stores out of 31,097 found. Of those live stores:
+  - 73% have an email;
+  - 28% a phone;
+  - 61% added a product in the last 90 days.
+- **Bug found and fixed:** responses were cut at 1.5 MB, so a full 250-product `products.json` often got cut and couldn't be parsed. That cost a third of live stores their catalog data. Now only HTML is cut off. The 9,776 affected stores are being re-checked.

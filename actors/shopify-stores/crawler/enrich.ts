@@ -65,8 +65,13 @@ export const fetchHttp: Http = {
   async get(url) {
     try {
       const res = await fetch(url, { headers: { "User-Agent": USER_AGENT, Accept: "*/*" }, redirect: "follow", signal: AbortSignal.timeout(20_000) });
-      // Homepages can be several MB; the facts we want are in the first 1.5 MB.
-      const body = res.ok ? (await res.text()).slice(0, 1_500_000) : (await res.body?.cancel(), "");
+      // Homepages can be several MB and the facts we want are near the top, so HTML
+      // is cut at 1.5 MB. JSON is kept whole: a cut products.json can't be parsed,
+      // and 250 products with descriptions often run past 1.5 MB (found 15 Oct 2026,
+      // when a third of stores had lost their catalog data this way).
+      const text = res.ok ? await res.text() : (await res.body?.cancel(), "");
+      const isJson = /json/i.test(res.headers.get("content-type") ?? "") || new URL(url).pathname.endsWith(".json");
+      const body = isJson ? text.slice(0, 30_000_000) : text.slice(0, 1_500_000);
       return { status: res.status, body, finalUrl: res.url };
     } catch {
       return { status: "ERR", body: "", finalUrl: url };
