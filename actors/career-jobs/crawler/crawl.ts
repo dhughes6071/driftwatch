@@ -71,6 +71,18 @@ export function openDb(path = DB_PATH) {
   return db;
 }
 
+/**
+ * Refresh a role seen before: (last_seen, light, posted_at, id). The light
+ * row is rebuilt from today's fetch, which stamps firstSeenAt with today, so
+ * firstSeenAt is put back from first_seen -- otherwise every re-seen role
+ * would look new to "seenAfter" searches.
+ */
+export function prepareTouch(db: Database.Database) {
+  return db.prepare(
+    "UPDATE jobs SET last_seen = ?, light = json_set(?, '$.firstSeenAt', first_seen), posted_at = ? WHERE id = ?",
+  );
+}
+
 /** Any parseable date -> UTC ISO, so string order is time order. */
 export function isoOrNull(v: string | null | undefined): string | null {
   if (!v) return null;
@@ -90,7 +102,7 @@ export async function crawl() {
   db.prepare("INSERT INTO runs (started_at) VALUES (?)").run(startedAt);
 
   const exists = db.prepare("SELECT 1 FROM jobs WHERE id = ?");
-  const touch = db.prepare("UPDATE jobs SET last_seen = ?, light = ?, posted_at = ? WHERE id = ?");
+  const touch = prepareTouch(db);
   const getLight = db.prepare("SELECT light FROM jobs WHERE id = ?");
   const insert = db.prepare(
     `INSERT INTO jobs (id, ats, company, posted_at, light, description, first_seen, last_seen)
