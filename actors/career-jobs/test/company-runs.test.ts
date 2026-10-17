@@ -235,7 +235,7 @@ test("Workday: a list page that fails is reported, so the site does not count as
   }) as unknown as typeof fetch;
   let failed = 0;
   let seen = 0;
-  await new WorkdayClient(fake).collect(
+  await new WorkdayClient(fake, 30_000, { ratePerSecond: Infinity }).collect(
     { host: "mgb.wd1.myworkdayjobs.com", tenant: "mgb", site: "MGBExternal" },
     { onPosting: () => void seen++, onPageFailed: () => void failed++ },
   );

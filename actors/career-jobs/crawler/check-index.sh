@@ -5,7 +5,9 @@
 # Alerts with a macOS notification, and a line in data/logs/alerts.log, when:
 #   - the published index is more than MAX_AGE_HOURS old (the nightly run didn't publish),
 #   - last night's log says CRAWL FAILED or PUBLISH FAILED,
-#   - a run has held the lock for more than 8 hours (stuck).
+#   - a run has held the lock for more than 8 hours (stuck),
+#   - a source (Workday, Oracle, ...) returned under half its usual number of roles
+#     in the latest full crawl (source-drops.ts).
 # The index URL is read from the gitignored data/career-manifest-url.txt; never print it.
 set -u
 ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
@@ -46,6 +48,12 @@ fi
 if [[ -d data/career-jobs.lock ]] && [[ -n "$(find data/career-jobs.lock -maxdepth 0 -mmin +480)" ]]; then
   problems+=("a run has been holding the lock for over 8 hours")
 fi
+
+# 4. Did a whole source come back far short? Companies that fail keep their roles,
+# so this does not show in the index size (17 Oct 2026: Workday 44k of ~780k).
+NODE="$(command -v node || echo /opt/homebrew/bin/node)"
+drops=$("$NODE" --experimental-strip-types actors/career-jobs/crawler/source-drops.ts 2>/dev/null)
+[[ -n "$drops" ]] && problems+=("${(f)drops}")
 
 if (( ${#problems} )); then
   msg="${(j:; :)problems}"

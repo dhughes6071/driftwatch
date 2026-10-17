@@ -3,12 +3,14 @@ import assert from "node:assert/strict";
 import {
   CAP,
   PAGE,
+  Pacer,
   WorkdayClient,
   chooseSplit,
   minAgeDays,
   normalize,
   parseCareerSiteUrl,
   parsePostedOn,
+  retryAfterMs,
   type Fetch,
   type Site,
 } from "../src/workday.ts";
@@ -130,10 +132,12 @@ function fakeWorkday(nJobs: number, categories: number, capped = true): { fetch:
 }
 
 const SITE: Site = { host: "acme.wd1.myworkdayjobs.com", tenant: "acme", site: "External" };
+/** Fakes need no pacing. */
+const UNPACED = { ratePerSecond: Infinity };
 
 test("collects every job from a site over the 2,000 cap, each exactly once", async () => {
   const wd = fakeWorkday(2650, 4);
-  const client = new WorkdayClient(wd.fetch);
+  const client = new WorkdayClient(wd.fetch, 30_000, UNPACED);
   const got: string[] = [];
   const cats = new Set<string | null>();
   await client.collect(SITE, {
@@ -149,7 +153,7 @@ test("collects every job from a site over the 2,000 cap, each exactly once", asy
 
 test("sites that report their real count are paged straight through, not split", async () => {
   const wd = fakeWorkday(4500, 1, false); // one category: nothing to split by anyway
-  const client = new WorkdayClient(wd.fetch);
+  const client = new WorkdayClient(wd.fetch, 30_000, UNPACED);
   const got = new Set<string>();
   await client.collect(SITE, { onPosting: (p) => void got.add(p.externalPath) });
   assert.equal(got.size, 4500);
@@ -158,7 +162,7 @@ test("sites that report their real count are paged straight through, not split",
 
 test("stops requesting once the caller has enough", async () => {
   const wd = fakeWorkday(1500, 1);
-  const client = new WorkdayClient(wd.fetch);
+  const client = new WorkdayClient(wd.fetch, 30_000, UNPACED);
   let n = 0;
   await client.collect(SITE, { concurrency: 1, onPosting: () => ++n >= 30 });
   assert.equal(n, 30);
@@ -229,4 +233,115 @@ test("short location codes match whole words only", async () => {
   const { locationMatcher } = await import("../src/workday.ts");
   assert.equal(locationMatcher(["TX"])("US, TX, Austin"), true);
   assert.equal(locationMatcher(["NY"])("Munich, Germany"), false);
+});
+
+// ------------------------------------------------------------------ rate limit and retries
+
+/** A clock that only moves when the client sleeps, so retry timing is exact and instant. */
+function fakeClock() {
+  let t = 0;
+  const slept: number[] = [];
+  return {
+    now: () => t,
+    sleep: async (ms: number) => void (slept.push(ms), (t += ms)),
+    slept,
+  };
+}
+
+const ok20 = (offset: number, total = 0) =>
+  Response.json({ total, facets: [], jobPostings: Array.from({ length: 20 }, (_, i) => ({ title: "R", externalPath: `/job/${offset + i}` })) });
+
+test("a page answered 429 is retried with growing waits until it loads (17 Oct 2026: 43% of requests got 429)", async () => {
+  const clock = fakeClock();
+  let calls = 0;
+  const f = (async () => (++calls <= 3 ? new Response("challenge", { status: 429 }) : ok20(0, 20))) as unknown as Fetch;
+  const client = new WorkdayClient(f, 30_000, { ...clock, random: () => 0.5 });
+  const r = await client.page(SITE, {}, 0);
+  assert.equal(r?.jobPostings?.length, 20);
+  // 2, 4, 8 s backoff (random 0.5 = no jitter); the pacer's own 100 ms gaps and 5 s pauses fall inside those.
+  assert.deepEqual(clock.slept.filter((ms) => ms >= 1000), [2000, 4000, 8000]);
+  assert.deepEqual(client.counts, { requests: 4, limited: 3, failed: 0 });
+});
+
+test("Retry-After is honoured, in seconds or as a date", async () => {
+  assert.equal(retryAfterMs("30"), 30_000);
+  assert.equal(retryAfterMs("Sat, 17 Oct 2026 13:46:56 GMT", Date.parse("Sat, 17 Oct 2026 13:46:26 GMT")), 30_000);
+  assert.equal(retryAfterMs(null), null);
+  assert.equal(retryAfterMs("soon"), null);
+
+  const clock = fakeClock();
+  let calls = 0;
+  const f = (async () => (++calls === 1 ? new Response("", { status: 429, headers: { "retry-after": "17" } }) : ok20(0, 20))) as unknown as Fetch;
+  await new WorkdayClient(f, 30_000, clock).page(SITE, {}, 0);
+  assert.ok(clock.slept.includes(17_000), `slept ${clock.slept}`);
+});
+
+test("a page that keeps getting 429 still fails in the end (fail rather than guess)", async () => {
+  const clock = fakeClock();
+  const f = (async () => new Response("", { status: 429 })) as unknown as Fetch;
+  const client = new WorkdayClient(f, 30_000, { ...clock, random: () => 0.5 });
+  assert.equal(await client.page(SITE, {}, 0), null);
+  assert.deepEqual(client.counts, { requests: 7, limited: 7, failed: 1 });
+  // About two minutes of waiting in all, then give up.
+  const waited = clock.now();
+  assert.ok(waited > 100_000 && waited < 200_000, `${waited} ms`);
+});
+
+test("a site that answers 5xx fails fast, as before (17 Oct: every Workday site gave 500)", async () => {
+  const clock = fakeClock();
+  const f = (async () => new Response("", { status: 500 })) as unknown as Fetch;
+  const client = new WorkdayClient(f, 30_000, clock);
+  assert.equal(await client.page(SITE, {}, 0), null);
+  assert.equal(client.counts.requests, 4);
+  assert.ok(clock.now() < 10_000, `${clock.now()} ms`);
+});
+
+test("404 is a definitive miss: no retry", async () => {
+  const clock = fakeClock();
+  const f = (async () => new Response("", { status: 404 })) as unknown as Fetch;
+  const client = new WorkdayClient(f, 30_000, clock);
+  assert.equal(await client.detail(SITE, "/job/gone"), null);
+  assert.equal(client.counts.requests, 1);
+});
+
+test("requests to one Workday domain are paced together, across sites and data centers", async () => {
+  const clock = fakeClock();
+  const at: Array<[string, number]> = [];
+  const f = (async (url: string) => (at.push([new URL(url).hostname, clock.now()]), ok20(0, 20))) as unknown as Fetch;
+  const client = new WorkdayClient(f, 30_000, { ...clock, ratePerSecond: 10 });
+  const other: Site = { host: "beta.wd5.myworkdayjobs.com", tenant: "beta", site: "Jobs" };
+  const elsewhere: Site = { host: "wd1.myworkdaysite.com", tenant: "gamma", site: "Jobs" };
+  for (let i = 0; i < 3; i++) {
+    await client.page(SITE, {}, 0);
+    await client.page(other, {}, 0);
+  }
+  await client.page(elsewhere, {}, 0);
+  // Six myworkdayjobs.com requests 100 ms apart, whichever host; myworkdaysite.com has its own pace.
+  assert.deepEqual(at.map(([, t]) => t), [0, 100, 200, 300, 400, 500, 500]);
+});
+
+test("the pacer slows down on 429 and recovers on success, never below 5 a second", () => {
+  const clock = fakeClock();
+  const p = new Pacer(11, clock.now, clock.sleep);
+  for (let i = 0; i < 20; i++) p.limited(0);
+  assert.equal(p.rate, 5);
+  for (let i = 0; i < 1000; i++) p.ok();
+  assert.equal(p.rate, 11);
+});
+
+test("a collect walk survives a burst of 429s and loads every page", async () => {
+  const clock = fakeClock();
+  let n = 0;
+  const f = (async (_url: string, init: RequestInit) => {
+    const { offset } = JSON.parse(String(init.body)) as { offset: number };
+    // Every third request is rate limited.
+    if (++n % 3 === 0) return new Response("", { status: 429 });
+    return ok20(offset, 200);
+  }) as unknown as Fetch;
+  const client = new WorkdayClient(f, 30_000, clock);
+  let failed = 0;
+  const seen = new Set<string>();
+  await client.collect(SITE, { onPosting: (p) => void seen.add(p.externalPath), onPageFailed: () => void failed++ });
+  assert.equal(failed, 0);
+  assert.equal(seen.size, 200);
 });

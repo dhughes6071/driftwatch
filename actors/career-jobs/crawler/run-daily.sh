@@ -24,6 +24,10 @@ notify() {
 {
   echo "=== $(date) crawl"
   "$NODE" --experimental-strip-types actors/career-jobs/crawler/crawl.ts || { echo "CRAWL FAILED"; notify "the crawl failed"; exit 1; }
+  # A source far below its usual count (17 Oct 2026: Workday 44k of ~780k) is worth a look,
+  # but still publish: companies that failed keep their roles, so the index stays whole.
+  drops=$("$NODE" --experimental-strip-types actors/career-jobs/crawler/source-drops.ts 2>/dev/null)
+  if [[ -n "$drops" ]]; then echo "SOURCE DROP: $drops"; notify "${drops//$'\n'/; }"; fi
   echo "=== $(date) publish"
   "$NODE" --experimental-strip-types actors/career-jobs/crawler/publish.ts || { echo "PUBLISH FAILED"; notify "publishing failed"; exit 1; }
   echo "=== $(date) done"

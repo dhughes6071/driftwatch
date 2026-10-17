@@ -173,19 +173,120 @@ export const publicBase = (s: Site) =>
 
 // ------------------------------------------------------------------ HTTP
 
+/**
+ * Rate limit, measured 17 Oct 2026: Workday's career sites sit behind
+ * Cloudflare, which allows roughly 12-13 requests a second from one IP across
+ * ALL *.myworkdayjobs.com sites together (wd1 and wd5 share it), and answers
+ * the rest with HTTP 429 (a "cf-mitigated: challenge" page, no Retry-After).
+ * Going over it for ~45 s brings a spell where nearly every request gets 429.
+ * The nightly crawl ran ~36 requests at once and got 429 on 43% of them, so
+ * 437 sites lost a page or two even after 4 retries and were not loaded.
+ *
+ * So every request now waits its turn in a per-domain pace (11 a second was
+ * clean for 3 minutes; the crawl uses that, the Actor a little less), which
+ * slows down further on each 429 and creeps back up as requests succeed.
+ */
+export const DEFAULT_RATE = 10;
+/** Never pace slower than this: a site that 429s everything still finishes in hours, not days. */
+const MIN_RATE = 5;
+/** 429: this many tries, waiting Retry-After or 2, 4, 8, 16, 32, 60 s (with jitter). */
+const TRIES_429 = 7;
+/** 5xx and network errors: this many tries, 1, 2, 4 s apart -- a site that is down fails fast. */
+const TRIES_ERROR = 4;
+
+export interface ClientOptions {
+  /** Requests per second per Workday domain (myworkdayjobs.com, myworkdaysite.com), shared by every site. */
+  ratePerSecond?: number;
+  /** For tests. */
+  sleep?: (ms: number) => Promise<void>;
+  now?: () => number;
+  random?: () => number;
+}
+
+/** Spaces requests to one domain evenly; slows down on 429, speeds back up on success. */
+export class Pacer {
+  private readonly max: number;
+  private readonly now: () => number;
+  private readonly sleepImpl: (ms: number) => Promise<void>;
+  rate: number;
+  private nextAt = 0;
+
+  constructor(max: number, now: () => number, sleepImpl: (ms: number) => Promise<void>) {
+    this.max = max;
+    this.rate = max;
+    this.now = now;
+    this.sleepImpl = sleepImpl;
+  }
+
+  /** Resolves when it is this request's turn. */
+  async turn(): Promise<void> {
+    const t = this.now();
+    const at = Math.max(t, this.nextAt);
+    this.nextAt = at + 1000 / this.rate;
+    if (at > t) await this.sleepImpl(at - t);
+  }
+
+  ok() {
+    // +1 request/s per 50 successes, back up to the configured pace.
+    this.rate = Math.min(this.max, this.rate + 0.02);
+  }
+
+  /** A 429: slow down by a fifth, and let nothing through for `pauseMs`. */
+  limited(pauseMs: number) {
+    this.rate = Math.max(Math.min(MIN_RATE, this.max), this.rate * 0.8);
+    this.nextAt = Math.max(this.nextAt, this.now() + pauseMs);
+  }
+}
+
+/** Retry-After as milliseconds (seconds or an HTTP date), or null. */
+export function retryAfterMs(header: string | null, now = Date.now()): number | null {
+  if (!header) return null;
+  if (/^\d+$/.test(header.trim())) return Number(header.trim()) * 1000;
+  const t = Date.parse(header);
+  return Number.isFinite(t) ? Math.max(0, t - now) : null;
+}
+
+/** "nvidia.wd5.myworkdayjobs.com" -> "myworkdayjobs.com": the rate limit is per domain, not per host. */
+const domainOf = (url: string) => new URL(url).hostname.split(".").slice(-2).join(".");
+
 export class WorkdayClient {
   // Plain fields, not parameter properties: Node's type stripping rejects those.
   private readonly fetchImpl: Fetch;
   private readonly timeoutMs: number;
+  private readonly rate: number;
+  private readonly sleepImpl: (ms: number) => Promise<void>;
+  private readonly now: () => number;
+  private readonly random: () => number;
+  private readonly pacers = new Map<string, Pacer>();
+  /** Requests answered 429, and list/detail calls that still failed after every retry (for logs). */
+  readonly counts = { requests: 0, limited: 0, failed: 0 };
 
-  constructor(fetchImpl: Fetch = fetch, timeoutMs = 30_000) {
+  constructor(fetchImpl: Fetch = fetch, timeoutMs = 30_000, opts: ClientOptions = {}) {
     this.fetchImpl = fetchImpl;
     this.timeoutMs = timeoutMs;
+    this.rate = opts.ratePerSecond ?? DEFAULT_RATE;
+    this.sleepImpl = opts.sleep ?? sleep;
+    this.now = opts.now ?? Date.now;
+    this.random = opts.random ?? Math.random;
   }
 
-  /** JSON request with retries on 429/5xx. Returns null on a definitive miss (404/422). */
+  private pacer(url: string): Pacer {
+    const d = domainOf(url);
+    let p = this.pacers.get(d);
+    if (!p) this.pacers.set(d, (p = new Pacer(this.rate, this.now, this.sleepImpl)));
+    return p;
+  }
+
+  /** JSON request with retries on 429/5xx. Returns null on a definitive miss (404/422) or when retries run out. */
   private async json<T>(url: string, body?: unknown): Promise<T | null> {
-    for (let attempt = 0; attempt < 4; attempt++) {
+    const pacer = this.pacer(url);
+    // 0.5x-1.5x, so pages that failed together do not all come back together.
+    const jitter = (ms: number) => Math.round(ms * (0.5 + this.random()));
+    let limited = 0;
+    let errors = 0;
+    while (limited < TRIES_429 && errors < TRIES_ERROR) {
+      await pacer.turn();
+      this.counts.requests++;
       let res: Response;
       try {
         res = await this.fetchImpl(url, {
@@ -202,22 +303,34 @@ export class WorkdayClient {
           signal: AbortSignal.timeout(this.timeoutMs),
         });
       } catch {
-        await sleep(1000 * 2 ** attempt);
+        if (++errors < TRIES_ERROR) await this.sleepImpl(1000 * 2 ** (errors - 1));
         continue;
       }
       if (res.ok) {
+        pacer.ok();
         try {
           return (await res.json()) as T;
         } catch {
           return null;
         }
       }
-      if (res.status === 429 || res.status >= 500) {
-        await sleep(1000 * 2 ** attempt);
+      // Free the connection: an unread body keeps the socket busy.
+      await res.body?.cancel().catch(() => {});
+      if (res.status === 429) {
+        this.counts.limited++;
+        const wait = retryAfterMs(res.headers.get("retry-after"), this.now()) ?? jitter(Math.min(60_000, 2000 * 2 ** limited));
+        limited++;
+        pacer.limited(Math.min(wait, 5000));
+        if (limited < TRIES_429) await this.sleepImpl(Math.min(wait, 120_000));
+        continue;
+      }
+      if (res.status >= 500) {
+        if (++errors < TRIES_ERROR) await this.sleepImpl(1000 * 2 ** (errors - 1));
         continue;
       }
       return null; // 400/404/422: the site or job does not exist -- retrying will not help
     }
+    this.counts.failed++;
     return null;
   }
 

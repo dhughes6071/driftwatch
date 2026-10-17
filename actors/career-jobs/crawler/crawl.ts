@@ -14,6 +14,8 @@
  *
  * Politeness: at most WORKDAY_SITES sites at once, a few requests each --
  * spread across ~1,800 companies' own hosts, no host sees more than a trickle.
+ * Workday requests are also paced to WORKDAY_RATE a second in total, under
+ * the Cloudflare limit that answers faster crawling with 429 (workday.ts).
  */
 import Database from "better-sqlite3";
 import { mkdirSync, readFileSync } from "node:fs";
@@ -34,6 +36,8 @@ export const DB_PATH = process.env.CAREER_INDEX_DB ?? resolve(ROOT, "data/career
 
 const WORKDAY_SITES = Number(process.env.WORKDAY_SITES ?? 12);
 const PER_SITE = Number(process.env.PER_SITE ?? 3);
+/** Workday requests per second, all sites together: Cloudflare 429s above ~12 (workday.ts). */
+const WORKDAY_RATE = Number(process.env.WORKDAY_RATE ?? 11);
 const ATS_CONCURRENCY = 8;
 /** For trial runs: only the first N companies / career sites. */
 const LIMIT = process.env.CRAWL_LIMIT ? Number(process.env.CRAWL_LIMIT) : Infinity;
@@ -175,8 +179,9 @@ export async function crawl() {
   // Trial runs take the smallest sites (the list is sorted biggest first).
   if (Number.isFinite(LIMIT)) sites.splice(0, Math.max(0, sites.length - LIMIT));
   log(`Workday: ${sites.length} career sites`);
-  const client = new WorkdayClient(fetch, 30_000);
+  const client = new WorkdayClient(fetch, 30_000, { ratePerSecond: WORKDAY_RATE });
 
+  const workdayStarted = Date.now();
   await pool(sites, WORKDAY_SITES, async (s) => {
     const site: Site = { host: s.host, tenant: s.tenant, site: s.site };
     let pageFailed = false;
@@ -238,6 +243,11 @@ export async function crawl() {
       log(`  Workday ${stats.workdaySites}/${sites.length} sites, ${stats.workdayJobs} jobs, ${stats.newJobs} new`);
     }
   });
+  const wc = client.counts;
+  log(
+    `Workday done in ${Math.round((Date.now() - workdayStarted) / 60_000)} min: ${wc.requests} requests, ` +
+      `${wc.limited} rate-limited (429), ${wc.failed} still failing after retries`,
+  );
 
   // ---------------------------------------------------------- Oracle Recruiting Cloud
   // Same shape as Workday: list everything, fetch a detail only for new roles.
@@ -365,7 +375,8 @@ export async function crawl() {
 
   db.prepare("UPDATE runs SET finished_at = ?, stats = ? WHERE started_at = ?").run(
     new Date().toISOString(),
-    JSON.stringify({ ...stats, small, companies: companyStats, purged }),
+    // `only` and `limit` let source-drops.ts tell a full nightly run from a catch-up or trial run.
+    JSON.stringify({ ...stats, workdayHttp: client.counts, small, companies: companyStats, purged, only: ONLY ? [...ONLY] : null, limit: Number.isFinite(LIMIT) ? LIMIT : null }),
     startedAt,
   );
   log(`Done: ${JSON.stringify({ ...stats, small, companies: companyStats, purged })}`);
