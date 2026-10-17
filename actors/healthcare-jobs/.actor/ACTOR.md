@@ -38,10 +38,12 @@ Email us at [chazmichael_michaels@icloud.com](mailto:chazmichael_michaels@icloud
 
 ## Pricing
 
-**PRICE TO BE CONFIRMED** per 1,000 jobs, plus Apify's standard run-start fee. Platform usage
-is included.
+**$5 per 1,000 jobs** ($0.005 per job), plus Apify's standard $0.00005 run-start fee. On
+Apify's paid plans it's cheaper: $4.50 (Starter), $4 (Scale) or $3.50 (Business) per 1,000.
+Platform usage is included, so you are not billed for compute separately. A daily feed of every
+new per diem RN role nationwide (about 330 a week in October 2026) costs about $7 a month.
 
-- **`maxJobs`** is a hard cap per run.
+- **`maxJobs`** is a hard cap per run (default 1,000, at most $5).
 - **Apify's maximum cost per run** also works: if the limit is reached, the Actor stops cleanly
   and keeps everything delivered so far.
 
