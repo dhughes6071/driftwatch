@@ -29,3 +29,7 @@ storage/
 
 # machine-local Claude Code permissions
 .claude/settings.local.json
+
+# Private strategy notes for Claude Code (repo is public)
+CLAUDE.md
+docs/apify-opportunity-scan.md
