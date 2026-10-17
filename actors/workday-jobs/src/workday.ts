@@ -194,6 +194,9 @@ export class WorkdayClient {
             accept: "application/json",
             "content-type": "application/json",
             "user-agent": UA,
+            // Node's fetch sends "Accept-Language: *" by default, and Workday answers
+            // that with HTTP 500 since 17 Oct 2026 (the nightly crawl got 44k of ~780k roles).
+            "accept-language": "en-US",
           },
           body: body ? JSON.stringify(body) : undefined,
           signal: AbortSignal.timeout(this.timeoutMs),
