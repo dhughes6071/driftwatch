@@ -147,6 +147,41 @@ index is scanned on every run at no extra cost; you pay only for the companies r
 { "companyKeywords": ["stripe", "datadog", "cloudflare"], "titleKeywords": ["security"] }
 ```
 
+## Use it from Claude, Cursor or any AI agent (MCP)
+
+Apify's hosted MCP server lets an AI assistant run this Actor as a tool. It writes the
+input from a plain-English request and reads back the results. Add this to your client's
+MCP settings (Claude Desktop, Cursor, VS Code, Windsurf and others):
+
+```json
+{
+  "mcpServers": {
+    "companies-hiring": {
+      "url": "https://mcp.apify.com?tools=viridian_layout_ea2/companies-hiring-leads"
+    }
+  }
+}
+```
+
+The first time it connects, a browser window opens so you can sign in to Apify. If your
+client can't do that, add `"headers": { "Authorization": "Bearer <YOUR_APIFY_TOKEN>" }`.
+You'll find your token under **Settings → API & Integrations** in Apify Console.
+
+In Claude Code, run this once:
+
+```bash
+claude mcp add --transport http companies-hiring "https://mcp.apify.com?tools=viridian_layout_ea2/companies-hiring-leads"
+```
+
+Then ask in plain English, for example:
+
+- *"Which US companies are hiring Salesforce administrators or developers right now? Biggest hirers first."*
+- *"Find mid-size companies that posted SDR or BDR roles in the last 30 days."*
+- *"Which of these companies are hiring security engineers: Datadog, Snowflake, HubSpot, Okta?"*
+
+Runs started by an agent are billed exactly like any other run, at $20 per 1,000 companies
+($14–$18 on paid Apify plans). Ask it to set `maxCompanies` if you want a hard cap.
+
 ## Notes
 
 - **Coverage.** The index covers companies that post jobs on their own career site through

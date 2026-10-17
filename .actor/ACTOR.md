@@ -134,6 +134,41 @@ run before charging, so filtered-out roles are never billed.
 { "useCuratedList": true, "includeDescription": false, "maxJobs": 2000 }
 ```
 
+## Use it from Claude, Cursor or any AI agent (MCP)
+
+Apify's hosted MCP server lets an AI assistant run this Actor as a tool. It writes the
+input from a plain-English request and reads back the results. Add this to your client's
+MCP settings (Claude Desktop, Cursor, VS Code, Windsurf and others):
+
+```json
+{
+  "mcpServers": {
+    "greenhouse-lever-ashby-jobs": {
+      "url": "https://mcp.apify.com?tools=viridian_layout_ea2/company-career-site-jobs"
+    }
+  }
+}
+```
+
+The first time it connects, a browser window opens so you can sign in to Apify. If your
+client can't do that, add `"headers": { "Authorization": "Bearer <YOUR_APIFY_TOKEN>" }`.
+You'll find your token under **Settings → API & Integrations** in Apify Console.
+
+In Claude Code, run this once:
+
+```bash
+claude mcp add --transport http greenhouse-lever-ashby-jobs "https://mcp.apify.com?tools=viridian_layout_ea2/company-career-site-jobs"
+```
+
+Then ask in plain English, for example:
+
+- *"Get every open role at Stripe, Ramp and Figma posted in the last 7 days, with salaries."*
+- *"Which startups on the curated list have remote engineering roles paying over $180k? Make a table."*
+- *"List Anthropic's open roles by department, titles and links only."*
+
+Runs started by an agent are billed exactly like any other run, at $1.50 per 1,000 jobs.
+Ask it to set `maxJobs` if you want a hard cap.
+
 ## A note on `remote`
 
 Applicant tracking systems disagree about what "remote" means. Ashby flagged 112

@@ -108,6 +108,41 @@ Platform usage is included, so you are not billed for compute separately.
 { "countries": ["AU"], "onlyNewSinceLastRun": true, "maxResults": 5000 }
 ```
 
+## Use it from Claude, Cursor or any AI agent (MCP)
+
+Apify's hosted MCP server lets an AI assistant run this Actor as a tool. It writes the
+input from a plain-English request and reads back the results. Add this to your client's
+MCP settings (Claude Desktop, Cursor, VS Code, Windsurf and others):
+
+```json
+{
+  "mcpServers": {
+    "shopify-store-leads": {
+      "url": "https://mcp.apify.com?tools=viridian_layout_ea2/shopify-store-leads"
+    }
+  }
+}
+```
+
+The first time it connects, a browser window opens so you can sign in to Apify. If your
+client can't do that, add `"headers": { "Authorization": "Bearer <YOUR_APIFY_TOKEN>" }`.
+You'll find your token under **Settings → API & Integrations** in Apify Console.
+
+In Claude Code, run this once:
+
+```bash
+claude mcp add --transport http shopify-store-leads "https://mcp.apify.com?tools=viridian_layout_ea2/shopify-store-leads"
+```
+
+Then ask in plain English, for example:
+
+- *"Find US coffee stores on Shopify that list an email address."*
+- *"Which skincare brands added 10 or more products this month? Biggest catalogs first."*
+- *"List UK Shopify stores that use Klaviyo and were active in the last 30 days, with their Instagram links."*
+
+Runs started by an agent are billed exactly like any other run, at the price shown under
+**Pricing**. Ask it to set `maxResults` if you want a hard cap.
+
 ## Notes
 
 - **How stores are found.** A store on its own domain points that domain at Shopify. We

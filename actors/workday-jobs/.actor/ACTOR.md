@@ -175,6 +175,41 @@ so the two datasets can be combined.
 { "useCuratedList": true, "companyKeywords": ["health", "hospital"], "titleKeywords": ["nurse", "rn"], "locationKeywords": ["TX", "Texas"] }
 ```
 
+## Use it from Claude, Cursor or any AI agent (MCP)
+
+Apify's hosted MCP server lets an AI assistant run this Actor as a tool. It writes the
+input from a plain-English request and reads back the results. Add this to your client's
+MCP settings (Claude Desktop, Cursor, VS Code, Windsurf and others):
+
+```json
+{
+  "mcpServers": {
+    "workday-jobs": {
+      "url": "https://mcp.apify.com?tools=viridian_layout_ea2/workday-jobs-scraper"
+    }
+  }
+}
+```
+
+The first time it connects, a browser window opens so you can sign in to Apify. If your
+client can't do that, add `"headers": { "Authorization": "Bearer <YOUR_APIFY_TOKEN>" }`.
+You'll find your token under **Settings → API & Integrations** in Apify Console.
+
+In Claude Code, run this once:
+
+```bash
+claude mcp add --transport http workday-jobs "https://mcp.apify.com?tools=viridian_layout_ea2/workday-jobs-scraper"
+```
+
+Then ask in plain English, for example:
+
+- *"Get every engineering role NVIDIA posted on its Workday site in the last week."*
+- *"Find nursing jobs in Texas at the hospital systems in the built-in list, with pay where stated."*
+- *"Pull all open roles from https://cvshealth.wd1.myworkdayjobs.com/CVS_Health_Careers and summarise them by state."*
+
+Runs started by an agent are billed exactly like any other run, at $1.50 per 1,000 jobs.
+Ask it to set `maxJobs` if you want a hard cap.
+
 ## Notes
 
 - Career sites that are unreachable or have no matching roles are skipped. One bad site

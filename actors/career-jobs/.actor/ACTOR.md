@@ -175,6 +175,41 @@ Actors, which fetch a company's jobs live when you need the very latest.
 { "companyKeywords": ["Morgan Stanley", "Stripe"], "maxJobs": 10000 }
 ```
 
+## Use it from Claude, Cursor or any AI agent (MCP)
+
+Apify's hosted MCP server lets an AI assistant run this Actor as a tool. It writes the
+input from a plain-English request and reads back the results. Add this to your client's
+MCP settings (Claude Desktop, Cursor, VS Code, Windsurf and others):
+
+```json
+{
+  "mcpServers": {
+    "career-jobs": {
+      "url": "https://mcp.apify.com?tools=viridian_layout_ea2/career-site-jobs-api"
+    }
+  }
+}
+```
+
+The first time it connects, a browser window opens so you can sign in to Apify. If your
+client can't do that, add `"headers": { "Authorization": "Bearer <YOUR_APIFY_TOKEN>" }`.
+You'll find your token under **Settings → API & Integrations** in Apify Console.
+
+In Claude Code, run this once:
+
+```bash
+claude mcp add --transport http career-jobs "https://mcp.apify.com?tools=viridian_layout_ea2/career-site-jobs-api"
+```
+
+Then ask in plain English, for example:
+
+- *"Find registered nurse jobs in Ohio posted in the last 3 days that state an hourly rate."*
+- *"Which companies posted remote data engineer roles paying over $150k this week? Make a table."*
+- *"List every open role at Morgan Stanley and Stripe, with titles and links only."*
+
+Runs started by an agent are billed exactly like any other run, at $2 per 1,000 jobs.
+Ask it to set `maxJobs` if you want a hard cap.
+
 ## Notes
 
 - Pay is read from each posting's own text, so it is as accurate as the posting. When a

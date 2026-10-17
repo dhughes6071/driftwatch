@@ -154,6 +154,41 @@ new operating companies (about 290) costs about $5.80.
 { "filedFrom": "2026-10-13", "filedTo": "2026-10-13", "companyType": "all", "includeAmendments": true, "latestPerCompany": false, "maxResults": 2000 }
 ```
 
+## Use it from Claude, Cursor or any AI agent (MCP)
+
+Apify's hosted MCP server lets an AI assistant run this Actor as a tool. It writes the
+input from a plain-English request and reads back the results. Add this to your client's
+MCP settings (Claude Desktop, Cursor, VS Code, Windsurf and others):
+
+```json
+{
+  "mcpServers": {
+    "form-d-funding": {
+      "url": "https://mcp.apify.com?tools=viridian_layout_ea2/sec-form-d-funding-tracker"
+    }
+  }
+}
+```
+
+The first time it connects, a browser window opens so you can sign in to Apify. If your
+client can't do that, add `"headers": { "Authorization": "Bearer <YOUR_APIFY_TOKEN>" }`.
+You'll find your token under **Settings → API & Integrations** in Apify Console.
+
+In Claude Code, run this once:
+
+```bash
+claude mcp add --transport http form-d-funding "https://mcp.apify.com?tools=viridian_layout_ea2/sec-form-d-funding-tracker"
+```
+
+Then ask in plain English, for example:
+
+- *"Which tech startups in California raised $1M or more in the last 30 days? Sort by amount raised."*
+- *"List health-care companies founded in the last 3 years that filed a Form D this week, with their executives."*
+- *"Show me new venture capital funds that started raising this month."*
+
+Runs started by an agent are billed exactly like any other run, at $20 per 1,000 filings
+($14–$18 on paid Apify plans). Ask it to set `maxResults` if you want a hard cap.
+
 ## Notes
 
 - **What Form D covers.** Private raises under Regulation D, the exemption most startups,
