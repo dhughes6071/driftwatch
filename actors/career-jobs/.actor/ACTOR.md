@@ -1,7 +1,7 @@
 # Career Site Jobs API — 1.7M+ Jobs with Salaries
 
 Search **more than 1.7 million open jobs from 19,000+ companies' own career sites** (not job boards)
-in seconds. Workday, Oracle, Greenhouse, Lever and 11 more hiring systems, refreshed every
+in seconds. Workday, Oracle, Greenhouse, Lever and 13 more hiring systems, refreshed every
 night. Get job titles, companies, locations, posting dates, descriptions, and salaries where
 the posting states them (more than 500,000 jobs), as clean JSON, CSV or Excel. You don't
 need any coding, proxies or servers.
@@ -52,27 +52,32 @@ Oracle Recruiting Cloud (JPMorgan Chase, Marriott, Kroger, Hilton, Macy's); mid-
 companies through SmartRecruiters (Bosch, Domino's, Accor), UKG (Buc-ee's, Big 5 Sporting
 Goods, Ollie's) or Jobvite (JBS, Pilgrim's, MedVet); startups and small businesses through
 Greenhouse, Workable, Ashby, Lever, BambooHR, Rippling, Breezy, Personio, Teamtailor and
-Recruitee. This Actor covers all of them with one set of output fields.
+Recruitee. Large US hospital systems are included too, such as Ascension, SSM Health, Sutter
+Health, Baylor Scott & White, Duke Health, BJC HealthCare and MedStar Health, including the
+ones on Phenom and iCIMS (Jibe) career sites. This Actor covers all of them with one set of
+output fields.
 
 | System | Jobs |
 |---|---:|
-| Workday | 870,000+ |
-| Oracle Recruiting Cloud | 310,000+ |
-| SmartRecruiters | 230,000+ |
-| UKG Pro (UltiPro) | 107,000+ |
-| Greenhouse | 91,000+ |
-| Workable | 62,000+ |
-| Ashby | 33,000+ |
-| BambooHR | 28,000+ |
+| Workday | 890,000+ |
+| Oracle Recruiting Cloud | 300,000+ |
+| SmartRecruiters | 220,000+ |
+| UKG Pro (UltiPro) | 108,000+ |
+| Greenhouse | 89,000+ |
+| Workable | 63,000+ |
+| Ashby | 32,000+ |
+| BambooHR | 27,000+ |
 | Breezy HR | 19,000+ |
 | Personio | 12,000+ |
 | Recruitee | 12,000+ |
 | Jobvite | 10,000+ |
 | Teamtailor | 10,000+ |
 | Rippling | 9,500+ |
+| Phenom career sites | 6,000+ |
+| iCIMS (Jibe career sites) | 5,500+ |
 | Lever | 3,000+ |
 
-*Counts from the 30 Sep 2026 index; they change daily.*
+*Counts from the 17 Oct 2026 index; they change daily.*
 
 ## Why this one
 
@@ -119,7 +124,7 @@ included, so you are not billed for compute separately.
 | `onlyWithSalary` | Only roles whose posting states pay. |
 | `minAnnualSalary` | Only roles whose pay range reaches at least this per year, in the job's own currency (hourly × 2,080, monthly × 12). |
 | `salaryCurrencies` | Only roles paying in these currencies, e.g. `USD`, `GBP`. |
-| `sources` | Limit to any of the 15 systems (`workday`, `oracle`, `smartrecruiters`, `ukg`, `greenhouse`, `workable`, `ashby`, `lever`, `bamboohr`, `breezy`, `personio`, `rippling`, `teamtailor`, `recruitee`, `jobvite`). |
+| `sources` | Limit to any of the 17 systems (`workday`, `oracle`, `smartrecruiters`, `ukg`, `greenhouse`, `workable`, `ashby`, `lever`, `bamboohr`, `breezy`, `personio`, `rippling`, `teamtailor`, `recruitee`, `jobvite`, `phenom`, `icims`). |
 | `includeDescription` | Adds the job description as plain text (up to 8,000 characters). |
 | `maxJobs` / `maxJobsPerCompany` | Caps on results, and your cost control. |
 
@@ -141,7 +146,7 @@ included, so you are not billed for compute separately.
 | `salaryText` / `salarySource` | The text it came from ("$120,000 - $150,000"), and whether it was published as data (`structured`) or read from the description |
 | `url` | Apply link on the company's own career site |
 | `description` | Plain-text description (optional) |
-| `ats` | Which of the 15 systems the role came from |
+| `ats` | Which of the 17 systems the role came from (e.g. `workday`, `greenhouse`, `phenom`, `icims`) |
 | `indexedAt` | When the index this run read was built |
 
 The field names match our [Workday](https://apify.com/viridian_layout_ea2/workday-jobs-scraper)

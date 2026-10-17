@@ -106,7 +106,9 @@
           "recruitee",
           "ukg",
           "workable",
-          "jobvite"
+          "jobvite",
+          "phenom",
+          "icims"
         ],
         "enumTitles": [
           "Workday",
@@ -123,7 +125,9 @@
           "Recruitee",
           "UKG Pro (UltiPro)",
           "Workable",
-          "Jobvite"
+          "Jobvite",
+          "Phenom career sites",
+          "iCIMS (Jibe career sites)"
         ]
       },
       "default": []
