@@ -52,6 +52,8 @@ test("the crawl's pre-build id matches the id build() produces, for every small 
     ukg: ["recruiting2.ultipro.com|AAM1000AAM|c5a88c41", { Id: "6f0e", Title: "Engineer" }],
     workable: ["Acme", { shortcode: "ABC123", title: "Engineer" }],
     jobvite: ["Acme", { id: "oAAA1", title: "Engineer", location: null, department: null }],
+    phenom: ["jobs.bswhealth.com", { jobId: "26018737", jobSeqNo: "BSWHUS26018737EXTERNALENUS", title: "Engineer" }],
+    icims: ["jobs.bjc.org", { slug: "28963", req_id: "28963", title: "Engineer" }],
   };
   for (const src of SMALL_SOURCES) {
     const s = samples[src.ats];

@@ -24,7 +24,7 @@ export const DESC_CHUNK_SIZE = 4_000;
 export type Source =
   | "greenhouse" | "ashby" | "lever" | "workday" | "oracle" | "smartrecruiters"
   | "bamboohr" | "breezy" | "personio" | "rippling" | "teamtailor" | "recruitee" | "ukg"
-  | "workable" | "jobvite";
+  | "workable" | "jobvite" | "phenom" | "icims";
 
 /** One job as stored in the index. Same field names as our other two Actors. */
 export interface IndexJob {

@@ -51,7 +51,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const NONPROD = /-(dev|test|tst|stg|stage|staging|uat|sit|qa|pre|preprod|demo|sandbox|trn|train)\d*$/i;
   const TEST_DATA_HOSTS = new Set(["eubt.fa.oraclecloud.com"]); // gibberish postings, 27 Sep 2026
   // Known sites Common Crawl misses. JPMorgan Chase (7,496 roles) was absent from every crawl checked.
-  for (const known of [{ host: "jpmc.fa.oraclecloud.com", site: "CX_1001" }]) {
+  // Ascension (3,449 roles) is linked only from its Phenom career site, added 16 Oct 2026.
+  for (const known of [{ host: "jpmc.fa.oraclecloud.com", site: "CX_1001" }, { host: "ibpcjb.fa.ocs.oraclecloud.com", site: "CX_1" }]) {
     if (!oracleSites.some((s) => s.host === known.host)) {
       const r = await O.listPage(known, 0, 1);
       if (r && r.total > 0) oracleSites.push({ ...known, name: prev.get(`${known.host}|${known.site}`.toLowerCase()), jobCount: r.total });

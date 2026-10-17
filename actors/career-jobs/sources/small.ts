@@ -10,6 +10,8 @@
  *   recruitee   https://{co}.recruitee.com/api/offers/                           JSON, includes descriptions
  *   workable    https://apply.workable.com/api/v1/widget/accounts/{co}?details=true  JSON, all jobs with descriptions (added 29 Sep)
  *   jobvite     https://jobs.jobvite.com/{co}/jobs (+ /job/{id})                 HTML only; the list page shows every job (added 29 Sep)
+ *   phenom      POST https://{host}/widgets (+ /us/en/job/{id})                   JSON list, description in the job page (added 16 Oct)
+ *   icims       https://{host}/api/jobs  -- Jibe career sites of iCIMS customers  JSON, includes descriptions (added 16 Oct)
  *
  * Skipped: JazzHR serves HTML only on few companies; Paylocity's feed returned
  * no jobs for any sample.
@@ -723,9 +725,226 @@ export const jobvite: SmallSource<JobviteRow> = {
   },
 };
 
+// ------------------------------------------------------------------ Phenom
+
+/**
+ * Phenom is a career-site front end used by large employers, hospital systems
+ * especially. Behind it can sit Workday, Oracle, Taleo or anything else; the
+ * sites whose back end we already crawl (Workday, Oracle) are crawled there
+ * instead, and this covers the rest (Taleo: Baylor Scott & White). Verified 16 Oct 2026:
+ *
+ *   list:   POST https://{host}/widgets  {"ddoKey":"refineSearch","from":N,"size":100,...}   JSON
+ *   detail: GET  https://{host}/us/en/job/{jobId}  -- the description sits in the page's phApp.ddo JSON
+ *
+ * The registry id is the career-site host ("jobs.bswhealth.com").
+ */
+export interface PhenomRow {
+  jobId: string;
+  jobSeqNo?: string;
+  title?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  cityStateCountry?: string;
+  multi_location?: string[];
+  category?: string;
+  department?: string;
+  type?: string;
+  postedDate?: string;
+  dateCreated?: string;
+}
+
+/** Phenom returns at most 500 jobs per request. */
+const PHENOM_PAGE = 500;
+/**
+ * Paging with `from` is unstable: the same job comes back on several pages and
+ * others never do (Baylor Scott & White: 2,297 hits, ~2,000 distinct, 16 Oct).
+ * So the list is split by facet until every slice fits in one request:
+ * category, then city. That returned every job (2,297 of 2,297).
+ */
+const PHENOM_SPLIT = ["category", "city"];
+
+/** "jobs.bswhealth.com" -> "bswhealth": the company part of job ids. */
+export const hostKey = (host: string) => {
+  const parts = host.toLowerCase().split(".");
+  return parts.length >= 2 ? parts[parts.length - 2] : host.toLowerCase();
+};
+
+type PhenomPage = { totalHits?: number; data?: { jobs?: PhenomRow[]; aggregations?: Array<{ field: string; value: Record<string, number> }> } };
+
+async function phenomQuery(host: string, selected: Record<string, string[]>, facet: string | undefined, from = 0): Promise<PhenomPage | null> {
+  const r = await getJson<{ refineSearch?: PhenomPage }>(`https://${host}/widgets`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      lang: "en_us", deviceType: "desktop", country: "us", pageName: "search-results", ddoKey: "refineSearch",
+      from, size: PHENOM_PAGE, jobs: true, counts: !!facet, all_fields: facet ? [facet] : [], siteType: "external",
+      keywords: "", global: true, selected_fields: selected, locationData: {},
+    }),
+  });
+  return r?.refineSearch?.data?.jobs ? r.refineSearch : null;
+}
+
+/** Every job matching `selected`, splitting by the next facet while a slice is too big for one request. */
+async function phenomSlice(host: string, selected: Record<string, string[]>, depth: number): Promise<PhenomRow[] | null> {
+  const facet = PHENOM_SPLIT[depth];
+  const r = await phenomQuery(host, selected, facet);
+  if (!r) return null;
+  const jobs = r.data!.jobs!;
+  if ((r.totalHits ?? 0) <= PHENOM_PAGE) return jobs;
+  if (!facet) {
+    // Still too big after every split: page through it and accept the overlap.
+    const rows = [...jobs];
+    for (let from = PHENOM_PAGE; from < (r.totalHits ?? 0); from += PHENOM_PAGE) {
+      const p = await phenomQuery(host, selected, undefined, from);
+      if (!p) return null;
+      rows.push(...p.data!.jobs!);
+    }
+    return rows;
+  }
+  // Jobs with no value for this facet are in `jobs` only, so keep those too.
+  const rows = [...jobs];
+  const values = r.data!.aggregations?.find((a) => a.field === facet)?.value ?? {};
+  for (const v of Object.keys(values)) {
+    const part = await phenomSlice(host, { ...selected, [facet]: [v] }, depth + 1);
+    if (!part) return null;
+    rows.push(...part);
+  }
+  return rows;
+}
+
+/**
+ * "United States, \u200b, United States" -> "United States": drops blank parts and
+ * repeats of the country. "New York, New York, United States" keeps both New Yorks.
+ */
+export const cleanPlace = (s: string) => {
+  const parts = s.split(",").map((x) => x.replace(/[\u200b\u00a0]/g, " ").trim()).filter(Boolean);
+  const last = parts.at(-1);
+  return parts.filter((x, i) => i === parts.length - 1 || x !== last).join(", ");
+};
+
+/** The job object inside a Phenom job page's `phApp.ddo = {...};` script. */
+export function parsePhenomDetail(html: string): { description?: string; postedDate?: string } | null {
+  const m = html.match(/phApp\.ddo\s*=\s*(\{[\s\S]*?\});\s*phApp/);
+  if (!m) return null;
+  try {
+    return (JSON.parse(m[1]) as { jobDetail?: { data?: { job?: { description?: string; postedDate?: string } } } }).jobDetail?.data?.job ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export const phenom: SmallSource<PhenomRow> = {
+  ats: "phenom",
+  companyKey: hostKey,
+  async list(host) {
+    // A slice that fails makes the whole list unreliable (see company-runs.ts), so it fails as a whole.
+    const rows = await phenomSlice(host, {}, 0);
+    if (!rows) return null;
+    const byId = new Map<string, PhenomRow>();
+    for (const p of rows) byId.set(p.jobSeqNo || p.jobId, p);
+    return [...byId.values()];
+  },
+  id: (_host, p) => p.jobSeqNo || p.jobId,
+  async build(host, name, p, now) {
+    const url = `https://${host}/us/en/job/${encodeURIComponent(p.jobId)}`;
+    const html = await getText(url);
+    const d = html ? parsePhenomDetail(html) : null;
+    const locs = (p.multi_location?.length ? p.multi_location : [p.cityStateCountry ?? [p.city, p.state, p.country].filter(Boolean).join(", ")])
+      .map(cleanPlace)
+      .filter(Boolean);
+    const j = job("phenom", hostKey(host), name, {
+      id: p.jobSeqNo || p.jobId,
+      title: p.title,
+      location: locs[0] || null,
+      additional: locs.slice(1),
+      country: p.country ?? null,
+      department: p.category || p.department || null,
+      postedAt: p.postedDate ?? d?.postedDate ?? p.dateCreated,
+      url,
+      employmentType: p.type || null,
+      firstSeenAt: now,
+    });
+    return j && { job: j, description: toText(d?.description) || null };
+  },
+};
+
+// ------------------------------------------------------------------ iCIMS (Jibe career sites)
+
+/**
+ * iCIMS itself has no public job feed, but many large iCIMS customers (BJC,
+ * MedStar, Novant, OSF) run their career site on Jibe, which serves every
+ * job, description included, from one JSON endpoint. Verified 16 Oct 2026:
+ *
+ *   list: GET https://{host}/api/jobs?page=N&limit=100
+ *
+ * The registry id is the career-site host ("jobs.bjc.org").
+ */
+export interface JibeRow {
+  slug?: string;
+  req_id?: string;
+  title?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  country_code?: string;
+  full_location?: string;
+  location_name?: string;
+  posted_date?: string;
+  create_date?: string;
+  employment_type?: string;
+  categories?: Array<{ name?: string }>;
+  department?: string;
+  location_type?: string;
+  description?: string;
+  qualifications?: string;
+  responsibilities?: string;
+}
+
+const JIBE_PAGE = 100;
+
+/** FULL_TIME -> Full time; PER_DIEM -> Per diem. */
+const jibeType = (t: string | undefined) => (t ? t.charAt(0) + t.slice(1).toLowerCase().replace(/_/g, " ") : null);
+
+export const icims: SmallSource<JibeRow> = {
+  ats: "icims",
+  companyKey: hostKey,
+  async list(host) {
+    const rows: JibeRow[] = [];
+    for (let page = 1; page <= 200; page++) {
+      const r = await getJson<{ totalCount?: number; jobs?: Array<{ data?: JibeRow }> }>(
+        `https://${host}/api/jobs?page=${page}&limit=${JIBE_PAGE}`,
+      );
+      if (!r?.jobs) return null;
+      for (const j of r.jobs) if (j.data) rows.push(j.data);
+      if (r.jobs.length < JIBE_PAGE || rows.length >= (r.totalCount ?? 0)) break;
+    }
+    return rows;
+  },
+  id: (_host, p) => String(p.slug ?? p.req_id),
+  async build(host, name, p, now) {
+    const id = String(p.slug ?? p.req_id);
+    const place = [p.full_location || [p.city, p.state].filter(Boolean).join(", "), p.country].filter(Boolean).join(", ");
+    const j = job("icims", hostKey(host), name, {
+      id,
+      title: p.title,
+      location: place || null,
+      country: p.country_code ?? null,
+      workplace: p.location_type || null,
+      department: p.categories?.[0]?.name || p.department || null,
+      postedAt: p.posted_date ?? p.create_date,
+      url: `https://${host}/jobs/${encodeURIComponent(id)}`,
+      employmentType: jibeType(p.employment_type),
+      firstSeenAt: now,
+    });
+    const description = [p.description, p.responsibilities, p.qualifications].filter(Boolean).join("\n");
+    return j && { job: j, description: toText(description) || null };
+  },
+};
+
 /** The index id of a small-source job -- used by the crawl before `build` runs, so it must match `job()`. */
 export const smallJobId = <P>(src: SmallSource<P>, co: string, p: P) =>
   `${src.ats}:${(src.companyKey?.(co) ?? co).toLowerCase()}:${src.id(co, p)}`;
 
 export { ukgParts };
-export const SMALL_SOURCES = [bamboohr, breezy, personio, rippling, teamtailor, recruitee, ukg, workable, jobvite] as SmallSource<unknown>[];
+export const SMALL_SOURCES = [bamboohr, breezy, personio, rippling, teamtailor, recruitee, ukg, workable, jobvite, phenom, icims] as SmallSource<unknown>[];
