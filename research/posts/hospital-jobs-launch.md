@@ -5,8 +5,9 @@ a few days apart, and read each subreddit's rules first: most allow a post that 
 or asks for feedback, but not a plain ad.
 
 **Links to use**
+- US Hospital & Nurse Jobs (new): https://apify.com/viridian_layout_ea2/us-hospital-jobs
 - Career Site Jobs API: https://apify.com/viridian_layout_ea2/career-site-jobs-api
-- Kaggle dataset: fill in once it's published (see section 1)
+- Kaggle dataset (published 17 Oct 2026): https://www.kaggle.com/datasets/dhughes6071/us-hospital-job-postings-with-pay-oct-2026
 
 **Facts to quote**
 - 113,000+ open jobs at 68 large US health systems (Trinity Health, Advocate, AdventHealth, Sanford,
@@ -50,10 +51,11 @@ systems, collected straight from each hospital system's own site, not from job b
 - Each health system is identified by its name, state and bed count from AHRQ's Compendium of U.S.
   Health Systems (2023), so the data joins to public hospital data
 
-The sample comes from a nightly index of 1.8 million open jobs at 19,000+ employers, including
-113,000+ jobs at 68 US health systems, built by CMM Research. The full index, searchable by title,
-location, company and pay, is the
-[Career Site Jobs API](https://apify.com/viridian_layout_ea2/career-site-jobs-api) on Apify.
+The sample comes from a nightly index of 113,000+ open jobs at 68 US health systems, built by
+CMM Research. The full, daily-updated data is the
+[US Hospital & Nurse Jobs](https://apify.com/viridian_layout_ea2/us-hospital-jobs) Actor on Apify,
+filterable by role, unit, shift, per diem / travel, sign-on bonus, state and pay, with only-new
+results for scheduled feeds.
 
 ### Columns
 
@@ -90,7 +92,7 @@ location, company and pay, is the
 > I run a daily crawl of company career sites, and this month I added the big US hospital
 > systems. Here's one week of their postings as a free CSV on Kaggle (CC BY 4.0):
 >
-> [Kaggle link]
+> https://www.kaggle.com/datasets/dhughes6071/us-hospital-job-postings-with-pay-oct-2026
 >
 > - 17,557 jobs posted 10–17 Oct 2026 at 67 health systems in 28 states (Trinity, Advocate,
 >   AdventHealth, Ascension, Tenet, SSM, Sutter, Baylor Scott & White, BJC, MedStar…)
@@ -126,7 +128,7 @@ question, not the product.
 > Would you use something like that? What would you need it to show, and what would it be worth
 > to your team per month? Honest "no, here's why" answers help just as much.
 >
-> (If it helps, a free one-week sample of the raw postings is here: [Kaggle link])
+> (If it helps, a free one-week sample of the raw postings is here: https://www.kaggle.com/datasets/dhughes6071/us-hospital-job-postings-with-pay-oct-2026)
 
 Write down every answer. They're the demand check for the Healthcare Jobs Index.
 
