@@ -22,6 +22,8 @@ import { openDb } from "./crawl.ts";
 import { LIVE_WHERE, liveParams, loadFailing } from "./company-runs.ts";
 import { extractSalary } from "../src/salary.ts";
 import { salaryFields, DESC_CHUNK_SIZE, SHARD_SIZE, type IndexJob, type Manifest, type ShardRef } from "../src/format.ts";
+import { healthSystemFor } from "../src/health.ts";
+import { clinicalTags, type ClinicalTags } from "../src/clinical.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
@@ -102,6 +104,10 @@ export async function publish() {
     .prepare(`SELECT light, chunk, description, first_seen FROM jobs WHERE ${LIVE_WHERE} ORDER BY posted_at IS NULL, posted_at DESC`)
     .iterate(live) as IterableIterator<{ light: string; chunk: string | null; description: string | null; first_seen: string }>;
   let withSalary = 0;
+  // Clinical tags for hospital jobs, read while the description is at hand (the
+  // Healthcare Jobs Actor would otherwise have to download every description).
+  const health: Record<string, ClinicalTags> = {};
+  let healthFailed = 0;
   for (const row of rows) {
     // first_seen is the source of truth: light rows written before the crawl
     // kept it carry the date of the latest crawl instead.
@@ -110,6 +116,13 @@ export async function publish() {
     if (j.salarySource !== "structured") Object.assign(j, salaryFields(extractSalary(row.description, j.country)));
     if (j.salaryMin != null) withSalary++;
     if (j.d) chunkKeys.add(j.d);
+    if (healthSystemFor(j.ats, j.company)) {
+      try {
+        health[j.id] = clinicalTags({ title: j.title, department: j.department, employmentType: j.employmentType, description: row.description });
+      } catch {
+        healthFailed++; // a tagging bug must never stop the publish
+      }
+    }
     companies.add(`${j.ats}:${j.company}`);
     bySource[j.ats] = (bySource[j.ats] ?? 0) + 1;
     total++;
@@ -122,6 +135,13 @@ export async function publish() {
   const desc: Record<string, string> = {};
   for (const k of chunkKeys) desc[k] = await kv.getRecordPublicUrl(k);
 
+  const healthKey = `health-${stamp}`;
+  const healthCount = Object.keys(health).length;
+  if (healthCount) {
+    await kv.setRecord({ key: healthKey, value: gzipSync(JSON.stringify(health)), contentType: "application/gzip" });
+    log(`clinical tags: ${healthCount} hospital jobs${healthFailed ? ` (${healthFailed} failed)` : ""}`);
+  }
+
   const manifest: Manifest = {
     version: 1,
     indexedAt: lastRun.started_at,
@@ -130,6 +150,7 @@ export async function publish() {
     bySource,
     shards,
     desc,
+    ...(healthCount ? { health: { url: await kv.getRecordPublicUrl(healthKey), count: healthCount } } : {}),
   };
   await kv.setRecord({ key: "MANIFEST", value: manifest, contentType: "application/json" });
   const manifestUrl = await kv.getRecordPublicUrl("MANIFEST");
@@ -141,7 +162,7 @@ export async function publish() {
   log(`MANIFEST: ${total} jobs, ${manifest.companies} companies, ${shards.length} shards, ${chunkKeys.size} description chunks`);
 
   // ---------------------------------------------------------- 4. clean up
-  const keep = new Set(["MANIFEST", ...shards.map((s) => s.key), ...chunkKeys]);
+  const keep = new Set(["MANIFEST", ...shards.map((s) => s.key), ...chunkKeys, ...(healthCount ? [healthKey] : [])]);
   let removed = 0;
   let exclusiveStartKey: string | undefined;
   do {

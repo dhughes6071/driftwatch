@@ -1,0 +1,5889 @@
+[
+{
+"id": "HSI00000492",
+"name": "HCA Healthcare",
+"city": "Nashville",
+"state": "TN",
+"hospitals": 185,
+"beds": 37395,
+"sources": []
+},
+{
+"id": "HSI00001427",
+"name": "CommonSpirit Health",
+"city": "Chicago",
+"state": "IL",
+"hospitals": 145,
+"beds": 16679,
+"sources": []
+},
+{
+"id": "HSI00000055",
+"name": "Ascension Health",
+"city": "Saint Louis",
+"state": "MO",
+"hospitals": 120,
+"beds": 15162,
+"sources": [
+"oracle:ibpcjb"
+]
+},
+{
+"id": "HSI00001106",
+"name": "Trinity Health",
+"city": "Livonia",
+"state": "MI",
+"hospitals": 105,
+"beds": 14914,
+"sources": [
+"workday:trinityhealth"
+]
+},
+{
+"id": "HSI00001066",
+"name": "Tenet Healthcare",
+"city": "Dallas",
+"state": "TX",
+"hospitals": 77,
+"beds": 12073,
+"sources": [
+"oracle:eodr"
+]
+},
+{
+"id": "HSI00001526",
+"name": "Advocate Health",
+"city": "Charlotte",
+"state": "NC",
+"hospitals": 58,
+"beds": 10615,
+"sources": [
+"workday:aah"
+]
+},
+{
+"id": "HSI00000536",
+"name": "Kaiser Permanente",
+"city": "Oakland",
+"state": "CA",
+"hospitals": 41,
+"beds": 9337,
+"sources": []
+},
+{
+"id": "HSI00000852",
+"name": "Providence",
+"city": "Renton",
+"state": "WA",
+"hospitals": 54,
+"beds": 9256,
+"sources": [
+"oracle:evac"
+]
+},
+{
+"id": "HSI00000249",
+"name": "Community Health Systems",
+"city": "Franklin",
+"state": "TN",
+"hospitals": 81,
+"beds": 9046,
+"sources": [
+"oracle:fa-evxo-saasfaprod1"
+]
+},
+{
+"id": "HSI00000010",
+"name": "AdventHealth",
+"city": "Altamonte Springs",
+"state": "FL",
+"hospitals": 42,
+"beds": 8809,
+"sources": [
+"workday:adventhealth"
+]
+},
+{
+"id": "HSI00000845",
+"name": "Prime Healthcare Services",
+"city": "Ontario",
+"state": "CA",
+"hospitals": 45,
+"beds": 6324,
+"sources": []
+},
+{
+"id": "HSI00001148",
+"name": "Universal Health Services",
+"city": "Norristown",
+"state": "PA",
+"hospitals": 158,
+"beds": 6023,
+"sources": []
+},
+{
+"id": "HSI00001126",
+"name": "UPMC",
+"city": "Pittsburgh",
+"state": "PA",
+"hospitals": 34,
+"beds": 5972,
+"sources": []
+},
+{
+"id": "HSI00000584",
+"name": "Lifepoint Health",
+"city": "Brentwood",
+"state": "TN",
+"hospitals": 79,
+"beds": 5841,
+"sources": [
+"oracle:ibnjjb"
+]
+},
+{
+"id": "HSI00001428",
+"name": "Bon Secours Mercy Health",
+"city": "Cincinnati",
+"state": "OH",
+"hospitals": 37,
+"beds": 5641,
+"sources": [
+"workday:easyservice"
+]
+},
+{
+"id": "HSI00000767",
+"name": "Northwell Health",
+"city": "New Hyde Park",
+"state": "NY",
+"hospitals": 19,
+"beds": 5412,
+"sources": [
+"oracle:eppr"
+]
+},
+{
+"id": "HSI00000073",
+"name": "Banner Health",
+"city": "Phoenix",
+"state": "AZ",
+"hospitals": 33,
+"beds": 5258,
+"sources": [
+"workday:bannerhealth"
+]
+},
+{
+"id": "HSI00001037",
+"name": "Steward Health Care System",
+"city": "Dallas",
+"state": "TX",
+"hospitals": 36,
+"beds": 5050,
+"sources": []
+},
+{
+"id": "HSI00001078",
+"name": "Cleveland Clinic",
+"city": "Cleveland",
+"state": "OH",
+"hospitals": 21,
+"beds": 5048,
+"sources": [
+"workday:ccf"
+]
+},
+{
+"id": "HSI00001021",
+"name": "Corewell Health",
+"city": "Grand Rapids",
+"state": "MI",
+"hospitals": 23,
+"beds": 4623,
+"sources": [
+"workday:spectrumhealth"
+]
+},
+{
+"id": "HSI00000660",
+"name": "Mercy",
+"city": "Chesterfield",
+"state": "MO",
+"hospitals": 45,
+"beds": 4363,
+"sources": []
+},
+{
+"id": "HSI00000902",
+"name": "SSM Health",
+"city": "Saint Louis",
+"state": "MO",
+"hospitals": 40,
+"beds": 4017,
+"sources": [
+"workday:ssmh"
+]
+},
+{
+"id": "HSI00000863",
+"name": "RWJBarnabas Health",
+"city": "West Orange",
+"state": "NJ",
+"hospitals": 16,
+"beds": 3966,
+"sources": []
+},
+{
+"id": "HSI00000516",
+"name": "Intermountain Healthcare",
+"city": "Salt Lake City",
+"state": "UT",
+"hospitals": 33,
+"beds": 3938,
+"sources": [
+"workday:imh"
+]
+},
+{
+"id": "HSI00000152",
+"name": "Christus Health",
+"city": "Irving",
+"state": "TX",
+"hospitals": 32,
+"beds": 3916,
+"sources": []
+},
+{
+"id": "HSI00000096",
+"name": "Baylor Scott and White Health",
+"city": "Dallas",
+"state": "TX",
+"hospitals": 31,
+"beds": 3840,
+"sources": [
+"phenom:bswhealth"
+]
+},
+{
+"id": "HSI00000826",
+"name": "Piedmont Healthcare",
+"city": "Atlanta",
+"state": "GA",
+"hospitals": 19,
+"beds": 3643,
+"sources": []
+},
+{
+"id": "HSI00000654",
+"name": "Memorial Hermann Healthcare System",
+"city": "Houston",
+"state": "TX",
+"hospitals": 11,
+"beds": 3548,
+"sources": []
+},
+{
+"id": "HSI00001168",
+"name": "University of California Health",
+"city": "Oakland",
+"state": "CA",
+"hospitals": 12,
+"beds": 3497,
+"sources": []
+},
+{
+"id": "HSI00000731",
+"name": "New York Presbyterian Healthcare System",
+"city": "New York",
+"state": "NY",
+"hospitals": 8,
+"beds": 3454,
+"sources": [
+"workday:nyp"
+]
+},
+{
+"id": "HSI00001050",
+"name": "Sutter Health",
+"city": "Sacramento",
+"state": "CA",
+"hospitals": 27,
+"beds": 3440,
+"sources": [
+"workday:sutterhealth"
+]
+},
+{
+"id": "HSI00000780",
+"name": "Ochsner Health System",
+"city": "New Orleans",
+"state": "LA",
+"hospitals": 36,
+"beds": 3280,
+"sources": [
+"workday:ochsner"
+]
+},
+{
+"id": "HSI00000048",
+"name": "Jefferson Health",
+"city": "Philadelphia",
+"state": "PA",
+"hospitals": 9,
+"beds": 3181,
+"sources": [
+"workday:jeffersonhealth"
+]
+},
+{
+"id": "HSI00000070",
+"name": "BJC Healthcare",
+"city": "Saint Louis",
+"state": "MO",
+"hospitals": 16,
+"beds": 3180,
+"sources": [
+"icims:bjc"
+]
+},
+{
+"id": "HSI00001072",
+"name": "Texas Health Resources",
+"city": "Arlington",
+"state": "TX",
+"hospitals": 21,
+"beds": 3165,
+"sources": []
+},
+{
+"id": "HSI00001123",
+"name": "UNC Health Care System",
+"city": "Chapel Hill",
+"state": "NC",
+"hospitals": 15,
+"beds": 3143,
+"sources": []
+},
+{
+"id": "HSI00000730",
+"name": "New York City Health and Hospitals Corporation",
+"city": "New York",
+"state": "NY",
+"hospitals": 12,
+"beds": 3096,
+"sources": []
+},
+{
+"id": "HSI00000439",
+"name": "Hackensack Meridian Health",
+"city": "Edison",
+"state": "NJ",
+"hospitals": 13,
+"beds": 3075,
+"sources": []
+},
+{
+"id": "HSI00000011",
+"name": "Adventist Health",
+"city": "Roseville",
+"state": "CA",
+"hospitals": 28,
+"beds": 2976,
+"sources": [
+"oracle:ecvz"
+]
+},
+{
+"id": "HSI00000773",
+"name": "Novant Health",
+"city": "Winston Salem",
+"state": "NC",
+"hospitals": 13,
+"beds": 2976,
+"sources": [
+"icims:novanthealth"
+]
+},
+{
+"id": "HSI00000820",
+"name": "University of Pennsylvania Health System",
+"city": "Philadelphia",
+"state": "PA",
+"hospitals": 9,
+"beds": 2929,
+"sources": []
+},
+{
+"id": "HSI00000046",
+"name": "Ardent Health Services",
+"city": "Brentwood",
+"state": "TN",
+"hospitals": 31,
+"beds": 2800,
+"sources": []
+},
+{
+"id": "HSI00000631",
+"name": "Mayo Clinic Health System",
+"city": "Rochester",
+"state": "MN",
+"hospitals": 26,
+"beds": 2792,
+"sources": []
+},
+{
+"id": "HSI00000813",
+"name": "Mass General Brigham",
+"city": "Boston",
+"state": "MA",
+"hospitals": 15,
+"beds": 2729,
+"sources": [
+"workday:massgeneralbrigham"
+]
+},
+{
+"id": "HSI00001081",
+"name": "Houston Methodist",
+"city": "Houston",
+"state": "TX",
+"hospitals": 8,
+"beds": 2653,
+"sources": []
+},
+{
+"id": "HSI00000510",
+"name": "Indiana University Health",
+"city": "Indianapolis",
+"state": "IN",
+"hospitals": 14,
+"beds": 2429,
+"sources": [
+"oracle:ekcm"
+]
+},
+{
+"id": "HSI00000711",
+"name": "Mount Sinai Health System",
+"city": "New York",
+"state": "NY",
+"hospitals": 5,
+"beds": 2429,
+"sources": [
+"oracle:ejis"
+]
+},
+{
+"id": "HSI00001121",
+"name": "UF Health",
+"city": "Gainesville",
+"state": "FL",
+"hospitals": 5,
+"beds": 2417,
+"sources": []
+},
+{
+"id": "HSI00001146",
+"name": "Unitypoint Health",
+"city": "West Des Moines",
+"state": "IA",
+"hospitals": 29,
+"beds": 2413,
+"sources": []
+},
+{
+"id": "HSI00000640",
+"name": "MedStar Health",
+"city": "Columbia",
+"state": "MD",
+"hospitals": 10,
+"beds": 2405,
+"sources": [
+"icims:medstarhealth"
+]
+},
+{
+"id": "HSI00000531",
+"name": "Johns Hopkins Health System",
+"city": "Baltimore",
+"state": "MD",
+"hospitals": 6,
+"beds": 2402,
+"sources": []
+},
+{
+"id": "HSI00001156",
+"name": "University Hospitals",
+"city": "Shaker Heights",
+"state": "OH",
+"hospitals": 17,
+"beds": 2376,
+"sources": []
+},
+{
+"id": "HSI00000700",
+"name": "Montefiore Medical Center",
+"city": "Bronx",
+"state": "NY",
+"hospitals": 8,
+"beds": 2370,
+"sources": [
+"workday:montefiore"
+]
+},
+{
+"id": "HSI00001251",
+"name": "West Virginia University Health System",
+"city": "Morgantown",
+"state": "WV",
+"hospitals": 23,
+"beds": 2370,
+"sources": [
+"workday:wvumedicine"
+]
+},
+{
+"id": "HSI00000081",
+"name": "Baptist Memorial Health Care Corporation",
+"city": "Memphis",
+"state": "TN",
+"hospitals": 21,
+"beds": 2368,
+"sources": [
+"oracle:fa-ewpe-saasfaprod1"
+]
+},
+{
+"id": "HSI00000972",
+"name": "Sentara Healthcare",
+"city": "Norfolk",
+"state": "VA",
+"hospitals": 13,
+"beds": 2314,
+"sources": [
+"workday:sentara"
+]
+},
+{
+"id": "HSI00001175",
+"name": "University of Maryland Medical System",
+"city": "Baltimore",
+"state": "MD",
+"hospitals": 13,
+"beds": 2282,
+"sources": [
+"phenom:umms"
+]
+},
+{
+"id": "HSI00000784",
+"name": "Ohiohealth",
+"city": "Columbus",
+"state": "OH",
+"hospitals": 14,
+"beds": 2280,
+"sources": [
+"workday:ohiohealth"
+]
+},
+{
+"id": "HSI00000770",
+"name": "Northwestern Medicine",
+"city": "Chicago",
+"state": "IL",
+"hospitals": 10,
+"beds": 2272,
+"sources": [
+"smartrecruiters:northwesternmedicine"
+]
+},
+{
+"id": "HSI00000796",
+"name": "Orlando Health",
+"city": "Orlando",
+"state": "FL",
+"hospitals": 5,
+"beds": 2258,
+"sources": []
+},
+{
+"id": "HSI00000342",
+"name": "Emory Healthcare",
+"city": "Atlanta",
+"state": "GA",
+"hospitals": 9,
+"beds": 2250,
+"sources": []
+},
+{
+"id": "HSI00000077",
+"name": "Baptist Health South Florida",
+"city": "Coral Gables",
+"state": "FL",
+"hospitals": 9,
+"beds": 2246,
+"sources": [
+"phenom:baptisthealth"
+]
+},
+{
+"id": "HSI00001272",
+"name": "Yale New Haven Health System",
+"city": "New Haven",
+"state": "CT",
+"hospitals": 7,
+"beds": 2228,
+"sources": []
+},
+{
+"id": "HSI00001416",
+"name": "Beth Israel Lahey Health",
+"city": "Cambridge",
+"state": "MA",
+"hospitals": 10,
+"beds": 2146,
+"sources": [
+"workday:bilh"
+]
+},
+{
+"id": "HSI00001378",
+"name": "Prisma Health",
+"city": "Greenville",
+"state": "SC",
+"hospitals": 12,
+"beds": 2129,
+"sources": [
+"workday:prismahealth"
+]
+},
+{
+"id": "HSI00000025",
+"name": "Allegheny Health Network",
+"city": "Pittsburgh",
+"state": "PA",
+"hospitals": 11,
+"beds": 2082,
+"sources": []
+},
+{
+"id": "HSI00000080",
+"name": "Baptist Healthcare System",
+"city": "Louisville",
+"state": "KY",
+"hospitals": 10,
+"beds": 2045,
+"sources": [
+"workday:bhs"
+]
+},
+{
+"id": "HSI00001169",
+"name": "University of Colorado Health",
+"city": "Aurora",
+"state": "CO",
+"hospitals": 12,
+"beds": 2036,
+"sources": []
+},
+{
+"id": "HSI00000190",
+"name": "Cedars Sinai Health System",
+"city": "West Hollywood",
+"state": "CA",
+"hospitals": 4,
+"beds": 1972,
+"sources": [
+"oracle:hdkk"
+]
+},
+{
+"id": "HSI00000851",
+"name": "Prospect Medical Holdings",
+"city": "Los Angeles",
+"state": "CA",
+"hospitals": 13,
+"beds": 1963,
+"sources": []
+},
+{
+"id": "HSI00000376",
+"name": "Franciscan Missionaries of Our Lady Health System",
+"city": "Baton Rouge",
+"state": "LA",
+"hospitals": 11,
+"beds": 1940,
+"sources": []
+},
+{
+"id": "HSI00000958",
+"name": "Sanford Health",
+"city": "Sioux Falls",
+"state": "SD",
+"hospitals": 41,
+"beds": 1925,
+"sources": [
+"workday:sanford"
+]
+},
+{
+"id": "HSI00000766",
+"name": "Northside Hospital",
+"city": "Atlanta",
+"state": "GA",
+"hospitals": 5,
+"beds": 1908,
+"sources": []
+},
+{
+"id": "HSI00000555",
+"name": "LCMC Health System",
+"city": "New Orleans",
+"state": "LA",
+"hospitals": 11,
+"beds": 1895,
+"sources": []
+},
+{
+"id": "HSI00001244",
+"name": "WellStar Health System",
+"city": "Marietta",
+"state": "GA",
+"hospitals": 9,
+"beds": 1882,
+"sources": [
+"workday:wellstar"
+]
+},
+{
+"id": "HSI00000776",
+"name": "OSF Healthcare System",
+"city": "Peoria",
+"state": "IL",
+"hospitals": 17,
+"beds": 1808,
+"sources": [
+"icims:osfcareers"
+]
+},
+{
+"id": "HSI00001475",
+"name": "ScionHealth",
+"city": "Louisville",
+"state": "KY",
+"hospitals": 82,
+"beds": 1803,
+"sources": []
+},
+{
+"id": "HSI00000475",
+"name": "Henry Ford Health",
+"city": "Detroit",
+"state": "MI",
+"hospitals": 6,
+"beds": 1787,
+"sources": [
+"smartrecruiters:henryfordhealth1"
+]
+},
+{
+"id": "HSI00000717",
+"name": "NYU Langone Health",
+"city": "New York",
+"state": "NY",
+"hospitals": 5,
+"beds": 1780,
+"sources": []
+},
+{
+"id": "HSI00000029",
+"name": "Allina Health",
+"city": "Minneapolis",
+"state": "MN",
+"hospitals": 13,
+"beds": 1759,
+"sources": [
+"workday:allina"
+]
+},
+{
+"id": "HSI00000186",
+"name": "Catholic Health",
+"city": "Rockville Centre",
+"state": "NY",
+"hospitals": 6,
+"beds": 1724,
+"sources": []
+},
+{
+"id": "HSI00000496",
+"name": "Hospital Sisters Health System",
+"city": "Springfield",
+"state": "IL",
+"hospitals": 17,
+"beds": 1705,
+"sources": []
+},
+{
+"id": "HSI00000653",
+"name": "Memorial Healthcare System",
+"city": "Hollywood",
+"state": "FL",
+"hospitals": 5,
+"beds": 1697,
+"sources": [
+"workday:memorialhealthcare"
+]
+},
+{
+"id": "HSI00001177",
+"name": "University of Michigan Health System",
+"city": "Ann Arbor",
+"state": "MI",
+"hospitals": 8,
+"beds": 1697,
+"sources": []
+},
+{
+"id": "HSI00000513",
+"name": "Inova Health System",
+"city": "Falls Church",
+"state": "VA",
+"hospitals": 5,
+"beds": 1682,
+"sources": [
+"oracle:elar"
+]
+},
+{
+"id": "HSI00000577",
+"name": "Lehigh Valley Health Network",
+"city": "Allentown",
+"state": "PA",
+"hospitals": 10,
+"beds": 1679,
+"sources": [
+"workday:lvhn"
+]
+},
+{
+"id": "HSI00000452",
+"name": "Hartford Healthcare",
+"city": "Hartford",
+"state": "CT",
+"hospitals": 10,
+"beds": 1674,
+"sources": []
+},
+{
+"id": "HSI00001165",
+"name": "The University of Texas System",
+"city": "Austin",
+"state": "TX",
+"hospitals": 7,
+"beds": 1672,
+"sources": []
+},
+{
+"id": "HSI00000771",
+"name": "Norton Healthcare",
+"city": "Louisville",
+"state": "KY",
+"hospitals": 7,
+"beds": 1665,
+"sources": []
+},
+{
+"id": "HSI00000575",
+"name": "Lee Health",
+"city": "Fort Myers",
+"state": "FL",
+"hospitals": 3,
+"beds": 1659,
+"sources": []
+},
+{
+"id": "HSI00000357",
+"name": "Fairview Health Services",
+"city": "Minneapolis",
+"state": "MN",
+"hospitals": 13,
+"beds": 1636,
+"sources": []
+},
+{
+"id": "HSI00001284",
+"name": "Ballad Health",
+"city": "Johnson City",
+"state": "TN",
+"hospitals": 22,
+"beds": 1635,
+"sources": []
+},
+{
+"id": "HSI00000860",
+"name": "Quorum Health Corporation",
+"city": "Brentwood",
+"state": "TN",
+"hospitals": 39,
+"beds": 1631,
+"sources": []
+},
+{
+"id": "HSI00000523",
+"name": "Jackson Health System",
+"city": "Miami",
+"state": "FL",
+"hospitals": 3,
+"beds": 1608,
+"sources": []
+},
+{
+"id": "HSI00000977",
+"name": "Sharp Healthcare",
+"city": "San Diego",
+"state": "CA",
+"hospitals": 6,
+"beds": 1601,
+"sources": [
+"workday:sharp"
+]
+},
+{
+"id": "HSI00000636",
+"name": "McLaren Health Care Corporation",
+"city": "Grand Blanc",
+"state": "MI",
+"hospitals": 13,
+"beds": 1600,
+"sources": []
+},
+{
+"id": "HSI00000467",
+"name": "Huntsville Hospital Health System",
+"city": "Huntsville",
+"state": "AL",
+"hospitals": 8,
+"beds": 1571,
+"sources": []
+},
+{
+"id": "HSI00000060",
+"name": "Atlantic Health System",
+"city": "Morristown",
+"state": "NJ",
+"hospitals": 6,
+"beds": 1568,
+"sources": [
+"oracle:erqh"
+]
+},
+{
+"id": "HSI00000644",
+"name": "Medical University of South Carolina Medical Center",
+"city": "Charleston",
+"state": "SC",
+"hospitals": 8,
+"beds": 1565,
+"sources": []
+},
+{
+"id": "HSI00000714",
+"name": "Multicare Health System",
+"city": "Tacoma",
+"state": "WA",
+"hospitals": 11,
+"beds": 1536,
+"sources": [
+"workday:multicare"
+]
+},
+{
+"id": "HSI00000323",
+"name": "Duke University Health System",
+"city": "Durham",
+"state": "NC",
+"hospitals": 3,
+"beds": 1535,
+"sources": [
+"phenom:dukehealth"
+]
+},
+{
+"id": "HSI00001174",
+"name": "University of Kentucky Healthcare",
+"city": "Lexington",
+"state": "KY",
+"hospitals": 5,
+"beds": 1521,
+"sources": []
+},
+{
+"id": "HSI00000074",
+"name": "Baptist Health",
+"city": "Little Rock",
+"state": "AR",
+"hospitals": 12,
+"beds": 1512,
+"sources": []
+},
+{
+"id": "HSI00001173",
+"name": "The University of Kansas Health System",
+"city": "Kansas City",
+"state": "KS",
+"hospitals": 5,
+"beds": 1478,
+"sources": []
+},
+{
+"id": "HSI00001116",
+"name": "UAB Health System",
+"city": "Birmingham",
+"state": "AL",
+"hospitals": 7,
+"beds": 1473,
+"sources": []
+},
+{
+"id": "HSI00000491",
+"name": "HonorHealth",
+"city": "Scottsdale",
+"state": "AZ",
+"hospitals": 7,
+"beds": 1406,
+"sources": []
+},
+{
+"id": "HSI00000756",
+"name": "NorthShore – Edward-Elmhurst Health",
+"city": "Evanston",
+"state": "IL",
+"hospitals": 8,
+"beds": 1398,
+"sources": []
+},
+{
+"id": "HSI00000675",
+"name": "Methodist Le Bonheur Healthcare",
+"city": "Memphis",
+"state": "TN",
+"hospitals": 3,
+"beds": 1395,
+"sources": []
+},
+{
+"id": "HSI00000919",
+"name": "Saint Francis Health System",
+"city": "Tulsa",
+"state": "OK",
+"hospitals": 8,
+"beds": 1382,
+"sources": [
+"workday:saintfrancis"
+]
+},
+{
+"id": "HSI00001230",
+"name": "ECU Health",
+"city": "Greenville",
+"state": "NC",
+"hospitals": 9,
+"beds": 1367,
+"sources": []
+},
+{
+"id": "HSI00000375",
+"name": "Franciscan Health",
+"city": "Mishawaka",
+"state": "IN",
+"hospitals": 14,
+"beds": 1366,
+"sources": [
+"workday:franciscanalliance"
+]
+},
+{
+"id": "HSI00001233",
+"name": "Virtua Health",
+"city": "Marlton",
+"state": "NJ",
+"hospitals": 5,
+"beds": 1329,
+"sources": [
+"workday:virtua"
+]
+},
+{
+"id": "HSI00001133",
+"name": "UW Medicine",
+"city": "Seattle",
+"state": "WA",
+"hospitals": 4,
+"beds": 1327,
+"sources": []
+},
+{
+"id": "HSI00000068",
+"name": "Avera Health",
+"city": "Sioux Falls",
+"state": "SD",
+"hospitals": 42,
+"beds": 1324,
+"sources": [
+"workday:avera"
+]
+},
+{
+"id": "HSI00000218",
+"name": "ChristianaCare",
+"city": "Wilmington",
+"state": "DE",
+"hospitals": 2,
+"beds": 1296,
+"sources": []
+},
+{
+"id": "HSI00000388",
+"name": "Geisinger",
+"city": "Danville",
+"state": "PA",
+"hospitals": 9,
+"beds": 1292,
+"sources": [
+"workday:geisinger"
+]
+},
+{
+"id": "HSI00000936",
+"name": "Saint Lukes University Health Network",
+"city": "Bethlehem",
+"state": "PA",
+"hospitals": 11,
+"beds": 1292,
+"sources": []
+},
+{
+"id": "HSI00001222",
+"name": "Vanderbilt Health",
+"city": "Nashville",
+"state": "TN",
+"hospitals": 4,
+"beds": 1292,
+"sources": [
+"workday:vumc"
+]
+},
+{
+"id": "HSI00000842",
+"name": "Premier Health",
+"city": "Dayton",
+"state": "OH",
+"hospitals": 3,
+"beds": 1282,
+"sources": []
+},
+{
+"id": "HSI00000848",
+"name": "ProMedica",
+"city": "Toledo",
+"state": "OH",
+"hospitals": 11,
+"beds": 1272,
+"sources": []
+},
+{
+"id": "HSI00000673",
+"name": "Methodist Health System",
+"city": "Dallas",
+"state": "TX",
+"hospitals": 8,
+"beds": 1266,
+"sources": []
+},
+{
+"id": "HSI00000745",
+"name": "Broward Health",
+"city": "Fort Lauderdale",
+"state": "FL",
+"hospitals": 4,
+"beds": 1261,
+"sources": []
+},
+{
+"id": "HSI00000814",
+"name": "Peacehealth",
+"city": "Vancouver",
+"state": "WA",
+"hospitals": 10,
+"beds": 1254,
+"sources": []
+},
+{
+"id": "HSI00001179",
+"name": "University of Rochester Medical Center",
+"city": "Rochester",
+"state": "NY",
+"hospitals": 6,
+"beds": 1254,
+"sources": []
+},
+{
+"id": "HSI00001033",
+"name": "Stanford Health Care",
+"city": "Stanford",
+"state": "CA",
+"hospitals": 3,
+"beds": 1253,
+"sources": [
+"workday:stanfordmedicine"
+]
+},
+{
+"id": "HSI00001252",
+"name": "WMC Health",
+"city": "Valhalla",
+"state": "NY",
+"hospitals": 8,
+"beds": 1230,
+"sources": []
+},
+{
+"id": "HSI00000843",
+"name": "Presbyterian Healthcare Services",
+"city": "Albuquerque",
+"state": "NM",
+"hospitals": 9,
+"beds": 1222,
+"sources": [
+"workday:phsorg"
+]
+},
+{
+"id": "HSI00000968",
+"name": "Scripps Health",
+"city": "San Diego",
+"state": "CA",
+"hospitals": 5,
+"beds": 1219,
+"sources": []
+},
+{
+"id": "HSI00000546",
+"name": "Kettering Health",
+"city": "Kettering",
+"state": "OH",
+"hospitals": 8,
+"beds": 1217,
+"sources": []
+},
+{
+"id": "HSI00001086",
+"name": "The Ohio State University Wexner Medical Center",
+"city": "Columbus",
+"state": "OH",
+"hospitals": 8,
+"beds": 1194,
+"sources": []
+},
+{
+"id": "HSI00000658",
+"name": "MemorialCare Health System",
+"city": "Fountain Valley",
+"state": "CA",
+"hospitals": 4,
+"beds": 1191,
+"sources": []
+},
+{
+"id": "HSI00000593",
+"name": "Los Angeles County Department of Health Services",
+"city": "Los Angeles",
+"state": "CA",
+"hospitals": 4,
+"beds": 1190,
+"sources": []
+},
+{
+"id": "HSI00000537",
+"name": "Kaleida Health",
+"city": "Buffalo",
+"state": "NY",
+"hospitals": 4,
+"beds": 1176,
+"sources": []
+},
+{
+"id": "HSI00000075",
+"name": "Baptist Health",
+"city": "Jacksonville",
+"state": "FL",
+"hospitals": 3,
+"beds": 1170,
+"sources": []
+},
+{
+"id": "HSI00000507",
+"name": "Integris Health",
+"city": "Oklahoma City",
+"state": "OK",
+"hospitals": 10,
+"beds": 1169,
+"sources": [
+"oracle:ertr"
+]
+},
+{
+"id": "HSI00000286",
+"name": "Covenant Health",
+"city": "Knoxville",
+"state": "TN",
+"hospitals": 10,
+"beds": 1162,
+"sources": []
+},
+{
+"id": "HSI00001243",
+"name": "Wellspan Health",
+"city": "York",
+"state": "PA",
+"hospitals": 8,
+"beds": 1160,
+"sources": [
+"oracle:fa-evzu-saasfaprod1"
+]
+},
+{
+"id": "HSI00001377",
+"name": "UofL Health",
+"city": "Louisville",
+"state": "KY",
+"hospitals": 7,
+"beds": 1154,
+"sources": [
+"workday:uoflhealth"
+]
+},
+{
+"id": "HSI00000253",
+"name": "Community Medical Centers",
+"city": "Clovis",
+"state": "CA",
+"hospitals": 4,
+"beds": 1135,
+"sources": []
+},
+{
+"id": "HSI00000611",
+"name": "MaineHealth",
+"city": "Portland",
+"state": "ME",
+"hospitals": 10,
+"beds": 1134,
+"sources": []
+},
+{
+"id": "HSI00000248",
+"name": "Community Health Network",
+"city": "Indianapolis",
+"state": "IN",
+"hospitals": 10,
+"beds": 1118,
+"sources": []
+},
+{
+"id": "HSI00000147",
+"name": "CAMC Health System",
+"city": "Charleston",
+"state": "WV",
+"hospitals": 8,
+"beds": 1087,
+"sources": []
+},
+{
+"id": "HSI00001253",
+"name": "Nuvance Health",
+"city": "Danbury",
+"state": "CT",
+"hospitals": 7,
+"beds": 1086,
+"sources": [
+"jobvite:nuvance"
+]
+},
+{
+"id": "HSI00001074",
+"name": "The Carle Foundation",
+"city": "Urbana",
+"state": "IL",
+"hospitals": 8,
+"beds": 1083,
+"sources": []
+},
+{
+"id": "HSI00000811",
+"name": "Parkview Health System",
+"city": "Fort Wayne",
+"state": "IN",
+"hospitals": 11,
+"beds": 1072,
+"sources": []
+},
+{
+"id": "HSI00000866",
+"name": "Tower Health",
+"city": "West Reading",
+"state": "PA",
+"hospitals": 6,
+"beds": 1064,
+"sources": []
+},
+{
+"id": "HSI00000386",
+"name": "Froedtert and the Medical College of Wisconsin",
+"city": "Milwaukee",
+"state": "WI",
+"hospitals": 6,
+"beds": 1061,
+"sources": []
+},
+{
+"id": "HSI00000821",
+"name": "Penn State Health Milton S Hershey Medical Center",
+"city": "Hershey",
+"state": "PA",
+"hospitals": 5,
+"beds": 1061,
+"sources": []
+},
+{
+"id": "HSI00000889",
+"name": "Rochester Regional Health System",
+"city": "Rochester",
+"state": "NY",
+"hospitals": 6,
+"beds": 1057,
+"sources": [
+"workday:rrhs"
+]
+},
+{
+"id": "HSI00000608",
+"name": "Main Line Health",
+"city": "Bryn Mawr",
+"state": "PA",
+"hospitals": 5,
+"beds": 1049,
+"sources": []
+},
+{
+"id": "HSI00001430",
+"name": "Catholic Health Systems",
+"city": "Buffalo",
+"state": "NY",
+"hospitals": 5,
+"beds": 1046,
+"sources": []
+},
+{
+"id": "HSI00000368",
+"name": "Florida Health Sciences Center",
+"city": "Tampa",
+"state": "FL",
+"hospitals": 2,
+"beds": 1017,
+"sources": []
+},
+{
+"id": "HSI00001122",
+"name": "UMass Memorial Health Care",
+"city": "Worcester",
+"state": "MA",
+"hospitals": 6,
+"beds": 1013,
+"sources": [
+"workday:ummh"
+]
+},
+{
+"id": "HSI00000576",
+"name": "Legacy Health",
+"city": "Portland",
+"state": "OR",
+"hospitals": 7,
+"beds": 1005,
+"sources": []
+},
+{
+"id": "HSI00000464",
+"name": "HealthPartners",
+"city": "Minneapolis",
+"state": "MN",
+"hospitals": 10,
+"beds": 1002,
+"sources": []
+},
+{
+"id": "HSI00000290",
+"name": "CoxHealth",
+"city": "Springfield",
+"state": "MO",
+"hospitals": 5,
+"beds": 986,
+"sources": []
+},
+{
+"id": "HSI00000897",
+"name": "Rush System for Health",
+"city": "Chicago",
+"state": "IL",
+"hospitals": 3,
+"beds": 975,
+"sources": []
+},
+{
+"id": "HSI00001132",
+"name": "UW Health",
+"city": "Madison",
+"state": "WI",
+"hospitals": 3,
+"beds": 968,
+"sources": []
+},
+{
+"id": "HSI00000350",
+"name": "Essentia Health",
+"city": "Duluth",
+"state": "MN",
+"hospitals": 18,
+"beds": 966,
+"sources": []
+},
+{
+"id": "HSI00001213",
+"name": "VCU Health System",
+"city": "Richmond",
+"state": "VA",
+"hospitals": 6,
+"beds": 965,
+"sources": []
+},
+{
+"id": "HSI00000935",
+"name": "Saint Lukes Health System",
+"city": "Kansas City",
+"state": "MO",
+"hospitals": 11,
+"beds": 964,
+"sources": []
+},
+{
+"id": "HSI00000585",
+"name": "Lifespan",
+"city": "Providence",
+"state": "RI",
+"hospitals": 4,
+"beds": 963,
+"sources": []
+},
+{
+"id": "HSI00000097",
+"name": "Baystate Health",
+"city": "Springfield",
+"state": "MA",
+"hospitals": 4,
+"beds": 939,
+"sources": []
+},
+{
+"id": "HSI00000263",
+"name": "Cone Health",
+"city": "Greensboro",
+"state": "NC",
+"hospitals": 3,
+"beds": 936,
+"sources": []
+},
+{
+"id": "HSI00001089",
+"name": "The University of Chicago Medicine",
+"city": "Chicago",
+"state": "IL",
+"hospitals": 2,
+"beds": 929,
+"sources": []
+},
+{
+"id": "HSI00000934",
+"name": "Saint Lukes",
+"city": "Boise",
+"state": "ID",
+"hospitals": 9,
+"beds": 921,
+"sources": []
+},
+{
+"id": "HSI00001112",
+"name": "Wellforce",
+"city": "Boston",
+"state": "MA",
+"hospitals": 4,
+"beds": 914,
+"sources": []
+},
+{
+"id": "HSI00000591",
+"name": "Loma Linda University Health",
+"city": "Loma Linda",
+"state": "CA",
+"hospitals": 4,
+"beds": 912,
+"sources": []
+},
+{
+"id": "HSI00001185",
+"name": "University of Vermont Health Network",
+"city": "Burlington",
+"state": "VT",
+"hospitals": 6,
+"beds": 908,
+"sources": []
+},
+{
+"id": "HSI00001069",
+"name": "Texas Childrens Hospital",
+"city": "Houston",
+"state": "TX",
+"hospitals": 1,
+"beds": 905,
+"sources": []
+},
+{
+"id": "HSI00000461",
+"name": "Health First",
+"city": "Rockledge",
+"state": "FL",
+"hospitals": 4,
+"beds": 904,
+"sources": []
+},
+{
+"id": "HSI00000962",
+"name": "Sarasota Memorial Health Care System",
+"city": "Sarasota",
+"state": "FL",
+"hospitals": 3,
+"beds": 896,
+"sources": []
+},
+{
+"id": "HSI00000019",
+"name": "Albany Medical Center",
+"city": "Albany",
+"state": "NY",
+"hospitals": 3,
+"beds": 890,
+"sources": []
+},
+{
+"id": "HSI00001065",
+"name": "Temple University Health System",
+"city": "Philadelphia",
+"state": "PA",
+"hospitals": 4,
+"beds": 889,
+"sources": []
+},
+{
+"id": "HSI00001186",
+"name": "University of Virginia Health System",
+"city": "Charlottesville",
+"state": "VA",
+"hospitals": 5,
+"beds": 885,
+"sources": []
+},
+{
+"id": "HSI00000012",
+"name": "Adventist Healthcare",
+"city": "Gaithersburg",
+"state": "MD",
+"hospitals": 6,
+"beds": 866,
+"sources": [
+"workday:adventisthealthcare"
+]
+},
+{
+"id": "HSI00001180",
+"name": "University of South Alabama Hospitals",
+"city": "Mobile",
+"state": "AL",
+"hospitals": 3,
+"beds": 858,
+"sources": []
+},
+{
+"id": "HSI00000637",
+"name": "McLeod Health",
+"city": "Florence",
+"state": "SC",
+"hospitals": 6,
+"beds": 846,
+"sources": []
+},
+{
+"id": "HSI00000805",
+"name": "PIH Health",
+"city": "Whittier",
+"state": "CA",
+"hospitals": 3,
+"beds": 846,
+"sources": []
+},
+{
+"id": "HSI00001236",
+"name": "WakeMed Health and Hospitals",
+"city": "Raleigh",
+"state": "NC",
+"hospitals": 2,
+"beds": 839,
+"sources": []
+},
+{
+"id": "HSI00000170",
+"name": "Carilion Clinic",
+"city": "Roanoke",
+"state": "VA",
+"hospitals": 7,
+"beds": 838,
+"sources": []
+},
+{
+"id": "HSI00000305",
+"name": "Deaconess Health System",
+"city": "Evansville",
+"state": "IN",
+"hospitals": 8,
+"beds": 834,
+"sources": []
+},
+{
+"id": "HSI00001250",
+"name": "West Tennessee Healthcare",
+"city": "Jackson",
+"state": "TN",
+"hospitals": 8,
+"beds": 824,
+"sources": []
+},
+{
+"id": "HSI00001155",
+"name": "The University of Mississippi Medical Center",
+"city": "Jackson",
+"state": "MS",
+"hospitals": 3,
+"beds": 819,
+"sources": []
+},
+{
+"id": "HSI00001383",
+"name": "OU Health",
+"city": "Oklahoma City",
+"state": "OK",
+"hospitals": 2,
+"beds": 819,
+"sources": []
+},
+{
+"id": "HSI00000582",
+"name": "LifeBridge Health",
+"city": "Baltimore",
+"state": "MD",
+"hospitals": 6,
+"beds": 817,
+"sources": []
+},
+{
+"id": "HSI00000162",
+"name": "Cape Fear Valley Health System",
+"city": "Fayetteville",
+"state": "NC",
+"hospitals": 6,
+"beds": 811,
+"sources": []
+},
+{
+"id": "HSI00000067",
+"name": "Pipeline Health",
+"city": "El Segundo",
+"state": "CA",
+"hospitals": 7,
+"beds": 808,
+"sources": []
+},
+{
+"id": "HSI00000959",
+"name": "Santa Clara Valley Health and Hospital System",
+"city": "San Jose",
+"state": "CA",
+"hospitals": 3,
+"beds": 805,
+"sources": []
+},
+{
+"id": "HSI00000203",
+"name": "Erlanger Health System",
+"city": "Chattanooga",
+"state": "TN",
+"hospitals": 3,
+"beds": 800,
+"sources": []
+},
+{
+"id": "HSI00000298",
+"name": "Parkland Health and Hospital System",
+"city": "Dallas",
+"state": "TX",
+"hospitals": 1,
+"beds": 787,
+"sources": []
+},
+{
+"id": "HSI00000251",
+"name": "Community Hospital Corporation",
+"city": "Plano",
+"state": "TX",
+"hospitals": 20,
+"beds": 772,
+"sources": []
+},
+{
+"id": "HSI00000299",
+"name": "Dartmouth-Hitchcock",
+"city": "Lebanon",
+"state": "NH",
+"hospitals": 8,
+"beds": 771,
+"sources": []
+},
+{
+"id": "HSI00000759",
+"name": "Northeast Georgia Health System",
+"city": "Gainesville",
+"state": "GA",
+"hospitals": 5,
+"beds": 771,
+"sources": []
+},
+{
+"id": "HSI00000511",
+"name": "Infirmary Health System",
+"city": "Mobile",
+"state": "AL",
+"hospitals": 5,
+"beds": 769,
+"sources": []
+},
+{
+"id": "HSI00000750",
+"name": "North Mississippi Health Services",
+"city": "Tupelo",
+"state": "MS",
+"hospitals": 7,
+"beds": 767,
+"sources": []
+},
+{
+"id": "HSI00001181",
+"name": "University of Southern California",
+"city": "Los Angeles",
+"state": "CA",
+"hospitals": 4,
+"beds": 767,
+"sources": []
+},
+{
+"id": "HSI00000569",
+"name": "Lakeland Regional Health",
+"city": "Lakeland",
+"state": "FL",
+"hospitals": 1,
+"beds": 764,
+"sources": []
+},
+{
+"id": "HSI00000917",
+"name": "Saint Elizabeth Healthcare",
+"city": "Edgewood",
+"state": "KY",
+"hospitals": 5,
+"beds": 755,
+"sources": []
+},
+{
+"id": "HSI00001172",
+"name": "University of Iowa Hospitals and Clinics",
+"city": "Iowa City",
+"state": "IA",
+"hospitals": 2,
+"beds": 752,
+"sources": []
+},
+{
+"id": "HSI00000722",
+"name": "Nationwide Childrens Hospital",
+"city": "Columbus",
+"state": "OH",
+"hospitals": 2,
+"beds": 747,
+"sources": []
+},
+{
+"id": "HSI00000154",
+"name": "Cabell Huntington Hospital",
+"city": "Huntington",
+"state": "WV",
+"hospitals": 3,
+"beds": 740,
+"sources": []
+},
+{
+"id": "HSI00001038",
+"name": "Stony Brook Medicine",
+"city": "Stony Brook",
+"state": "NY",
+"hospitals": 3,
+"beds": 725,
+"sources": []
+},
+{
+"id": "HSI00001087",
+"name": "The Queens Health Systems",
+"city": "Honolulu",
+"state": "HI",
+"hospitals": 4,
+"beds": 722,
+"sources": []
+},
+{
+"id": "HSI00001263",
+"name": "Willis Knighton Health System",
+"city": "Shreveport",
+"state": "LA",
+"hospitals": 3,
+"beds": 720,
+"sources": []
+},
+{
+"id": "HSI00000041",
+"name": "Appalachian Regional Healthcare",
+"city": "Lexington",
+"state": "KY",
+"hospitals": 14,
+"beds": 713,
+"sources": []
+},
+{
+"id": "HSI00001020",
+"name": "Spartanburg Regional Healthcare System",
+"city": "Spartanburg",
+"state": "SC",
+"hospitals": 6,
+"beds": 713,
+"sources": []
+},
+{
+"id": "HSI00000224",
+"name": "Cincinnati Childrens Hospital Medical Center",
+"city": "Cincinnati",
+"state": "OH",
+"hospitals": 1,
+"beds": 711,
+"sources": []
+},
+{
+"id": "HSI00000648",
+"name": "Memorial Health System",
+"city": "Springfield",
+"state": "IL",
+"hospitals": 7,
+"beds": 711,
+"sources": []
+},
+{
+"id": "HSI00001118",
+"name": "UC Health",
+"city": "Cincinnati",
+"state": "OH",
+"hospitals": 5,
+"beds": 711,
+"sources": []
+},
+{
+"id": "HSI00000246",
+"name": "Community Foundation of Northwest Indiana",
+"city": "Munster",
+"state": "IN",
+"hospitals": 4,
+"beds": 707,
+"sources": []
+},
+{
+"id": "HSI00000412",
+"name": "Grady Health System",
+"city": "Atlanta",
+"state": "GA",
+"hospitals": 1,
+"beds": 707,
+"sources": []
+},
+{
+"id": "HSI00000098",
+"name": "Beacon Health System",
+"city": "South Bend",
+"state": "IN",
+"hospitals": 5,
+"beds": 702,
+"sources": []
+},
+{
+"id": "HSI00000143",
+"name": "Bryan Health",
+"city": "Lincoln",
+"state": "NE",
+"hospitals": 8,
+"beds": 700,
+"sources": []
+},
+{
+"id": "HSI00000057",
+"name": "Aspirus",
+"city": "Wausau",
+"state": "WI",
+"hospitals": 16,
+"beds": 699,
+"sources": []
+},
+{
+"id": "HSI00001153",
+"name": "University of Tennessee Medical Center",
+"city": "Knoxville",
+"state": "TN",
+"hospitals": 1,
+"beds": 698,
+"sources": []
+},
+{
+"id": "HSI00001085",
+"name": "The Nebraska Medical Center",
+"city": "Omaha",
+"state": "NE",
+"hospitals": 4,
+"beds": 686,
+"sources": []
+},
+{
+"id": "HSI00000929",
+"name": "Saint Josephs Health",
+"city": "Paterson",
+"state": "NJ",
+"hospitals": 2,
+"beds": 681,
+"sources": []
+},
+{
+"id": "HSI00000514",
+"name": "Inspira Health Network",
+"city": "Mullica Hill",
+"state": "NJ",
+"hospitals": 4,
+"beds": 679,
+"sources": []
+},
+{
+"id": "HSI00000371",
+"name": "Forrest Health",
+"city": "Hattiesburg",
+"state": "MS",
+"hospitals": 8,
+"beds": 673,
+"sources": []
+},
+{
+"id": "HSI00001075",
+"name": "The Childrens Hospital of Philadelphia",
+"city": "Philadelphia",
+"state": "PA",
+"hospitals": 1,
+"beds": 667,
+"sources": []
+},
+{
+"id": "HSI00000795",
+"name": "Oregon Health and Science University",
+"city": "Portland",
+"state": "OR",
+"hospitals": 2,
+"beds": 662,
+"sources": []
+},
+{
+"id": "HSI00000113",
+"name": "University Health System",
+"city": "San Antonio",
+"state": "TX",
+"hospitals": 1,
+"beds": 657,
+"sources": []
+},
+{
+"id": "HSI00000471",
+"name": "Hendrick Health System",
+"city": "Abilene",
+"state": "TX",
+"hospitals": 3,
+"beds": 656,
+"sources": []
+},
+{
+"id": "HSI00000193",
+"name": "CentraCare",
+"city": "Saint Cloud",
+"state": "MN",
+"hospitals": 10,
+"beds": 650,
+"sources": []
+},
+{
+"id": "HSI00000209",
+"name": "Childrens Healthcare of Atlanta",
+"city": "Atlanta",
+"state": "GA",
+"hospitals": 2,
+"beds": 649,
+"sources": []
+},
+{
+"id": "HSI00000904",
+"name": "SUNY Upstate Medical University",
+"city": "Syracuse",
+"state": "NY",
+"hospitals": 2,
+"beds": 645,
+"sources": []
+},
+{
+"id": "HSI00000330",
+"name": "Northern Light Health",
+"city": "Brewer",
+"state": "ME",
+"hospitals": 11,
+"beds": 637,
+"sources": []
+},
+{
+"id": "HSI00001004",
+"name": "Southcoast Health System",
+"city": "New Bedford",
+"state": "MA",
+"hospitals": 1,
+"beds": 635,
+"sources": []
+},
+{
+"id": "HSI00000819",
+"name": "Penn Highlands Healthcare",
+"city": "Du Bois",
+"state": "PA",
+"hospitals": 8,
+"beds": 633,
+"sources": []
+},
+{
+"id": "HSI00000715",
+"name": "Munson Healthcare",
+"city": "Traverse City",
+"state": "MI",
+"hospitals": 10,
+"beds": 624,
+"sources": []
+},
+{
+"id": "HSI00001561",
+"name": "American Healthcare Systems",
+"city": "Glendale",
+"state": "CA",
+"hospitals": 3,
+"beds": 623,
+"sources": []
+},
+{
+"id": "HSI00001178",
+"name": "University of Missouri Health Care",
+"city": "Columbia",
+"state": "MO",
+"hospitals": 5,
+"beds": 621,
+"sources": []
+},
+{
+"id": "HSI00001184",
+"name": "University of Utah Hospitals and Clinics",
+"city": "Salt Lake City",
+"state": "UT",
+"hospitals": 2,
+"beds": 616,
+"sources": []
+},
+{
+"id": "HSI00001125",
+"name": "UNM Health System",
+"city": "Albuquerque",
+"state": "NM",
+"hospitals": 2,
+"beds": 614,
+"sources": []
+},
+{
+"id": "HSI00000466",
+"name": "Healthcare Authority for Baptist Health",
+"city": "Montgomery",
+"state": "AL",
+"hospitals": 3,
+"beds": 611,
+"sources": []
+},
+{
+"id": "HSI00000530",
+"name": "John Muir Health",
+"city": "Walnut Creek",
+"state": "CA",
+"hospitals": 3,
+"beds": 610,
+"sources": []
+},
+{
+"id": "HSI00000621",
+"name": "Marshfield Clinic Health System",
+"city": "Marshfield",
+"state": "WI",
+"hospitals": 12,
+"beds": 603,
+"sources": []
+},
+{
+"id": "HSI00000139",
+"name": "Bronson Healthcare Group",
+"city": "Kalamazoo",
+"state": "MI",
+"hospitals": 5,
+"beds": 602,
+"sources": []
+},
+{
+"id": "HSI00000455",
+"name": "Hawaii Pacific Health",
+"city": "Honolulu",
+"state": "HI",
+"hospitals": 4,
+"beds": 602,
+"sources": []
+},
+{
+"id": "HSI00000451",
+"name": "Harris Health System",
+"city": "Bellaire",
+"state": "TX",
+"hospitals": 1,
+"beds": 595,
+"sources": []
+},
+{
+"id": "HSI00000874",
+"name": "Renown Health",
+"city": "Reno",
+"state": "NV",
+"hospitals": 3,
+"beds": 592,
+"sources": []
+},
+{
+"id": "HSI00000883",
+"name": "Riverside Health System",
+"city": "Newport News",
+"state": "VA",
+"hospitals": 6,
+"beds": 592,
+"sources": []
+},
+{
+"id": "HSI00000226",
+"name": "Emanate Health",
+"city": "Covina",
+"state": "CA",
+"hospitals": 3,
+"beds": 586,
+"sources": []
+},
+{
+"id": "HSI00001217",
+"name": "Valley Health",
+"city": "Winchester",
+"state": "VA",
+"hospitals": 6,
+"beds": 580,
+"sources": []
+},
+{
+"id": "HSI00000038",
+"name": "Luminis Health",
+"city": "Annapolis",
+"state": "MD",
+"hospitals": 3,
+"beds": 579,
+"sources": []
+},
+{
+"id": "HSI00001079",
+"name": "Cooper University Health Care",
+"city": "Camden",
+"state": "NJ",
+"hospitals": 1,
+"beds": 578,
+"sources": []
+},
+{
+"id": "HSI00000441",
+"name": "Halifax Health",
+"city": "Daytona Beach",
+"state": "FL",
+"hospitals": 2,
+"beds": 576,
+"sources": []
+},
+{
+"id": "HSI00000166",
+"name": "Care New England Health System",
+"city": "Providence",
+"state": "RI",
+"hospitals": 3,
+"beds": 570,
+"sources": []
+},
+{
+"id": "HSI00000192",
+"name": "Centra Health",
+"city": "Lynchburg",
+"state": "VA",
+"hospitals": 5,
+"beds": 562,
+"sources": []
+},
+{
+"id": "HSI00001043",
+"name": "Summa Health System",
+"city": "Akron",
+"state": "OH",
+"hospitals": 3,
+"beds": 560,
+"sources": []
+},
+{
+"id": "HSI00000947",
+"name": "Salem Health Hospitals and Clinics",
+"city": "Salem",
+"state": "OR",
+"hospitals": 2,
+"beds": 559,
+"sources": []
+},
+{
+"id": "HSI00001060",
+"name": "Tallahassee Memorial Healthcare",
+"city": "Tallahassee",
+"state": "FL",
+"hospitals": 3,
+"beds": 551,
+"sources": []
+},
+{
+"id": "HSI00000579",
+"name": "Lexington Medical Center",
+"city": "West Columbia",
+"state": "SC",
+"hospitals": 1,
+"beds": 541,
+"sources": []
+},
+{
+"id": "HSI00000672",
+"name": "Methodist Health System",
+"city": "Omaha",
+"state": "NE",
+"hospitals": 3,
+"beds": 540,
+"sources": []
+},
+{
+"id": "HSI00001160",
+"name": "University Medical Center of Southern Nevada",
+"city": "Las Vegas",
+"state": "NV",
+"hospitals": 1,
+"beds": 537,
+"sources": []
+},
+{
+"id": "HSI00001369",
+"name": "AtlantiCare",
+"city": "Egg Harbor Township",
+"state": "NJ",
+"hospitals": 1,
+"beds": 532,
+"sources": []
+},
+{
+"id": "HSI00000642",
+"name": "Medisys Health Network",
+"city": "Jamaica",
+"state": "NY",
+"hospitals": 2,
+"beds": 528,
+"sources": []
+},
+{
+"id": "HSI00000868",
+"name": "Monument Health",
+"city": "Rapid City",
+"state": "SD",
+"hospitals": 10,
+"beds": 522,
+"sources": []
+},
+{
+"id": "HSI00001166",
+"name": "University of Arkansas for Medical Sciences",
+"city": "Little Rock",
+"state": "AR",
+"hospitals": 1,
+"beds": 521,
+"sources": []
+},
+{
+"id": "HSI00000064",
+"name": "Augusta University Health System",
+"city": "Augusta",
+"state": "GA",
+"hospitals": 4,
+"beds": 519,
+"sources": []
+},
+{
+"id": "HSI00001055",
+"name": "TMC Healthcare",
+"city": "Tucson",
+"state": "AZ",
+"hospitals": 3,
+"beds": 519,
+"sources": []
+},
+{
+"id": "HSI00000716",
+"name": "NCH Healthcare System",
+"city": "Naples",
+"state": "FL",
+"hospitals": 1,
+"beds": 517,
+"sources": []
+},
+{
+"id": "HSI00000484",
+"name": "Hoag Memorial Hospital Presbyterian",
+"city": "Newport Beach",
+"state": "CA",
+"hospitals": 2,
+"beds": 512,
+"sources": []
+},
+{
+"id": "HSI00000026",
+"name": "Allegiance Health Management",
+"city": "Bossier City",
+"state": "LA",
+"hospitals": 13,
+"beds": 507,
+"sources": []
+},
+{
+"id": "HSI00000624",
+"name": "Mary Washington Healthcare",
+"city": "Fredericksburg",
+"state": "VA",
+"hospitals": 3,
+"beds": 502,
+"sources": []
+},
+{
+"id": "HSI00001386",
+"name": "Crouse Health System",
+"city": "Syracuse",
+"state": "NY",
+"hospitals": 1,
+"beds": 502,
+"sources": []
+},
+{
+"id": "HSI00001083",
+"name": "The Metrohealth System",
+"city": "Cleveland",
+"state": "OH",
+"hospitals": 1,
+"beds": 501,
+"sources": []
+},
+{
+"id": "HSI00001288",
+"name": "Brookdale University Hospital And Medical Center",
+"city": "Brooklyn",
+"state": "NY",
+"hospitals": 1,
+"beds": 498,
+"sources": []
+},
+{
+"id": "HSI00001500",
+"name": "Childrens Hospital Colorado",
+"city": "Aurora",
+"state": "CO",
+"hospitals": 1,
+"beds": 497,
+"sources": []
+},
+{
+"id": "HSI00000054",
+"name": "Asante Health System",
+"city": "Medford",
+"state": "OR",
+"hospitals": 3,
+"beds": 489,
+"sources": []
+},
+{
+"id": "HSI00000130",
+"name": "Boston Childrens Hospital",
+"city": "Boston",
+"state": "MA",
+"hospitals": 1,
+"beds": 485,
+"sources": []
+},
+{
+"id": "HSI00000712",
+"name": "Mount Sinai Medical Center of Florida",
+"city": "Miami Beach",
+"state": "FL",
+"hospitals": 1,
+"beds": 481,
+"sources": []
+},
+{
+"id": "HSI00000749",
+"name": "North Memorial Health",
+"city": "Robbinsdale",
+"state": "MN",
+"hospitals": 2,
+"beds": 476,
+"sources": []
+},
+{
+"id": "HSI00000114",
+"name": "Billings Clinic",
+"city": "Billings",
+"state": "MT",
+"hospitals": 13,
+"beds": 474,
+"sources": []
+},
+{
+"id": "HSI00001104",
+"name": "TriHealth",
+"city": "Cincinnati",
+"state": "OH",
+"hospitals": 3,
+"beds": 468,
+"sources": []
+},
+{
+"id": "HSI00000823",
+"name": "Phoebe Putney Health Systems",
+"city": "Albany",
+"state": "GA",
+"hospitals": 5,
+"beds": 465,
+"sources": []
+},
+{
+"id": "HSI00000288",
+"name": "Covenant Medical Center",
+"city": "Saginaw",
+"state": "MI",
+"hospitals": 1,
+"beds": 464,
+"sources": []
+},
+{
+"id": "HSI00000274",
+"name": "Cook County Health and Hospital System",
+"city": "Chicago",
+"state": "IL",
+"hospitals": 2,
+"beds": 460,
+"sources": []
+},
+{
+"id": "HSI00000140",
+"name": "BronxCare Health System",
+"city": "Bronx",
+"state": "NY",
+"hospitals": 1,
+"beds": 454,
+"sources": []
+},
+{
+"id": "HSI00000927",
+"name": "Saint Josephs Candler Health System",
+"city": "Savannah",
+"state": "GA",
+"hospitals": 2,
+"beds": 451,
+"sources": []
+},
+{
+"id": "HSI00000208",
+"name": "Childrens Health",
+"city": "Dallas",
+"state": "TX",
+"hospitals": 3,
+"beds": 448,
+"sources": []
+},
+{
+"id": "HSI00000273",
+"name": "Cook Childrens Health Care System",
+"city": "Fort Worth",
+"state": "TX",
+"hospitals": 2,
+"beds": 447,
+"sources": []
+},
+{
+"id": "HSI00001063",
+"name": "JPS Health Network",
+"city": "Fort Worth",
+"state": "TX",
+"hospitals": 1,
+"beds": 446,
+"sources": []
+},
+{
+"id": "HSI00000933",
+"name": "Saint Lukes Episcopal Presbyterian Hospital",
+"city": "Chesterfield",
+"state": "MO",
+"hospitals": 2,
+"beds": 445,
+"sources": []
+},
+{
+"id": "HSI00001077",
+"name": "The Christ Hospital Health Network",
+"city": "Cincinnati",
+"state": "OH",
+"hospitals": 1,
+"beds": 444,
+"sources": []
+},
+{
+"id": "HSI00000131",
+"name": "Boston Medical Center",
+"city": "Boston",
+"state": "MA",
+"hospitals": 1,
+"beds": 442,
+"sources": []
+},
+{
+"id": "HSI00001039",
+"name": "Stormont Vail Health",
+"city": "Topeka",
+"state": "KS",
+"hospitals": 2,
+"beds": 442,
+"sources": []
+},
+{
+"id": "HSI00000297",
+"name": "DCH Health System",
+"city": "Tuscaloosa",
+"state": "AL",
+"hospitals": 3,
+"beds": 433,
+"sources": []
+},
+{
+"id": "HSI00000354",
+"name": "Excela Health",
+"city": "Greensburg",
+"state": "PA",
+"hospitals": 3,
+"beds": 431,
+"sources": []
+},
+{
+"id": "HSI00000540",
+"name": "Kaweah Delta Health Care District",
+"city": "Visalia",
+"state": "CA",
+"hospitals": 1,
+"beds": 430,
+"sources": []
+},
+{
+"id": "HSI00001275",
+"name": "Yuma Regional Medical Center",
+"city": "Yuma",
+"state": "AZ",
+"hospitals": 1,
+"beds": 430,
+"sources": []
+},
+{
+"id": "HSI00000430",
+"name": "Guthrie Healthcare System",
+"city": "Sayre",
+"state": "PA",
+"hospitals": 5,
+"beds": 426,
+"sources": []
+},
+{
+"id": "HSI00000089",
+"name": "Baton Rouge General Health System",
+"city": "Baton Rouge",
+"state": "LA",
+"hospitals": 2,
+"beds": 425,
+"sources": []
+},
+{
+"id": "HSI00000171",
+"name": "Caromont Health System",
+"city": "Gastonia",
+"state": "NC",
+"hospitals": 1,
+"beds": 424,
+"sources": []
+},
+{
+"id": "HSI00000885",
+"name": "Riverside University Health System",
+"city": "Moreno Valley",
+"state": "CA",
+"hospitals": 1,
+"beds": 423,
+"sources": []
+},
+{
+"id": "HSI00001159",
+"name": "UMC Health System",
+"city": "Lubbock",
+"state": "TX",
+"hospitals": 1,
+"beds": 422,
+"sources": []
+},
+{
+"id": "HSI00000705",
+"name": "Mosaic Life Care",
+"city": "Saint Joseph",
+"state": "MO",
+"hospitals": 5,
+"beds": 421,
+"sources": []
+},
+{
+"id": "HSI00000207",
+"name": "Childrens Minnesota",
+"city": "Minneapolis",
+"state": "MN",
+"hospitals": 2,
+"beds": 420,
+"sources": []
+},
+{
+"id": "HSI00000423",
+"name": "Garnet Health",
+"city": "Middletown",
+"state": "NY",
+"hospitals": 3,
+"beds": 420,
+"sources": []
+},
+{
+"id": "HSI00001092",
+"name": "ThedaCare",
+"city": "Appleton",
+"state": "WI",
+"hospitals": 7,
+"beds": 417,
+"sources": []
+},
+{
+"id": "HSI00000365",
+"name": "FirstHealth of the Carolinas",
+"city": "Pinehurst",
+"state": "NC",
+"hospitals": 3,
+"beds": 415,
+"sources": []
+},
+{
+"id": "HSI00001239",
+"name": "Washington Hospital Healthcare System",
+"city": "Fremont",
+"state": "CA",
+"hospitals": 1,
+"beds": 415,
+"sources": []
+},
+{
+"id": "HSI00000667",
+"name": "Mercyhealth",
+"city": "Janesville",
+"state": "WI",
+"hospitals": 4,
+"beds": 414,
+"sources": []
+},
+{
+"id": "HSI00000210",
+"name": "Childrens Hospital Los Angeles",
+"city": "Los Angeles",
+"state": "CA",
+"hospitals": 1,
+"beds": 413,
+"sources": []
+},
+{
+"id": "HSI00000244",
+"name": "Commonwealth Health Corporation",
+"city": "Bowling Green",
+"state": "KY",
+"hospitals": 6,
+"beds": 413,
+"sources": []
+},
+{
+"id": "HSI00000833",
+"name": "Pomona Valley Hospital Medical Center",
+"city": "Pomona",
+"state": "CA",
+"hospitals": 1,
+"beds": 412,
+"sources": []
+},
+{
+"id": "HSI00001138",
+"name": "United Health Services",
+"city": "Binghamton",
+"state": "NY",
+"hospitals": 3,
+"beds": 412,
+"sources": [
+"workday:nyuhs"
+]
+},
+{
+"id": "HSI00000065",
+"name": "Aultman Health Foundation",
+"city": "Canton",
+"state": "OH",
+"hospitals": 5,
+"beds": 410,
+"sources": []
+},
+{
+"id": "HSI00001080",
+"name": "The Erie County Medical Center Corporation",
+"city": "Buffalo",
+"state": "NY",
+"hospitals": 1,
+"beds": 410,
+"sources": []
+},
+{
+"id": "HSI00001382",
+"name": "AnMed Health",
+"city": "Anderson",
+"state": "SC",
+"hospitals": 2,
+"beds": 409,
+"sources": []
+},
+{
+"id": "HSI00000169",
+"name": "Carepoint Health",
+"city": "Jersey City",
+"state": "NJ",
+"hospitals": 3,
+"beds": 408,
+"sources": []
+},
+{
+"id": "HSI00000211",
+"name": "Akron Childrens Hospital",
+"city": "Akron",
+"state": "OH",
+"hospitals": 1,
+"beds": 408,
+"sources": []
+},
+{
+"id": "HSI00000988",
+"name": "Singing River Health System",
+"city": "Gautier",
+"state": "MS",
+"hospitals": 2,
+"beds": 407,
+"sources": []
+},
+{
+"id": "HSI00001082",
+"name": "The Methodist Hospitals",
+"city": "Gary",
+"state": "IN",
+"hospitals": 2,
+"beds": 405,
+"sources": []
+},
+{
+"id": "HSI00000864",
+"name": "Rady Childrens Hospital San Diego",
+"city": "San Diego",
+"state": "CA",
+"hospitals": 1,
+"beds": 401,
+"sources": []
+},
+{
+"id": "HSI00000287",
+"name": "Covenant Health Systems",
+"city": "Tewksbury",
+"state": "MA",
+"hospitals": 3,
+"beds": 399,
+"sources": []
+},
+{
+"id": "HSI00000318",
+"name": "DHR Health",
+"city": "Edinburg",
+"state": "TX",
+"hospitals": 2,
+"beds": 399,
+"sources": []
+},
+{
+"id": "HSI00000428",
+"name": "Gundersen Health System",
+"city": "La Crosse",
+"state": "WI",
+"hospitals": 8,
+"beds": 399,
+"sources": []
+},
+{
+"id": "HSI00000802",
+"name": "Owensboro Health",
+"city": "Owensboro",
+"state": "KY",
+"hospitals": 3,
+"beds": 398,
+"sources": []
+},
+{
+"id": "HSI00000283",
+"name": "Cottage Health System",
+"city": "Santa Barbara",
+"state": "CA",
+"hospitals": 4,
+"beds": 397,
+"sources": []
+},
+{
+"id": "HSI00000094",
+"name": "Bayhealth",
+"city": "Dover",
+"state": "DE",
+"hospitals": 2,
+"beds": 396,
+"sources": []
+},
+{
+"id": "HSI00000307",
+"name": "Denver Health and Hospital Authority",
+"city": "Denver",
+"state": "CO",
+"hospitals": 1,
+"beds": 396,
+"sources": []
+},
+{
+"id": "HSI00001171",
+"name": "UI Health",
+"city": "Chicago",
+"state": "IL",
+"hospitals": 1,
+"beds": 395,
+"sources": []
+},
+{
+"id": "HSI00001502",
+"name": "Antelope Valley Medical Center",
+"city": "Lancaster",
+"state": "CA",
+"hospitals": 1,
+"beds": 393,
+"sources": []
+},
+{
+"id": "HSI00000401",
+"name": "Glens Falls Hospital",
+"city": "Glens Falls",
+"state": "NY",
+"hospitals": 1,
+"beds": 391,
+"sources": []
+},
+{
+"id": "HSI00000987",
+"name": "Sinai Health System",
+"city": "Chicago",
+"state": "IL",
+"hospitals": 4,
+"beds": 391,
+"sources": []
+},
+{
+"id": "HSI00000336",
+"name": "El Camino Health",
+"city": "Mountain View",
+"state": "CA",
+"hospitals": 2,
+"beds": 388,
+"sources": []
+},
+{
+"id": "HSI00000911",
+"name": "Saint Bernards Healthcare",
+"city": "Jonesboro",
+"state": "AR",
+"hospitals": 4,
+"beds": 388,
+"sources": []
+},
+{
+"id": "HSI00000809",
+"name": "Palomar Health",
+"city": "Escondido",
+"state": "CA",
+"hospitals": 3,
+"beds": 387,
+"sources": []
+},
+{
+"id": "HSI00000454",
+"name": "Hawaii Health Systems Corporation",
+"city": "Honolulu",
+"state": "HI",
+"hospitals": 11,
+"beds": 385,
+"sources": []
+},
+{
+"id": "HSI00001218",
+"name": "Valley Health System",
+"city": "Ridgewood",
+"state": "NJ",
+"hospitals": 1,
+"beds": 385,
+"sources": []
+},
+{
+"id": "HSI00001499",
+"name": "VHC Health",
+"city": "Arlington",
+"state": "VA",
+"hospitals": 1,
+"beds": 385,
+"sources": []
+},
+{
+"id": "HSI00000381",
+"name": "Freeman Health System",
+"city": "Joplin",
+"state": "MO",
+"hospitals": 2,
+"beds": 384,
+"sources": []
+},
+{
+"id": "HSI00000748",
+"name": "North Kansas City Hospital",
+"city": "North Kansas City",
+"state": "MO",
+"hospitals": 1,
+"beds": 383,
+"sources": []
+},
+{
+"id": "HSI00000824",
+"name": "Phoenix Childrens Hospital",
+"city": "Phoenix",
+"state": "AZ",
+"hospitals": 1,
+"beds": 383,
+"sources": []
+},
+{
+"id": "HSI00000164",
+"name": "Capital Health System",
+"city": "Trenton",
+"state": "NJ",
+"hospitals": 2,
+"beds": 382,
+"sources": []
+},
+{
+"id": "HSI00001240",
+"name": "Washington Regional",
+"city": "Fayetteville",
+"state": "AR",
+"hospitals": 1,
+"beds": 377,
+"sources": []
+},
+{
+"id": "HSI00001110",
+"name": "University Health",
+"city": "Kansas City",
+"state": "MO",
+"hospitals": 2,
+"beds": 375,
+"sources": []
+},
+{
+"id": "HSI00001002",
+"name": "South Shore Health System",
+"city": "South Weymouth",
+"state": "MA",
+"hospitals": 1,
+"beds": 374,
+"sources": []
+},
+{
+"id": "HSI00000969",
+"name": "Seattle Childrens Hospital Research and Foundation",
+"city": "Seattle",
+"state": "WA",
+"hospitals": 1,
+"beds": 370,
+"sources": []
+},
+{
+"id": "HSI00001076",
+"name": "The Childrens Mercy Hospital",
+"city": "Kansas City",
+"state": "MO",
+"hospitals": 2,
+"beds": 370,
+"sources": []
+},
+{
+"id": "HSI00000505",
+"name": "Hurley Medical Center",
+"city": "Flint",
+"state": "MI",
+"hospitals": 1,
+"beds": 369,
+"sources": []
+},
+{
+"id": "HSI00000053",
+"name": "Arrowhead Regional Medical Center",
+"city": "Colton",
+"state": "CA",
+"hospitals": 1,
+"beds": 366,
+"sources": []
+},
+{
+"id": "HSI00000476",
+"name": "Heritage Valley Health System",
+"city": "Beaver",
+"state": "PA",
+"hospitals": 3,
+"beds": 365,
+"sources": []
+},
+{
+"id": "HSI00000036",
+"name": "Ann and Robert H Lurie Childrens Hospital of Chicago",
+"city": "Chicago",
+"state": "IL",
+"hospitals": 1,
+"beds": 364,
+"sources": []
+},
+{
+"id": "HSI00000954",
+"name": "San Antonio Regional Hospital",
+"city": "Upland",
+"state": "CA",
+"hospitals": 1,
+"beds": 363,
+"sources": []
+},
+{
+"id": "HSI00000076",
+"name": "Baptist Health Care",
+"city": "Pensacola",
+"state": "FL",
+"hospitals": 3,
+"beds": 362,
+"sources": [
+"oracle:fa-etrr-saasfaprod1"
+]
+},
+{
+"id": "HSI00000107",
+"name": "Benefis Health System",
+"city": "Great Falls",
+"state": "MT",
+"hospitals": 3,
+"beds": 362,
+"sources": []
+},
+{
+"id": "HSI00000335",
+"name": "Eisenhower Health",
+"city": "Rancho Mirage",
+"state": "CA",
+"hospitals": 1,
+"beds": 362,
+"sources": []
+},
+{
+"id": "HSI00001154",
+"name": "University Hospital",
+"city": "Newark",
+"state": "NJ",
+"hospitals": 2,
+"beds": 358,
+"sources": []
+},
+{
+"id": "HSI00001497",
+"name": "Valley Childrens Healthcare",
+"city": "Madera",
+"state": "CA",
+"hospitals": 1,
+"beds": 358,
+"sources": []
+},
+{
+"id": "HSI00000338",
+"name": "Solutionhealth",
+"city": "Manchester",
+"state": "NH",
+"hospitals": 2,
+"beds": 353,
+"sources": []
+},
+{
+"id": "HSI00000725",
+"name": "Nemours Childrens Health",
+"city": "Jacksonville",
+"state": "FL",
+"hospitals": 2,
+"beds": 352,
+"sources": []
+},
+{
+"id": "HSI00000942",
+"name": "Saint Peters Healthcare System",
+"city": "New Brunswick",
+"state": "NJ",
+"hospitals": 1,
+"beds": 352,
+"sources": []
+},
+{
+"id": "HSI00000217",
+"name": "Childrens of Alabama",
+"city": "Birmingham",
+"state": "AL",
+"hospitals": 1,
+"beds": 351,
+"sources": []
+},
+{
+"id": "HSI00000050",
+"name": "Arkansas Childrens Hospital",
+"city": "Little Rock",
+"state": "AR",
+"hospitals": 2,
+"beds": 350,
+"sources": []
+},
+{
+"id": "HSI00000553",
+"name": "Kootenai Health",
+"city": "Coeur D Alene",
+"state": "ID",
+"hospitals": 2,
+"beds": 349,
+"sources": []
+},
+{
+"id": "HSI00000473",
+"name": "Hennepin Healthcare",
+"city": "Minneapolis",
+"state": "MN",
+"hospitals": 1,
+"beds": 347,
+"sources": []
+},
+{
+"id": "HSI00000697",
+"name": "Mohawk Valley Health System",
+"city": "Utica",
+"state": "NY",
+"hospitals": 1,
+"beds": 346,
+"sources": []
+},
+{
+"id": "HSI00001005",
+"name": "Southeast Health",
+"city": "Dothan",
+"state": "AL",
+"hospitals": 1,
+"beds": 345,
+"sources": []
+},
+{
+"id": "HSI00000212",
+"name": "Childrens Hospital and Health System",
+"city": "Wauwatosa",
+"state": "WI",
+"hospitals": 2,
+"beds": 340,
+"sources": []
+},
+{
+"id": "HSI00000912",
+"name": "Saint Charles Health System",
+"city": "Bend",
+"state": "OR",
+"hospitals": 4,
+"beds": 340,
+"sources": []
+},
+{
+"id": "HSI00000975",
+"name": "Shannon Health System",
+"city": "San Angelo",
+"state": "TX",
+"hospitals": 2,
+"beds": 340,
+"sources": []
+},
+{
+"id": "HSI00001006",
+"name": "Southeast Georgia Health System",
+"city": "Brunswick",
+"state": "GA",
+"hospitals": 2,
+"beds": 340,
+"sources": []
+},
+{
+"id": "HSI00000117",
+"name": "Blessing Health System",
+"city": "Quincy",
+"state": "IL",
+"hospitals": 2,
+"beds": 334,
+"sources": []
+},
+{
+"id": "HSI00000214",
+"name": "CHOC Childrens",
+"city": "Orange",
+"state": "CA",
+"hospitals": 2,
+"beds": 334,
+"sources": []
+},
+{
+"id": "HSI00000146",
+"name": "Butler Health System",
+"city": "Butler",
+"state": "PA",
+"hospitals": 2,
+"beds": 332,
+"sources": []
+},
+{
+"id": "HSI00000353",
+"name": "EvergreenHealth",
+"city": "Kirkland",
+"state": "WA",
+"hospitals": 2,
+"beds": 330,
+"sources": []
+},
+{
+"id": "HSI00000761",
+"name": "Northern Arizona Healthcare",
+"city": "Flagstaff",
+"state": "AZ",
+"hospitals": 2,
+"beds": 329,
+"sources": []
+},
+{
+"id": "HSI00000847",
+"name": "Prohealth Care",
+"city": "Waukesha",
+"state": "WI",
+"hospitals": 3,
+"beds": 328,
+"sources": []
+},
+{
+"id": "HSI00001423",
+"name": "Pikeville Medical Center",
+"city": "Pikeville",
+"state": "KY",
+"hospitals": 1,
+"beds": 328,
+"sources": []
+},
+{
+"id": "HSI00001009",
+"name": "Southern Illinois Healthcare",
+"city": "Carbondale",
+"state": "IL",
+"hospitals": 4,
+"beds": 325,
+"sources": []
+},
+{
+"id": "HSI00000216",
+"name": "Childrens National Health System",
+"city": "Washington",
+"state": "DC",
+"hospitals": 2,
+"beds": 323,
+"sources": []
+},
+{
+"id": "HSI00000743",
+"name": "Norman Regional Health System",
+"city": "Norman",
+"state": "OK",
+"hospitals": 1,
+"beds": 322,
+"sources": []
+},
+{
+"id": "HSI00000818",
+"name": "TidalHealth Peninsula Regional",
+"city": "Salisbury",
+"state": "MD",
+"hospitals": 3,
+"beds": 322,
+"sources": []
+},
+{
+"id": "HSI00000161",
+"name": "Cape Cod Healthcare",
+"city": "Hyannis",
+"state": "MA",
+"hospitals": 2,
+"beds": 320,
+"sources": []
+},
+{
+"id": "HSI00000985",
+"name": "Silver Cross Hospital",
+"city": "New Lenox",
+"state": "IL",
+"hospitals": 1,
+"beds": 320,
+"sources": []
+},
+{
+"id": "HSI00000882",
+"name": "Riverside Health Care System",
+"city": "Yonkers",
+"state": "NY",
+"hospitals": 2,
+"beds": 319,
+"sources": []
+},
+{
+"id": "HSI00000165",
+"name": "Capital Region Health Care",
+"city": "Concord",
+"state": "NH",
+"hospitals": 3,
+"beds": 317,
+"sources": []
+},
+{
+"id": "HSI00001354",
+"name": "Self Regional Healthcare",
+"city": "Greenwood",
+"state": "SC",
+"hospitals": 2,
+"beds": 315,
+"sources": []
+},
+{
+"id": "HSI00000349",
+"name": "Eskenazi Health",
+"city": "Indianapolis",
+"state": "IN",
+"hospitals": 1,
+"beds": 314,
+"sources": []
+},
+{
+"id": "HSI00000616",
+"name": "MarinHealth",
+"city": "Greenbrae",
+"state": "CA",
+"hospitals": 1,
+"beds": 310,
+"sources": []
+},
+{
+"id": "HSI00001506",
+"name": "Tri City Healthcare District",
+"city": "Oceanside",
+"state": "CA",
+"hospitals": 1,
+"beds": 310,
+"sources": []
+},
+{
+"id": "HSI00000172",
+"name": "CarolinaEast Health System",
+"city": "New Bern",
+"state": "NC",
+"hospitals": 1,
+"beds": 306,
+"sources": []
+},
+{
+"id": "HSI00000034",
+"name": "Anderson Regional Health System",
+"city": "Meridian",
+"state": "MS",
+"hospitals": 2,
+"beds": 303,
+"sources": []
+},
+{
+"id": "HSI00000205",
+"name": "Chesapeake Regional Healthcare",
+"city": "Chesapeake",
+"state": "VA",
+"hospitals": 1,
+"beds": 302,
+"sources": []
+},
+{
+"id": "HSI00000538",
+"name": "Logan Health",
+"city": "Kalispell",
+"state": "MT",
+"hospitals": 6,
+"beds": 301,
+"sources": []
+},
+{
+"id": "HSI00000615",
+"name": "Valleywise Health",
+"city": "Phoenix",
+"state": "AZ",
+"hospitals": 1,
+"beds": 301,
+"sources": []
+},
+{
+"id": "HSI00000944",
+"name": "Slidell Memorial Hospital",
+"city": "Slidell",
+"state": "LA",
+"hospitals": 1,
+"beds": 301,
+"sources": []
+},
+{
+"id": "HSI00000630",
+"name": "Maury Regional Medical Center",
+"city": "Columbia",
+"state": "TN",
+"hospitals": 3,
+"beds": 299,
+"sources": []
+},
+{
+"id": "HSI00000008",
+"name": "Adena Health System",
+"city": "Chillicothe",
+"state": "OH",
+"hospitals": 4,
+"beds": 298,
+"sources": []
+},
+{
+"id": "HSI00000018",
+"name": "Alameda Health System",
+"city": "Oakland",
+"state": "CA",
+"hospitals": 4,
+"beds": 298,
+"sources": []
+},
+{
+"id": "HSI00000951",
+"name": "Samaritan Health Services",
+"city": "Corvallis",
+"state": "OR",
+"hospitals": 5,
+"beds": 298,
+"sources": []
+},
+{
+"id": "HSI00000913",
+"name": "Saint Clair Hospital",
+"city": "Pittsburgh",
+"state": "PA",
+"hospitals": 1,
+"beds": 297,
+"sources": []
+},
+{
+"id": "HSI00000999",
+"name": "South Georgia Medical Center",
+"city": "Valdosta",
+"state": "GA",
+"hospitals": 3,
+"beds": 296,
+"sources": []
+},
+{
+"id": "HSI00001409",
+"name": "El Paso County Hospital District",
+"city": "El Paso",
+"state": "TX",
+"hospitals": 1,
+"beds": 296,
+"sources": []
+},
+{
+"id": "HSI00001436",
+"name": "Overlake Medical Center and Clinics",
+"city": "Bellevue",
+"state": "WA",
+"hospitals": 1,
+"beds": 296,
+"sources": []
+},
+{
+"id": "HSI00000045",
+"name": "Archbold Medical Center",
+"city": "Thomasville",
+"state": "GA",
+"hospitals": 4,
+"beds": 293,
+"sources": []
+},
+{
+"id": "HSI00000497",
+"name": "Houston Healthcare",
+"city": "Warner Robins",
+"state": "GA",
+"hospitals": 2,
+"beds": 293,
+"sources": []
+},
+{
+"id": "HSI00001061",
+"name": "Tanner Health System",
+"city": "Carrollton",
+"state": "GA",
+"hospitals": 4,
+"beds": 292,
+"sources": []
+},
+{
+"id": "HSI00000870",
+"name": "Regional One Health",
+"city": "Memphis",
+"state": "TN",
+"hospitals": 2,
+"beds": 291,
+"sources": []
+},
+{
+"id": "HSI00001389",
+"name": "Holy Name Medical Center",
+"city": "Teaneck",
+"state": "NJ",
+"hospitals": 1,
+"beds": 289,
+"sources": []
+},
+{
+"id": "HSI00001032",
+"name": "Stamford Health",
+"city": "Stamford",
+"state": "CT",
+"hospitals": 1,
+"beds": 288,
+"sources": []
+},
+{
+"id": "HSI00000655",
+"name": "Memorial Hospital at Gulfport",
+"city": "Gulfport",
+"state": "MS",
+"hospitals": 2,
+"beds": 285,
+"sources": []
+},
+{
+"id": "HSI00001137",
+"name": "Union Health",
+"city": "Terre Haute",
+"state": "IN",
+"hospitals": 2,
+"beds": 285,
+"sources": []
+},
+{
+"id": "HSI00001351",
+"name": "San Francisco Health Network",
+"city": "San Francisco",
+"state": "CA",
+"hospitals": 2,
+"beds": 284,
+"sources": []
+},
+{
+"id": "HSI00000910",
+"name": "SBH Health System",
+"city": "Bronx",
+"state": "NY",
+"hospitals": 1,
+"beds": 283,
+"sources": []
+},
+{
+"id": "HSI00000306",
+"name": "Delta Health System",
+"city": "Greenville",
+"state": "MS",
+"hospitals": 4,
+"beds": 282,
+"sources": []
+},
+{
+"id": "HSI00000920",
+"name": "Saint Francis Healthcare System",
+"city": "Cape Girardeau",
+"state": "MO",
+"hospitals": 1,
+"beds": 282,
+"sources": []
+},
+{
+"id": "HSI00000087",
+"name": "Bassett Healthcare Network",
+"city": "Cooperstown",
+"state": "NY",
+"hospitals": 5,
+"beds": 279,
+"sources": []
+},
+{
+"id": "HSI00000380",
+"name": "Frederick Regional Health System",
+"city": "Frederick",
+"state": "MD",
+"hospitals": 1,
+"beds": 279,
+"sources": []
+},
+{
+"id": "HSI00000678",
+"name": "Nicklaus Childrens Health System",
+"city": "Miami",
+"state": "FL",
+"hospitals": 1,
+"beds": 278,
+"sources": []
+},
+{
+"id": "HSI00001501",
+"name": "Boone Hospital Center",
+"city": "Columbia",
+"state": "MO",
+"hospitals": 1,
+"beds": 278,
+"sources": []
+},
+{
+"id": "HSI00000325",
+"name": "East Alabama Medical Center",
+"city": "Opelika",
+"state": "AL",
+"hospitals": 2,
+"beds": 277,
+"sources": []
+},
+{
+"id": "HSI00000391",
+"name": "Genesis Healthcare System",
+"city": "Zanesville",
+"state": "OH",
+"hospitals": 1,
+"beds": 277,
+"sources": []
+},
+{
+"id": "HSI00001007",
+"name": "Southeast Health",
+"city": "Cape Girardeau",
+"state": "MO",
+"hospitals": 2,
+"beds": 275,
+"sources": []
+},
+{
+"id": "HSI00001442",
+"name": "Englewood Health",
+"city": "Englewood",
+"state": "NJ",
+"hospitals": 1,
+"beds": 274,
+"sources": []
+},
+{
+"id": "HSI00001223",
+"name": "Ventura County Health Care Agency",
+"city": "Ventura",
+"state": "CA",
+"hospitals": 1,
+"beds": 272,
+"sources": []
+},
+{
+"id": "HSI00000339",
+"name": "Ellis Medicine",
+"city": "Schenectady",
+"state": "NY",
+"hospitals": 2,
+"beds": 270,
+"sources": []
+},
+{
+"id": "HSI00000684",
+"name": "Midland County Hospital District",
+"city": "Midland",
+"state": "TX",
+"hospitals": 1,
+"beds": 268,
+"sources": []
+},
+{
+"id": "HSI00000903",
+"name": "SUNY Downstate Medical Center",
+"city": "Brooklyn",
+"state": "NY",
+"hospitals": 1,
+"beds": 268,
+"sources": []
+},
+{
+"id": "HSI00001441",
+"name": "South Central Regional Medical Center Health System",
+"city": "Laurel",
+"state": "MS",
+"hospitals": 1,
+"beds": 268,
+"sources": []
+},
+{
+"id": "HSI00000422",
+"name": "GBMC Healthcare",
+"city": "Baltimore",
+"state": "MD",
+"hospitals": 1,
+"beds": 265,
+"sources": []
+},
+{
+"id": "HSI00000671",
+"name": "Meritus Health",
+"city": "Hagerstown",
+"state": "MD",
+"hospitals": 1,
+"beds": 265,
+"sources": []
+},
+{
+"id": "HSI00000109",
+"name": "Berkshire Health Systems",
+"city": "Pittsfield",
+"state": "MA",
+"hospitals": 2,
+"beds": 262,
+"sources": []
+},
+{
+"id": "HSI00000188",
+"name": "Catholic Medical Center",
+"city": "Manchester",
+"state": "NH",
+"hospitals": 1,
+"beds": 262,
+"sources": []
+},
+{
+"id": "HSI00000345",
+"name": "Enloe Medical Center",
+"city": "Chico",
+"state": "CA",
+"hospitals": 1,
+"beds": 258,
+"sources": []
+},
+{
+"id": "HSI00001533",
+"name": "Riverside Healthcare",
+"city": "Kankakee",
+"state": "IL",
+"hospitals": 1,
+"beds": 256,
+"sources": []
+},
+{
+"id": "HSI00000255",
+"name": "Community Memorial Health System",
+"city": "Ventura",
+"state": "CA",
+"hospitals": 2,
+"beds": 254,
+"sources": []
+},
+{
+"id": "HSI00000937",
+"name": "Saint Lukes Hospital of Duluth",
+"city": "Duluth",
+"state": "MN",
+"hospitals": 2,
+"beds": 254,
+"sources": []
+},
+{
+"id": "HSI00001341",
+"name": "Parkview Medical Center",
+"city": "Pueblo",
+"state": "CO",
+"hospitals": 1,
+"beds": 253,
+"sources": []
+},
+{
+"id": "HSI00000710",
+"name": "Mount Nittany Health System",
+"city": "State College",
+"state": "PA",
+"hospitals": 1,
+"beds": 248,
+"sources": []
+},
+{
+"id": "HSI00000320",
+"name": "Doylestown Health",
+"city": "Doylestown",
+"state": "PA",
+"hospitals": 1,
+"beds": 247,
+"sources": []
+},
+{
+"id": "HSI00000751",
+"name": "North Oaks Health System",
+"city": "Hammond",
+"state": "LA",
+"hospitals": 2,
+"beds": 247,
+"sources": []
+},
+{
+"id": "HSI00000527",
+"name": "Jefferson Hospital Association",
+"city": "Pine Bluff",
+"state": "AR",
+"hospitals": 1,
+"beds": 245,
+"sources": []
+},
+{
+"id": "HSI00001143",
+"name": "United Regional Health Care System",
+"city": "Wichita Falls",
+"state": "TX",
+"hospitals": 1,
+"beds": 244,
+"sources": []
+},
+{
+"id": "HSI00001419",
+"name": "Jupiter Medical Center",
+"city": "Jupiter",
+"state": "FL",
+"hospitals": 1,
+"beds": 242,
+"sources": []
+},
+{
+"id": "HSI00000194",
+"name": "Centrastate Healthcare System",
+"city": "Freehold",
+"state": "NJ",
+"hospitals": 1,
+"beds": 240,
+"sources": []
+},
+{
+"id": "HSI00000949",
+"name": "Salinas Valley Memorial Healthcare System",
+"city": "Salinas",
+"state": "CA",
+"hospitals": 1,
+"beds": 240,
+"sources": []
+},
+{
+"id": "HSI00000444",
+"name": "Hamilton Health Care System",
+"city": "Dalton",
+"state": "GA",
+"hospitals": 1,
+"beds": 239,
+"sources": []
+},
+{
+"id": "HSI00000197",
+"name": "Central Maine Healthcare Corporation",
+"city": "Lewiston",
+"state": "ME",
+"hospitals": 3,
+"beds": 237,
+"sources": []
+},
+{
+"id": "HSI00001450",
+"name": "Larkin Health System",
+"city": "South Miami",
+"state": "FL",
+"hospitals": 3,
+"beds": 237,
+"sources": []
+},
+{
+"id": "HSI00001407",
+"name": "The Brooklyn Hospital Center",
+"city": "Brooklyn",
+"state": "NY",
+"hospitals": 1,
+"beds": 236,
+"sources": []
+},
+{
+"id": "HSI00001238",
+"name": "Washington Health System",
+"city": "Washington",
+"state": "PA",
+"hospitals": 2,
+"beds": 232,
+"sources": []
+},
+{
+"id": "HSI00000564",
+"name": "Lake Charles Memorial Health System",
+"city": "Lake Charles",
+"state": "LA",
+"hospitals": 2,
+"beds": 227,
+"sources": []
+},
+{
+"id": "HSI00001443",
+"name": "Montage Health",
+"city": "Monterey",
+"state": "CA",
+"hospitals": 1,
+"beds": 227,
+"sources": []
+},
+{
+"id": "HSI00000156",
+"name": "Cambridge Health Alliance",
+"city": "Cambridge",
+"state": "MA",
+"hospitals": 1,
+"beds": 225,
+"sources": []
+},
+{
+"id": "HSI00000639",
+"name": "Meadville Medical Center",
+"city": "Meadville",
+"state": "PA",
+"hospitals": 2,
+"beds": 225,
+"sources": []
+},
+{
+"id": "HSI00000581",
+"name": "Licking Memorial Health Systems",
+"city": "Newark",
+"state": "OH",
+"hospitals": 1,
+"beds": 219,
+"sources": []
+},
+{
+"id": "HSI00000649",
+"name": "Memorial Health System",
+"city": "Marietta",
+"state": "OH",
+"hospitals": 3,
+"beds": 219,
+"sources": []
+},
+{
+"id": "HSI00000666",
+"name": "Mercy Medical Center",
+"city": "Cedar Rapids",
+"state": "IA",
+"hospitals": 1,
+"beds": 216,
+"sources": []
+},
+{
+"id": "HSI00000321",
+"name": "Driscoll Childrens Hospital",
+"city": "Corpus Christi",
+"state": "TX",
+"hospitals": 1,
+"beds": 215,
+"sources": []
+},
+{
+"id": "HSI00000240",
+"name": "Columbus Regional Health",
+"city": "Columbus",
+"state": "IN",
+"hospitals": 1,
+"beds": 213,
+"sources": []
+},
+{
+"id": "HSI00000488",
+"name": "Holy Redeemer Health System",
+"city": "Huntingdon Valley",
+"state": "PA",
+"hospitals": 1,
+"beds": 213,
+"sources": []
+},
+{
+"id": "HSI00001571",
+"name": "Saint Tammany Health System",
+"city": "Covington",
+"state": "LA",
+"hospitals": 1,
+"beds": 213,
+"sources": []
+},
+{
+"id": "HSI00000275",
+"name": "Cookeville Regional Health System",
+"city": "Cookeville",
+"state": "TN",
+"hospitals": 1,
+"beds": 212,
+"sources": []
+},
+{
+"id": "HSI00001090",
+"name": "The University of Toledo Medical Center",
+"city": "Toledo",
+"state": "OH",
+"hospitals": 1,
+"beds": 212,
+"sources": []
+},
+{
+"id": "HSI00000103",
+"name": "Beebe Healthcare",
+"city": "Lewes",
+"state": "DE",
+"hospitals": 1,
+"beds": 210,
+"sources": []
+},
+{
+"id": "HSI00000879",
+"name": "Richmond University Medical Center",
+"city": "Staten Island",
+"state": "NY",
+"hospitals": 1,
+"beds": 209,
+"sources": []
+},
+{
+"id": "HSI00000812",
+"name": "Parrish Medical Center",
+"city": "Titusville",
+"state": "FL",
+"hospitals": 1,
+"beds": 208,
+"sources": []
+},
+{
+"id": "HSI00000346",
+"name": "Ephraim Mcdowell Health",
+"city": "Danville",
+"state": "KY",
+"hospitals": 3,
+"beds": 207,
+"sources": []
+},
+{
+"id": "HSI00000052",
+"name": "Arnot Health",
+"city": "Elmira",
+"state": "NY",
+"hospitals": 3,
+"beds": 206,
+"sources": []
+},
+{
+"id": "HSI00000948",
+"name": "Salina Regional Health Center",
+"city": "Salina",
+"state": "KS",
+"hospitals": 4,
+"beds": 206,
+"sources": []
+},
+{
+"id": "HSI00001457",
+"name": "San Joaquin County Clinics",
+"city": "French Camp",
+"state": "CA",
+"hospitals": 1,
+"beds": 206,
+"sources": []
+},
+{
+"id": "HSI00000105",
+"name": "Bellin Health Systems",
+"city": "Green Bay",
+"state": "WI",
+"hospitals": 3,
+"beds": 204,
+"sources": []
+},
+{
+"id": "HSI00000755",
+"name": "Northbay Healthcare",
+"city": "Fairfield",
+"state": "CA",
+"hospitals": 2,
+"beds": 204,
+"sources": []
+},
+{
+"id": "HSI00001525",
+"name": "Williamson County Hospital District",
+"city": "Franklin",
+"state": "TN",
+"hospitals": 1,
+"beds": 203,
+"sources": []
+},
+{
+"id": "HSI00000215",
+"name": "Childrens Hospital of the Kings Daughters Health System",
+"city": "Norfolk",
+"state": "VA",
+"hospitals": 1,
+"beds": 202,
+"sources": []
+},
+{
+"id": "HSI00000242",
+"name": "Comanche County Memorial Hospital",
+"city": "Lawton",
+"state": "OK",
+"hospitals": 1,
+"beds": 201,
+"sources": []
+},
+{
+"id": "HSI00001219",
+"name": "Valley Health Systems",
+"city": "Holyoke",
+"state": "MA",
+"hospitals": 1,
+"beds": 201,
+"sources": []
+},
+{
+"id": "HSI00000182",
+"name": "Catawba Valley Medical Center",
+"city": "Hickory",
+"state": "NC",
+"hospitals": 1,
+"beds": 200,
+"sources": []
+},
+{
+"id": "HSI00000729",
+"name": "New Liberty Hospital District of Clay County",
+"city": "Pleasant Valley",
+"state": "MO",
+"hospitals": 1,
+"beds": 199,
+"sources": []
+},
+{
+"id": "HSI00001532",
+"name": "Shore Physicians Group",
+"city": "Somers Point",
+"state": "NJ",
+"hospitals": 1,
+"beds": 199,
+"sources": []
+},
+{
+"id": "HSI00000032",
+"name": "Altru Health System",
+"city": "Grand Forks",
+"state": "ND",
+"hospitals": 2,
+"beds": 198,
+"sources": []
+},
+{
+"id": "HSI00000266",
+"name": "Confluence Health",
+"city": "Wenatchee",
+"state": "WA",
+"hospitals": 3,
+"beds": 198,
+"sources": []
+},
+{
+"id": "HSI00000867",
+"name": "Redlands Community Hospital",
+"city": "Redlands",
+"state": "CA",
+"hospitals": 1,
+"beds": 196,
+"sources": []
+},
+{
+"id": "HSI00001260",
+"name": "White River Health System",
+"city": "Batesville",
+"state": "AR",
+"hospitals": 2,
+"beds": 195,
+"sources": []
+},
+{
+"id": "HSI00000272",
+"name": "Conway Regional Health System",
+"city": "Conway",
+"state": "AR",
+"hospitals": 3,
+"beds": 194,
+"sources": []
+},
+{
+"id": "HSI00000063",
+"name": "Augusta Health",
+"city": "Fishersville",
+"state": "VA",
+"hospitals": 1,
+"beds": 193,
+"sources": []
+},
+{
+"id": "HSI00000236",
+"name": "Columbia Memorial Health",
+"city": "Hudson",
+"state": "NY",
+"hospitals": 1,
+"beds": 192,
+"sources": []
+},
+{
+"id": "HSI00001481",
+"name": "Southern Ohio Medical Center",
+"city": "Portsmouth",
+"state": "OH",
+"hospitals": 1,
+"beds": 192,
+"sources": []
+},
+{
+"id": "HSI00000956",
+"name": "San Juan Regional Medical Center",
+"city": "Farmington",
+"state": "NM",
+"hospitals": 2,
+"beds": 191,
+"sources": []
+},
+{
+"id": "HSI00001097",
+"name": "Tift Regional Medical Center",
+"city": "Tifton",
+"state": "GA",
+"hospitals": 2,
+"beds": 189,
+"sources": []
+},
+{
+"id": "HSI00001319",
+"name": "Holland Hospital",
+"city": "Holland",
+"state": "MI",
+"hospitals": 1,
+"beds": 189,
+"sources": []
+},
+{
+"id": "HSI00000268",
+"name": "Connecticut Childrens Medical Center Foundation",
+"city": "Hartford",
+"state": "CT",
+"hospitals": 1,
+"beds": 187,
+"sources": []
+},
+{
+"id": "HSI00000683",
+"name": "Middlesex Health System",
+"city": "Middletown",
+"state": "CT",
+"hospitals": 1,
+"beds": 187,
+"sources": []
+},
+{
+"id": "HSI00000213",
+"name": "Childrens Hospital and Medical Center",
+"city": "Omaha",
+"state": "NE",
+"hospitals": 1,
+"beds": 186,
+"sources": []
+},
+{
+"id": "HSI00000610",
+"name": "MaineGeneral Health",
+"city": "Augusta",
+"state": "ME",
+"hospitals": 1,
+"beds": 186,
+"sources": []
+},
+{
+"id": "HSI00001458",
+"name": "Lawrence General Hospital",
+"city": "Lawrence",
+"state": "MA",
+"hospitals": 1,
+"beds": 186,
+"sources": []
+},
+{
+"id": "HSI00000180",
+"name": "Skagit Regional Health",
+"city": "Arlington",
+"state": "WA",
+"hospitals": 2,
+"beds": 185,
+"sources": []
+},
+{
+"id": "HSI00000356",
+"name": "Fairfield Medical Center",
+"city": "Lancaster",
+"state": "OH",
+"hospitals": 1,
+"beds": 185,
+"sources": []
+},
+{
+"id": "HSI00000952",
+"name": "Samaritan Health",
+"city": "Watertown",
+"state": "NY",
+"hospitals": 2,
+"beds": 185,
+"sources": []
+},
+{
+"id": "HSI00000502",
+"name": "Hunterdon Healthcare System",
+"city": "Flemington",
+"state": "NJ",
+"hospitals": 1,
+"beds": 184,
+"sources": []
+},
+{
+"id": "HSI00000873",
+"name": "Reid Health",
+"city": "Richmond",
+"state": "IN",
+"hospitals": 1,
+"beds": 183,
+"sources": []
+},
+{
+"id": "HSI00000302",
+"name": "Dayton Childrens",
+"city": "Dayton",
+"state": "OH",
+"hospitals": 1,
+"beds": 181,
+"sources": []
+},
+{
+"id": "HSI00000415",
+"name": "Grand View Hospital",
+"city": "Sellersville",
+"state": "PA",
+"hospitals": 1,
+"beds": 180,
+"sources": []
+},
+{
+"id": "HSI00001145",
+"name": "Unity Health",
+"city": "Searcy",
+"state": "AR",
+"hospitals": 5,
+"beds": 179,
+"sources": []
+},
+{
+"id": "HSI00000116",
+"name": "Blanchard Valley Health System",
+"city": "Findlay",
+"state": "OH",
+"hospitals": 2,
+"beds": 177,
+"sources": []
+},
+{
+"id": "HSI00000178",
+"name": "Carson Tahoe Health",
+"city": "Carson City",
+"state": "NV",
+"hospitals": 3,
+"beds": 175,
+"sources": []
+},
+{
+"id": "HSI00000984",
+"name": "Signature Healthcare",
+"city": "Brockton",
+"state": "MA",
+"hospitals": 1,
+"beds": 175,
+"sources": []
+},
+{
+"id": "HSI00000421",
+"name": "Great River Health Systems",
+"city": "West Burlington",
+"state": "IA",
+"hospitals": 1,
+"beds": 174,
+"sources": []
+},
+{
+"id": "HSI00000358",
+"name": "Faith Regional Health Services",
+"city": "Norfolk",
+"state": "NE",
+"hospitals": 4,
+"beds": 173,
+"sources": []
+},
+{
+"id": "HSI00000663",
+"name": "Mercy Medical Center",
+"city": "Baltimore",
+"state": "MD",
+"hospitals": 1,
+"beds": 173,
+"sources": []
+},
+{
+"id": "HSI00000490",
+"name": "Holzer Health System",
+"city": "Gallipolis",
+"state": "OH",
+"hospitals": 2,
+"beds": 172,
+"sources": []
+},
+{
+"id": "HSI00000271",
+"name": "Conway Medical Center",
+"city": "Conway",
+"state": "SC",
+"hospitals": 1,
+"beds": 171,
+"sources": []
+},
+{
+"id": "HSI00000554",
+"name": "Kuakini Health System",
+"city": "Honolulu",
+"state": "HI",
+"hospitals": 1,
+"beds": 170,
+"sources": []
+},
+{
+"id": "HSI00001107",
+"name": "Trinity Health",
+"city": "Minot",
+"state": "ND",
+"hospitals": 2,
+"beds": 170,
+"sources": []
+},
+{
+"id": "HSI00000090",
+"name": "Baxter Regional Medical Center",
+"city": "Mountain Home",
+"state": "AR",
+"hospitals": 1,
+"beds": 169,
+"sources": []
+},
+{
+"id": "HSI00000100",
+"name": "Beaufort Memorial Hospital",
+"city": "Beaufort",
+"state": "SC",
+"hospitals": 1,
+"beds": 167,
+"sources": []
+},
+{
+"id": "HSI00001053",
+"name": "T J Regional Health",
+"city": "Glasgow",
+"state": "KY",
+"hospitals": 2,
+"beds": 161,
+"sources": []
+},
+{
+"id": "HSI00001520",
+"name": "El Centro Regional Medical Center",
+"city": "El Centro",
+"state": "CA",
+"hospitals": 1,
+"beds": 161,
+"sources": []
+},
+{
+"id": "HSI00001431",
+"name": "Hays Medical Center",
+"city": "Hays",
+"state": "KS",
+"hospitals": 2,
+"beds": 160,
+"sources": []
+},
+{
+"id": "HSI00000518",
+"name": "Iredell Health System",
+"city": "Statesville",
+"state": "NC",
+"hospitals": 1,
+"beds": 155,
+"sources": []
+},
+{
+"id": "HSI00001546",
+"name": "OroHealth Corporation",
+"city": "Oroville",
+"state": "CA",
+"hospitals": 1,
+"beds": 153,
+"sources": []
+},
+{
+"id": "HSI00001464",
+"name": "MLK Community Healthcare",
+"city": "Los Angeles",
+"state": "CA",
+"hospitals": 1,
+"beds": 152,
+"sources": []
+},
+{
+"id": "HSI00000363",
+"name": "Firelands Regional Health System",
+"city": "Sandusky",
+"state": "OH",
+"hospitals": 1,
+"beds": 149,
+"sources": []
+},
+{
+"id": "HSI00001396",
+"name": "Cape Regional Health System",
+"city": "Cape May Court House",
+"state": "NJ",
+"hospitals": 1,
+"beds": 149,
+"sources": []
+},
+{
+"id": "HSI00000206",
+"name": "Cheyenne Regional Medical Center",
+"city": "Cheyenne",
+"state": "WY",
+"hospitals": 2,
+"beds": 147,
+"sources": []
+},
+{
+"id": "HSI00001359",
+"name": "Stillwater Medical Center Authority",
+"city": "Stillwater",
+"state": "OK",
+"hospitals": 4,
+"beds": 147,
+"sources": []
+},
+{
+"id": "HSI00000118",
+"name": "Blount Memorial Hospital",
+"city": "Maryville",
+"state": "TN",
+"hospitals": 1,
+"beds": 145,
+"sources": []
+},
+{
+"id": "HSI00000686",
+"name": "Lecom Health",
+"city": "Erie",
+"state": "PA",
+"hospitals": 2,
+"beds": 144,
+"sources": []
+},
+{
+"id": "HSI00000723",
+"name": "Natividad Medical Center",
+"city": "Salinas",
+"state": "CA",
+"hospitals": 1,
+"beds": 144,
+"sources": []
+},
+{
+"id": "HSI00000930",
+"name": "Saint Lawrence Health System",
+"city": "Potsdam",
+"state": "NY",
+"hospitals": 3,
+"beds": 144,
+"sources": []
+},
+{
+"id": "HSI00001473",
+"name": "Anderson Medical Group",
+"city": "Maryville",
+"state": "IL",
+"hospitals": 1,
+"beds": 144,
+"sources": []
+},
+{
+"id": "HSI00000362",
+"name": "Finger Lakes Regional Health System",
+"city": "Geneva",
+"state": "NY",
+"hospitals": 2,
+"beds": 142,
+"sources": []
+},
+{
+"id": "HSI00000900",
+"name": "Rutland Regional Health Services",
+"city": "Rutland",
+"state": "VT",
+"hospitals": 1,
+"beds": 142,
+"sources": []
+},
+{
+"id": "HSI00001170",
+"name": "University of Connecticut Health Center",
+"city": "Farmington",
+"state": "CT",
+"hospitals": 1,
+"beds": 141,
+"sources": []
+},
+{
+"id": "HSI00000347",
+"name": "Episcopal Health Services",
+"city": "Garden City",
+"state": "NY",
+"hospitals": 1,
+"beds": 140,
+"sources": []
+},
+{
+"id": "HSI00000132",
+"name": "Boulder Community Health",
+"city": "Boulder",
+"state": "CO",
+"hospitals": 1,
+"beds": 139,
+"sources": []
+},
+{
+"id": "HSI00000135",
+"name": "Bozeman Deaconess Hospital",
+"city": "Bozeman",
+"state": "MT",
+"hospitals": 1,
+"beds": 139,
+"sources": []
+},
+{
+"id": "HSI00000881",
+"name": "Ridgeview Medical Center",
+"city": "Waconia",
+"state": "MN",
+"hospitals": 3,
+"beds": 138,
+"sources": []
+},
+{
+"id": "HSI00001545",
+"name": "Cullman Regional Medical Center",
+"city": "Cullman",
+"state": "AL",
+"hospitals": 1,
+"beds": 137,
+"sources": []
+},
+{
+"id": "HSI00000478",
+"name": "Heywood Healthcare",
+"city": "Gardner",
+"state": "MA",
+"hospitals": 2,
+"beds": 135,
+"sources": []
+},
+{
+"id": "HSI00001324",
+"name": "Indiana Regional Medical Center",
+"city": "Indiana",
+"state": "PA",
+"hospitals": 1,
+"beds": 134,
+"sources": []
+},
+{
+"id": "HSI00000737",
+"name": "Niagara Falls Memorial Medical Center",
+"city": "Niagara Falls",
+"state": "NY",
+"hospitals": 1,
+"beds": 133,
+"sources": []
+},
+{
+"id": "HSI00000798",
+"name": "Oswego Health",
+"city": "Oswego",
+"state": "NY",
+"hospitals": 1,
+"beds": 132,
+"sources": []
+},
+{
+"id": "HSI00000871",
+"name": "Regional West Health Services",
+"city": "Scottsbluff",
+"state": "NE",
+"hospitals": 3,
+"beds": 132,
+"sources": []
+},
+{
+"id": "HSI00000472",
+"name": "Hendricks Regional Health",
+"city": "Danville",
+"state": "IN",
+"hospitals": 2,
+"beds": 130,
+"sources": []
+},
+{
+"id": "HSI00000300",
+"name": "Davis Health System",
+"city": "Elkins",
+"state": "WV",
+"hospitals": 3,
+"beds": 127,
+"sources": []
+},
+{
+"id": "HSI00000943",
+"name": "Saint Peters Health",
+"city": "Helena",
+"state": "MT",
+"hospitals": 1,
+"beds": 125,
+"sources": []
+},
+{
+"id": "HSI00001041",
+"name": "Sturdy Memorial Hospital",
+"city": "Attleboro",
+"state": "MA",
+"hospitals": 1,
+"beds": 125,
+"sources": []
+},
+{
+"id": "HSI00000270",
+"name": "Contra Costa Health Services",
+"city": "Martinez",
+"state": "CA",
+"hospitals": 1,
+"beds": 124,
+"sources": []
+},
+{
+"id": "HSI00001286",
+"name": "Bristol Hospital",
+"city": "Bristol",
+"state": "CT",
+"hospitals": 1,
+"beds": 123,
+"sources": []
+},
+{
+"id": "HSI00000925",
+"name": "Saint Joseph Medical Center",
+"city": "Yonkers",
+"state": "NY",
+"hospitals": 1,
+"beds": 122,
+"sources": []
+},
+{
+"id": "HSI00001446",
+"name": "Foundation Health Partners",
+"city": "Fairbanks",
+"state": "AK",
+"hospitals": 1,
+"beds": 122,
+"sources": []
+},
+{
+"id": "HSI00000887",
+"name": "Riverview Hospital",
+"city": "Noblesville",
+"state": "IN",
+"hospitals": 1,
+"beds": 121,
+"sources": []
+},
+{
+"id": "HSI00001338",
+"name": "Northeastern Health System",
+"city": "Tahlequah",
+"state": "OK",
+"hospitals": 2,
+"beds": 121,
+"sources": []
+},
+{
+"id": "HSI00000352",
+"name": "Evangelical Community Hospital",
+"city": "Lewisburg",
+"state": "PA",
+"hospitals": 1,
+"beds": 119,
+"sources": []
+},
+{
+"id": "HSI00000189",
+"name": "Cayuga Medical Center",
+"city": "Ithaca",
+"state": "NY",
+"hospitals": 2,
+"beds": 114,
+"sources": []
+},
+{
+"id": "HSI00000652",
+"name": "Memorial Healthcare",
+"city": "Owosso",
+"state": "MI",
+"hospitals": 1,
+"beds": 113,
+"sources": []
+},
+{
+"id": "HSI00001287",
+"name": "Broadlawns Medical Center",
+"city": "Des Moines",
+"state": "IA",
+"hospitals": 1,
+"beds": 113,
+"sources": []
+},
+{
+"id": "HSI00001314",
+"name": "Hancock Regional Hospital",
+"city": "Greenfield",
+"state": "IN",
+"hospitals": 1,
+"beds": 113,
+"sources": []
+},
+{
+"id": "HSI00001421",
+"name": "Wooster Community Hospital Health System",
+"city": "Wooster",
+"state": "OH",
+"hospitals": 1,
+"beds": 112,
+"sources": []
+},
+{
+"id": "HSI00000340",
+"name": "Emerson Hospital Health System",
+"city": "Concord",
+"state": "MA",
+"hospitals": 1,
+"beds": 111,
+"sources": []
+},
+{
+"id": "HSI00000619",
+"name": "Marshall Medical Center",
+"city": "Placerville",
+"state": "CA",
+"hospitals": 1,
+"beds": 111,
+"sources": []
+},
+{
+"id": "HSI00001529",
+"name": "Ozarks Healthcare",
+"city": "West Plains",
+"state": "MO",
+"hospitals": 1,
+"beds": 111,
+"sources": []
+},
+{
+"id": "HSI00001415",
+"name": "LMH Health",
+"city": "Lawrence",
+"state": "KS",
+"hospitals": 1,
+"beds": 110,
+"sources": []
+},
+{
+"id": "HSI00000568",
+"name": "Lake Regional Health System",
+"city": "Osage Beach",
+"state": "MO",
+"hospitals": 1,
+"beds": 105,
+"sources": []
+},
+{
+"id": "HSI00000301",
+"name": "Day Kimball Healthcare",
+"city": "Putnam",
+"state": "CT",
+"hospitals": 1,
+"beds": 104,
+"sources": []
+},
+{
+"id": "HSI00001309",
+"name": "Goshen Health",
+"city": "Goshen",
+"state": "IN",
+"hospitals": 1,
+"beds": 103,
+"sources": []
+},
+{
+"id": "HSI00000792",
+"name": "Oneida Health",
+"city": "Oneida",
+"state": "NY",
+"hospitals": 1,
+"beds": 101,
+"sources": []
+},
+{
+"id": "HSI00000235",
+"name": "Colquitt Regional Medical Center",
+"city": "Moultrie",
+"state": "GA",
+"hospitals": 1,
+"beds": 100,
+"sources": []
+},
+{
+"id": "HSI00000382",
+"name": "Freeport Health Network",
+"city": "Freeport",
+"state": "IL",
+"hospitals": 1,
+"beds": 100,
+"sources": []
+},
+{
+"id": "HSI00000914",
+"name": "Saint Claire Regional Medical Center",
+"city": "Morehead",
+"state": "KY",
+"hospitals": 1,
+"beds": 100,
+"sources": []
+},
+{
+"id": "HSI00000961",
+"name": "Sarah Bush Lincoln Health System",
+"city": "Mattoon",
+"state": "IL",
+"hospitals": 1,
+"beds": 100,
+"sources": []
+},
+{
+"id": "HSI00001381",
+"name": "Saint Marys Healthcare",
+"city": "Amsterdam",
+"state": "NY",
+"hospitals": 2,
+"beds": 100,
+"sources": []
+},
+{
+"id": "HSI00000319",
+"name": "Alomere Health",
+"city": "Alexandria",
+"state": "MN",
+"hospitals": 1,
+"beds": 99,
+"sources": []
+},
+{
+"id": "HSI00000355",
+"name": "Exeter Health Resources",
+"city": "Exeter",
+"state": "NH",
+"hospitals": 1,
+"beds": 99,
+"sources": []
+},
+{
+"id": "HSI00000405",
+"name": "Good Samaritan",
+"city": "Vincennes",
+"state": "IN",
+"hospitals": 1,
+"beds": 99,
+"sources": []
+},
+{
+"id": "HSI00000694",
+"name": "Missouri Delta Medical Center",
+"city": "Sikeston",
+"state": "MO",
+"hospitals": 1,
+"beds": 98,
+"sources": []
+},
+{
+"id": "HSI00000822",
+"name": "Peterson Health",
+"city": "Kerrville",
+"state": "TX",
+"hospitals": 1,
+"beds": 98,
+"sources": []
+},
+{
+"id": "HSI00000106",
+"name": "Beloit Health System",
+"city": "Beloit",
+"state": "WI",
+"hospitals": 1,
+"beds": 97,
+"sources": []
+},
+{
+"id": "HSI00000623",
+"name": "Mary Lanning Healthcare",
+"city": "Hastings",
+"state": "NE",
+"hospitals": 1,
+"beds": 97,
+"sources": []
+},
+{
+"id": "HSI00000753",
+"name": "Great Plains Health",
+"city": "North Platte",
+"state": "NE",
+"hospitals": 1,
+"beds": 96,
+"sources": []
+},
+{
+"id": "HSI00001560",
+"name": "Little Company of Mary Hospital of Indiana",
+"city": "Jasper",
+"state": "IN",
+"hospitals": 1,
+"beds": 96,
+"sources": []
+},
+{
+"id": "HSI00000051",
+"name": "Armstrong County Memorial Hospital",
+"city": "Kittanning",
+"state": "PA",
+"hospitals": 1,
+"beds": 95,
+"sources": []
+},
+{
+"id": "HSI00000148",
+"name": "CGH Medical Center",
+"city": "Sterling",
+"state": "IL",
+"hospitals": 1,
+"beds": 95,
+"sources": []
+},
+{
+"id": "HSI00001242",
+"name": "Wayne Memorial Health System",
+"city": "Honesdale",
+"state": "PA",
+"hospitals": 1,
+"beds": 92,
+"sources": []
+},
+{
+"id": "HSI00000567",
+"name": "Lake Region Healthcare",
+"city": "Fergus Falls",
+"state": "MN",
+"hospitals": 2,
+"beds": 90,
+"sources": []
+},
+{
+"id": "HSI00000994",
+"name": "Sky Lakes Medical Center",
+"city": "Klamath Falls",
+"state": "OR",
+"hospitals": 1,
+"beds": 90,
+"sources": []
+},
+{
+"id": "HSI00001084",
+"name": "The Morris Hospital and Healthcare Centers",
+"city": "Morris",
+"state": "IL",
+"hospitals": 1,
+"beds": 89,
+"sources": []
+},
+{
+"id": "HSI00001400",
+"name": "Summit Healthcare",
+"city": "Show Low",
+"state": "AZ",
+"hospitals": 1,
+"beds": 89,
+"sources": []
+},
+{
+"id": "HSI00001350",
+"name": "Salem Regional Medical Center",
+"city": "Salem",
+"state": "OH",
+"hospitals": 1,
+"beds": 87,
+"sources": []
+},
+{
+"id": "HSI00000086",
+"name": "Barton Health",
+"city": "South Lake Tahoe",
+"state": "CA",
+"hospitals": 2,
+"beds": 86,
+"sources": []
+},
+{
+"id": "HSI00000445",
+"name": "Hannibal Regional Healthcare System",
+"city": "Hannibal",
+"state": "MO",
+"hospitals": 1,
+"beds": 86,
+"sources": []
+},
+{
+"id": "HSI00001283",
+"name": "Auburn Community Hospital",
+"city": "Auburn",
+"state": "NY",
+"hospitals": 1,
+"beds": 85,
+"sources": []
+},
+{
+"id": "HSI00000539",
+"name": "Katherine Shaw Bethea Hospital",
+"city": "Dixon",
+"state": "IL",
+"hospitals": 1,
+"beds": 80,
+"sources": []
+},
+{
+"id": "HSI00000998",
+"name": "South County Health",
+"city": "Wakefield",
+"state": "RI",
+"hospitals": 1,
+"beds": 79,
+"sources": []
+},
+{
+"id": "HSI00000155",
+"name": "CalvertHealth",
+"city": "Prince Frederick",
+"state": "MD",
+"hospitals": 1,
+"beds": 78,
+"sources": []
+},
+{
+"id": "HSI00000229",
+"name": "Olympic Medical Center",
+"city": "Port Angeles",
+"state": "WA",
+"hospitals": 1,
+"beds": 78,
+"sources": []
+},
+{
+"id": "HSI00000367",
+"name": "Fisher Titus Medical Center",
+"city": "Norwalk",
+"state": "OH",
+"hospitals": 1,
+"beds": 78,
+"sources": []
+},
+{
+"id": "HSI00001449",
+"name": "Oaklawn Hospital",
+"city": "Marshall",
+"state": "MI",
+"hospitals": 1,
+"beds": 78,
+"sources": []
+},
+{
+"id": "HSI00001188",
+"name": "Upper Peninsula Health Care Solutions",
+"city": "Marquette",
+"state": "MI",
+"hospitals": 4,
+"beds": 72,
+"sources": []
+},
+{
+"id": "HSI00001281",
+"name": "Astria Health System",
+"city": "Sunnyside",
+"state": "WA",
+"hospitals": 2,
+"beds": 72,
+"sources": []
+},
+{
+"id": "HSI00001403",
+"name": "San Mateo County Health",
+"city": "San Mateo",
+"state": "CA",
+"hospitals": 1,
+"beds": 69,
+"sources": []
+},
+{
+"id": "HSI00000159",
+"name": "Campbell County Health",
+"city": "Gillette",
+"state": "WY",
+"hospitals": 1,
+"beds": 66,
+"sources": []
+},
+{
+"id": "HSI00000264",
+"name": "Conejos County Hospital Corporation",
+"city": "La Jara",
+"state": "CO",
+"hospitals": 2,
+"beds": 66,
+"sources": []
+},
+{
+"id": "HSI00000394",
+"name": "Gerald Champion Regional Medical Center",
+"city": "Alamogordo",
+"state": "NM",
+"hospitals": 1,
+"beds": 66,
+"sources": []
+},
+{
+"id": "HSI00001580",
+"name": "Knox Community Hospital",
+"city": "Mount Vernon",
+"state": "OH",
+"hospitals": 1,
+"beds": 64,
+"sources": []
+},
+{
+"id": "HSI00000059",
+"name": "Atlantic General Health System",
+"city": "Berlin",
+"state": "MD",
+"hospitals": 1,
+"beds": 62,
+"sources": []
+},
+{
+"id": "HSI00000789",
+"name": "Olmsted Medical Center",
+"city": "Rochester",
+"state": "MN",
+"hospitals": 1,
+"beds": 61,
+"sources": []
+},
+{
+"id": "HSI00001424",
+"name": "Memorial Hospital of Sweetwater County",
+"city": "Rock Springs",
+"state": "WY",
+"hospitals": 1,
+"beds": 58,
+"sources": []
+},
+{
+"id": "HSI00001214",
+"name": "Vail Health",
+"city": "Vail",
+"state": "CO",
+"hospitals": 1,
+"beds": 54,
+"sources": []
+},
+{
+"id": "HSI00001274",
+"name": "York Hospital",
+"city": "York",
+"state": "ME",
+"hospitals": 1,
+"beds": 54,
+"sources": []
+},
+{
+"id": "HSI00000225",
+"name": "Citizens Memorial Healthcare",
+"city": "Bolivar",
+"state": "MO",
+"hospitals": 1,
+"beds": 52,
+"sources": []
+},
+{
+"id": "HSI00000360",
+"name": "Boys Town National Research Hospital",
+"city": "Boys Town",
+"state": "NE",
+"hospitals": 1,
+"beds": 52,
+"sources": []
+},
+{
+"id": "HSI00001352",
+"name": "Schneck Medical Center",
+"city": "Seymour",
+"state": "IN",
+"hospitals": 1,
+"beds": 52,
+"sources": []
+},
+{
+"id": "HSI00001269",
+"name": "Witham Health Services",
+"city": "Lebanon",
+"state": "IN",
+"hospitals": 1,
+"beds": 50,
+"sources": []
+},
+{
+"id": "HSI00001447",
+"name": "North Country Healthcare",
+"city": "Whitefield",
+"state": "NH",
+"hospitals": 3,
+"beds": 50,
+"sources": []
+},
+{
+"id": "HSI00000474",
+"name": "Henry Community Health",
+"city": "New Castle",
+"state": "IN",
+"hospitals": 1,
+"beds": 48,
+"sources": []
+},
+{
+"id": "HSI00000953",
+"name": "Samaritan Healthcare",
+"city": "Moses Lake",
+"state": "WA",
+"hospitals": 1,
+"beds": 48,
+"sources": []
+},
+{
+"id": "HSI00001588",
+"name": "Saint Johns Health",
+"city": "Jackson",
+"state": "WY",
+"hospitals": 1,
+"beds": 48,
+"sources": []
+},
+{
+"id": "HSI00000612",
+"name": "Major Health Partners",
+"city": "Shelbyville",
+"state": "IN",
+"hospitals": 1,
+"beds": 46,
+"sources": []
+},
+{
+"id": "HSI00001003",
+"name": "Southeast Alaska Regional Health Consortium",
+"city": "Juneau",
+"state": "AK",
+"hospitals": 4,
+"beds": 45,
+"sources": []
+},
+{
+"id": "HSI00001334",
+"name": "Mountain View Hospital",
+"city": "Idaho Falls",
+"state": "ID",
+"hospitals": 1,
+"beds": 43,
+"sources": []
+},
+{
+"id": "HSI00001356",
+"name": "Island Hospital",
+"city": "Anacortes",
+"state": "WA",
+"hospitals": 1,
+"beds": 43,
+"sources": []
+},
+{
+"id": "HSI00000402",
+"name": "Golden Valley Memorial Healthcare",
+"city": "Clinton",
+"state": "MO",
+"hospitals": 1,
+"beds": 42,
+"sources": []
+},
+{
+"id": "HSI00001264",
+"name": "Winona Health",
+"city": "Winona",
+"state": "MN",
+"hospitals": 1,
+"beds": 41,
+"sources": []
+},
+{
+"id": "HSI00000765",
+"name": "Northfield Hospital and Clinics",
+"city": "Northfield",
+"state": "MN",
+"hospitals": 1,
+"beds": 37,
+"sources": []
+},
+{
+"id": "HSI00001365",
+"name": "Valley View Hospital Association",
+"city": "Glenwood Springs",
+"state": "CO",
+"hospitals": 1,
+"beds": 31,
+"sources": []
+},
+{
+"id": "HSI00001059",
+"name": "Tahoe Forest Hospital District",
+"city": "Truckee",
+"state": "CA",
+"hospitals": 2,
+"beds": 29,
+"sources": []
+},
+{
+"id": "HSI00000071",
+"name": "BMH",
+"city": "Blackfoot",
+"state": "ID",
+"hospitals": 2,
+"beds": 25,
+"sources": []
+},
+{
+"id": "HSI00000416",
+"name": "Grande Ronde Hospital and Clinics",
+"city": "La Grande",
+"state": "OR",
+"hospitals": 1,
+"beds": 25,
+"sources": []
+},
+{
+"id": "HSI00000526",
+"name": "Jefferson Healthcare",
+"city": "Port Townsend",
+"state": "WA",
+"hospitals": 2,
+"beds": 25,
+"sources": []
+},
+{
+"id": "HSI00000613",
+"name": "Bitterroot Health",
+"city": "Hamilton",
+"state": "MT",
+"hospitals": 1,
+"beds": 25,
+"sources": []
+},
+{
+"id": "HSI00000614",
+"name": "Margaret Mary Health",
+"city": "Batesville",
+"state": "IN",
+"hospitals": 1,
+"beds": 25,
+"sources": []
+},
+{
+"id": "HSI00000815",
+"name": "Pella Regional Health Center",
+"city": "Pella",
+"state": "IA",
+"hospitals": 1,
+"beds": 25,
+"sources": []
+},
+{
+"id": "HSI00000855",
+"name": "Public Hospital District 1A of Whitman County",
+"city": "Pullman",
+"state": "WA",
+"hospitals": 1,
+"beds": 25,
+"sources": []
+},
+{
+"id": "HSI00001301",
+"name": "Cuyuna Regional Medical Center",
+"city": "Crosby",
+"state": "MN",
+"hospitals": 2,
+"beds": 25,
+"sources": []
+},
+{
+"id": "HSI00001402",
+"name": "Tri State Memorial Hospital",
+"city": "Clarkston",
+"state": "WA",
+"hospitals": 1,
+"beds": 25,
+"sources": []
+},
+{
+"id": "HSI00001412",
+"name": "Redington Fairview General Hospital",
+"city": "Skowhegan",
+"state": "ME",
+"hospitals": 1,
+"beds": 25,
+"sources": []
+},
+{
+"id": "HSI00001540",
+"name": "Western Wisconsin Health",
+"city": "Baldwin",
+"state": "WI",
+"hospitals": 2,
+"beds": 25,
+"sources": []
+},
+{
+"id": "HSI00000559",
+"name": "LSU Healthcare Services Division",
+"city": "Baton Rouge",
+"state": "LA",
+"hospitals": 1,
+"beds": 24,
+"sources": []
+},
+{
+"id": "HSI00000720",
+"name": "National Jewish Health",
+"city": "Denver",
+"state": "CO",
+"hospitals": 1,
+"beds": 13,
+"sources": []
+},
+{
+"id": "HSI00000327",
+"name": "East Tennessee Childrens Hospital Association",
+"city": "Knoxville",
+"state": "TN",
+"hospitals": 1,
+"beds": 0,
+"sources": []
+},
+{
+"id": "HSI00000515",
+"name": "Interfaith Medical Center",
+"city": "Brooklyn",
+"state": "NY",
+"hospitals": 1,
+"beds": 0,
+"sources": []
+},
+{
+"id": "HSI00000981",
+"name": "Shriners Hospitals for Children",
+"city": "Tampa",
+"state": "FL",
+"hospitals": 17,
+"beds": 0,
+"sources": []
+},
+{
+"id": "HSI00001176",
+"name": "University of Miami Health System",
+"city": "Miami",
+"state": "FL",
+"hospitals": 3,
+"beds": 0,
+"sources": []
+}
+]

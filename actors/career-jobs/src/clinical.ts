@@ -224,7 +224,7 @@ export function clinicalTags(j: ClinicalInput): ClinicalTags {
         ? "per diem"
         : /\bcontract\b|temporary|\btemp\b|seasonal/i.test(emp)
           ? "contract"
-          : /part[\s-]?time|\bPT\b(?!A)|\b0?\.[1-7]\d? FTE\b/.test(emp) && !/physical therap/i.test(title)
+          : (/part[\s-]?time/i.test(emp) || /\bPT\b(?!A)|\b0?\.[1-7]\d? FTE\b/.test(emp)) && !/physical therap/i.test(title)
             ? "part time"
             : /full[\s-]?time|\bFT\b/i.test(emp)
               ? "full time"

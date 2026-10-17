@@ -1,0 +1,19 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "Hospital jobs output",
+  "description": "One record per job in the default dataset, plus a SUMMARY record describing the run.",
+  "properties": {
+    "jobs": {
+      "type": "string",
+      "title": "Hospital jobs",
+      "description": "Every job delivered, with its health system and clinical tags.",
+      "template": "{{links.apiDefaultDatasetUrl}}/items"
+    },
+    "summary": {
+      "type": "string",
+      "title": "Run summary",
+      "description": "Jobs delivered, index date, and why the run stopped.",
+      "template": "{{links.apiDefaultKeyValueStoreUrl}}/records/SUMMARY"
+    }
+  }
+}

@@ -76,6 +76,8 @@ test("employment: locum, travel, per diem, contract, part and full time", () => 
   assert.equal(emp("Respiratory Therapist (RT) Casual"), "per diem");
   assert.equal(emp("Pharmacy Technician - Hospital Contract $30/hr", "Full time"), "contract");
   assert.equal(emp("Emergency Technician 0.6 FTE Night"), "part time");
+  // The title wins over the site's employment type.
+  assert.equal(emp("Registered Nurse RN Labor and Delivery Night Part Time", "Full time"), "part time");
   assert.equal(emp("RN Ambulatory - Rheumatology - FT"), "full time");
   // PT on a physical therapist is the job, not part time.
   assert.equal(emp("PT - Physical Therapist Outpatient", "Full time"), "full time");

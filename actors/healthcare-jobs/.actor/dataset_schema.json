@@ -1,0 +1,74 @@
+{
+  "actorSpecification": 1,
+  "views": {
+    "overview": {
+      "title": "Hospital jobs",
+      "transformation": {
+        "fields": [
+          "title",
+          "healthSystem",
+          "location",
+          "roleFamily",
+          "specialties",
+          "shift",
+          "employment",
+          "signOnBonusAmount",
+          "salaryMin",
+          "salaryMax",
+          "salaryPeriod",
+          "postedAt",
+          "url"
+        ]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "title": {
+            "label": "Title"
+          },
+          "healthSystem": {
+            "label": "Health system"
+          },
+          "location": {
+            "label": "Location"
+          },
+          "roleFamily": {
+            "label": "Role type"
+          },
+          "specialties": {
+            "label": "Specialty"
+          },
+          "shift": {
+            "label": "Shift"
+          },
+          "employment": {
+            "label": "Employment"
+          },
+          "signOnBonusAmount": {
+            "label": "Sign-on bonus",
+            "format": "number"
+          },
+          "salaryMin": {
+            "label": "Pay from",
+            "format": "number"
+          },
+          "salaryMax": {
+            "label": "Pay to",
+            "format": "number"
+          },
+          "salaryPeriod": {
+            "label": "Per"
+          },
+          "postedAt": {
+            "label": "Posted",
+            "format": "date"
+          },
+          "url": {
+            "label": "Apply",
+            "format": "link"
+          }
+        }
+      }
+    }
+  }
+}

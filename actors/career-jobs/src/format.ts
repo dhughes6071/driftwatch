@@ -103,6 +103,8 @@ export interface Manifest {
   shards: ShardRef[];
   /** Description chunk key -> signed URL. */
   desc: Record<string, string>;
+  /** Clinical tags (src/clinical.ts) for jobs at US health systems: gzip JSON { jobId: ClinicalTags }. Absent before 17 Oct 2026. */
+  health?: { url: string; count: number };
 }
 
 /** Newest first; undated last (they cannot be ruled in or out by a date filter). */

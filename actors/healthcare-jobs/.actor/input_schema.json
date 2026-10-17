@@ -1,0 +1,196 @@
+{
+  "title": "US Hospital & Health System Jobs",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "titleKeywords": {
+      "title": "Title keywords",
+      "type": "array",
+      "editor": "stringList",
+      "description": "Only roles whose title contains one of these (case-insensitive). Keywords of 3 letters or fewer, like \"RN\", match whole words only.",
+      "prefill": [
+        "registered nurse",
+        "RN"
+      ]
+    },
+    "roleFamilies": {
+      "title": "Role type",
+      "type": "array",
+      "editor": "select",
+      "description": "Only these kinds of roles. Leave empty for all.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Registered nurse",
+          "LPN / LVN",
+          "Nursing support",
+          "Nursing leadership",
+          "Advanced practice provider",
+          "Physician",
+          "Allied health",
+          "Non-clinical"
+        ]
+      }
+    },
+    "specialties": {
+      "title": "Unit or specialty",
+      "type": "array",
+      "editor": "select",
+      "description": "Only roles in one of these units or specialties, read from the job title and category (e.g. ICU, Emergency, Labor and delivery).",
+      "items": {
+        "type": "string",
+        "enum": [
+          "NICU",
+          "PICU",
+          "ICU",
+          "Emergency",
+          "Perioperative",
+          "Med-surg",
+          "Telemetry / step-down",
+          "Labor and delivery",
+          "Mother-baby / postpartum",
+          "Pediatrics",
+          "Oncology",
+          "Cardiac",
+          "Behavioral health",
+          "Dialysis",
+          "Home health / hospice",
+          "Rehabilitation",
+          "Ambulatory",
+          "Float pool",
+          "Case management",
+          "Neuro",
+          "Orthopedics",
+          "Long-term care"
+        ]
+      }
+    },
+    "employment": {
+      "title": "Employment type",
+      "type": "array",
+      "editor": "select",
+      "description": "Only these kinds of employment. Per diem includes PRN and casual.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "per diem",
+          "travel",
+          "locum",
+          "contract",
+          "part time",
+          "full time"
+        ]
+      }
+    },
+    "shifts": {
+      "title": "Shift",
+      "type": "array",
+      "editor": "select",
+      "description": "Only roles whose title or description names one of these shifts.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "days",
+          "nights",
+          "evenings",
+          "rotating",
+          "weekends"
+        ]
+      }
+    },
+    "onlySignOnBonus": {
+      "title": "Only roles with a sign-on bonus",
+      "type": "boolean",
+      "description": "Only roles whose title or description offers a sign-on (or hiring) bonus.",
+      "default": false
+    },
+    "minSignOnBonus": {
+      "title": "Minimum sign-on bonus (USD)",
+      "type": "integer",
+      "description": "Only roles that state a sign-on bonus of at least this amount.",
+      "minimum": 0
+    },
+    "healthSystems": {
+      "title": "Health systems",
+      "type": "array",
+      "editor": "stringList",
+      "description": "Only these health systems, by name (partial names work: \"Ascension\", \"Baylor\", \"BJC\"). Leave empty for all."
+    },
+    "systemStates": {
+      "title": "Health system home states",
+      "type": "array",
+      "editor": "stringList",
+      "description": "Only health systems based in these states, as two-letter codes (e.g. TX, MO). To filter by where the job is, use Location keywords."
+    },
+    "locationKeywords": {
+      "title": "Location keywords",
+      "type": "array",
+      "editor": "stringList",
+      "description": "Only roles whose location contains one of these, e.g. \"Dallas\", \"Ohio\", \"TX\". Codes of 3 letters or fewer match whole words."
+    },
+    "postedWithinDays": {
+      "title": "Posted within (days)",
+      "type": "integer",
+      "description": "Only roles posted in the last N days. Roles without a posting date count from the day our index first saw them.",
+      "minimum": 1,
+      "maximum": 365,
+      "prefill": 7
+    },
+    "onlyWithSalary": {
+      "title": "Only roles that state pay",
+      "type": "boolean",
+      "description": "Only roles whose posting states a pay range.",
+      "default": false
+    },
+    "minHourlyRate": {
+      "title": "Minimum hourly rate (USD)",
+      "type": "number",
+      "description": "Only hourly roles whose stated top rate reaches at least this, e.g. 45.",
+      "minimum": 0
+    },
+    "minSystemBeds": {
+      "title": "Minimum health system size (beds)",
+      "type": "integer",
+      "description": "Only health systems with at least this many staffed beds (AHRQ, 2023).",
+      "minimum": 0
+    },
+    "titleExcludeKeywords": {
+      "title": "Exclude title keywords",
+      "type": "array",
+      "editor": "stringList",
+      "description": "Leave out roles whose title contains any of these, e.g. \"manager\", \"director\"."
+    },
+    "includeDescription": {
+      "title": "Include job description",
+      "type": "boolean",
+      "description": "Adds the job description as plain text (up to 8,000 characters). Off by default: faster and smaller.",
+      "default": false
+    },
+    "onlyNewSinceLastRun": {
+      "title": "Only jobs new since this search last ran",
+      "type": "boolean",
+      "description": "For scheduled runs: return only jobs the index has added since this same search last ran, so you never pay for the same job twice. The first run returns all current matches. The Actor remembers each search in a key-value store named <code>healthcare-jobs-monitor</code> in your account; changing any filter starts a new history.",
+      "default": false
+    },
+    "monitorName": {
+      "title": "Monitor name",
+      "type": "string",
+      "editor": "textfield",
+      "description": "Optional. Keeps two searches with identical filters on separate histories (e.g. one per client)."
+    },
+    "maxJobs": {
+      "title": "Maximum jobs",
+      "type": "integer",
+      "description": "Hard cap on results, and your main cost control: you are charged per job returned. Newest roles come first.",
+      "default": 1000,
+      "minimum": 1,
+      "maximum": 200000
+    },
+    "maxJobsPerSystem": {
+      "title": "Maximum jobs per health system",
+      "type": "integer",
+      "description": "Optional cap per health system, for variety.",
+      "minimum": 1
+    }
+  }
+}
