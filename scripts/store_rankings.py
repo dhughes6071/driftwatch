@@ -21,9 +21,9 @@ for q in QUERIES:
         rows.append({"date": today, "query": q, "results": r["data"]["total"], "rank": rank or "", "actor": name or ""})
     print(f"{q:20} {r['data']['total']:6} results   " + (", ".join(f"#{k} {n}" for k, n in hits) or "not in top 100"))
 
-new = not os.path.exists(OUT)
-with open(OUT, "a", newline="") as f:
+# One set of rows per day: a second run the same day replaces the first.
+old = [r for r in csv.DictReader(open(OUT))] if os.path.exists(OUT) else []
+with open(OUT, "w", newline="") as f:
     w = csv.DictWriter(f, fieldnames=["date", "query", "results", "rank", "actor"])
-    if new:
-        w.writeheader()
-    w.writerows(rows)
+    w.writeheader()
+    w.writerows([r for r in old if r["date"] != today] + rows)
