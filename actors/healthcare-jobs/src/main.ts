@@ -132,15 +132,25 @@ async function findJobs(q: HealthQuery, manifest: Manifest, tags: Record<string,
 
 /** Every health-system job in the index (about 1 in 15), for Standby to search in memory. */
 async function preloadHealthJobs(manifest: Manifest): Promise<IndexJob[]> {
-  const out: IndexJob[] = [];
-  for (const shard of manifest.shards) {
-    for (const line of unzipText(await httpFetcher(shard.url)).split("\n")) {
-      if (!line) continue;
-      const j = JSON.parse(line) as IndexJob;
-      if (healthSystemFor(j.ats, j.company)) out.push(j);
+  // Downloads dominate (~3 s a shard), so fetch 8 at a time; rows of other employers are skipped before parsing.
+  const head = /^\{"id":"[^"]*","ats":"([^"]*)","company":"([^"]*)"/;
+  const perShard: IndexJob[][] = [];
+  let next = 0;
+  await Promise.all(Array.from({ length: 8 }, async () => {
+    while (next < manifest.shards.length) {
+      const i = next++;
+      const out: IndexJob[] = [];
+      for (const line of unzipText(await httpFetcher(manifest.shards[i].url)).split("\n")) {
+        if (!line) continue;
+        const k = head.exec(line);
+        if (k && !healthSystemFor(k[1], k[2])) continue;
+        const j = JSON.parse(line) as IndexJob;
+        if (healthSystemFor(j.ats, j.company)) out.push(j);
+      }
+      perShard[i] = out;
     }
-  }
-  return out;
+  }));
+  return perShard.flat(); // shard order, as a run reads them
 }
 
 async function batchRun(input: Input) {
@@ -213,20 +223,29 @@ async function batchRun(input: Input) {
 async function startStandby() {
   const schema = JSON.parse(await readFile(new URL("../.actor/input_schema.json", import.meta.url), "utf8"));
   const kinds = fieldKinds(schema.properties);
-  type Loaded = Awaited<ReturnType<typeof loadIndex>> & { jobs: IndexJob[] };
-  const load = async (): Promise<Loaded> => {
+  type Index = Awaited<ReturnType<typeof loadIndex>>;
+  // Answer at once (the platform gives up on a first request after ~2 minutes): until every health-system job is in
+  // memory, requests read the index shards like a run does; then they search memory in milliseconds.
+  let base: Promise<Index> = loadIndex();
+  let loaded: (Index & { jobs: IndexJob[] }) | null = null;
+  const preload = async () => {
     const started = Date.now();
-    const idx = await loadIndex();
+    const idx = await base;
     const jobs = await preloadHealthJobs(idx.manifest);
+    loaded = { ...idx, jobs };
     log.info(`Standby: loaded ${jobs.length.toLocaleString()} health-system jobs from the index of ${idx.manifest.indexedAt} in ${((Date.now() - started) / 1000).toFixed(0)} s`);
-    return { ...idx, jobs };
   };
-  let current = await load(); // fail fast if the index link is broken
+  preload().catch((err) => log.error(`Standby: preload failed, searching the index shards instead: ${err instanceof Error ? err.message : err}`));
   // The index is rebuilt once a night: look for a newer one every 15 minutes and swap it in once loaded.
   setInterval(async () => {
     try {
       const m = JSON.parse(new TextDecoder().decode(await httpFetcher(process.env.CAREER_MANIFEST_URL!))) as Manifest;
-      if (m.indexedAt !== current.manifest.indexedAt) current = await load();
+      if (loaded && m.indexedAt !== loaded.manifest.indexedAt) {
+        const fresh = loadIndex();
+        await fresh;
+        base = fresh;
+        await preload();
+      }
     } catch (err) {
       log.warning(`Standby: index refresh failed, keeping the loaded one: ${err instanceof Error ? err.message : err}`);
     }
@@ -239,8 +258,8 @@ async function startStandby() {
     if (!(q.maxJobs >= 1)) throw new BadRequest("maxJobs must be at least 1");
     q.maxJobs = Math.min(q.maxJobs, 5000); // one HTTP answer; larger pulls belong in a run
     const includeDescription = input.includeDescription ?? false;
-    const { manifest, tags, jobs } = current;
-    const { found, timeLimited } = await findJobs(q, manifest, tags, Infinity, jobs);
+    const { manifest, tags } = loaded ?? (await base);
+    const { found, timeLimited } = await findJobs(q, manifest, tags, Date.now() + 90_000, loaded?.jobs);
     const charged = found.length ? await Actor.charge({ eventName: EVENT_JOB, count: found.length }) : null;
     const n = charged ? Math.min(found.length, charged.chargedCount) : 0;
     const delivered = found.slice(0, n);
