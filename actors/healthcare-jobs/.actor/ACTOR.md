@@ -1,4 +1,4 @@
-# US Hospital & Nurse Jobs — Per Diem, Travel, Sign-On Bonus
+# US Hospital, Nurse & Healthcare Jobs — Per Diem, Sign-On Bonus
 
 Every open job at **68 of the largest US health systems**, read straight from their own career
 sites and refreshed every night: Ascension, Trinity Health, Advocate, AdventHealth, SSM Health,
