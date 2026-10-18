@@ -13,6 +13,8 @@ Answers one question, precisely and with citations:
 
 New here? Start with the [Beginner's Guide](BEGINNER_GUIDE.md).
 
+This repo also holds the source of CMM Research's [data Actors on Apify](#data-actors-on-apify): job, hospital, funding and Shopify data APIs.
+
 ---
 
 ## Install (30 seconds)
@@ -246,6 +248,26 @@ The metric that matters is not revenue — it is **calls per unique payer**. Bel
 5 means tourism. Above 20 means a real business, even at tiny revenue.
 
 ---
+
+## Data Actors on Apify
+
+The `actors/` folder and `src/jobs/` hold the source of CMM Research's paid data Actors. Each runs on
+[Apify](https://apify.com/viridian_layout_ea2), with pay-per-result pricing and an MCP endpoint for AI agents:
+
+| Actor | What it does |
+|---|---|
+| [Career Site Jobs API](https://apify.com/viridian_layout_ea2/career-site-jobs-api) | Search 1.8M+ open jobs from 19,000+ companies' own career sites (Workday, Oracle, Greenhouse and 14 more), refreshed nightly, with salaries |
+| [US Hospital, Nurse & Healthcare Jobs](https://apify.com/viridian_layout_ea2/us-hospital-jobs) | 113,000+ openings at 68 large US health systems, tagged by role, unit, shift, per diem / travel and sign-on bonus |
+| [Greenhouse, Lever & Ashby Jobs](https://apify.com/viridian_layout_ea2/company-career-site-jobs) | Live jobs from 3,500+ startups' job boards, with salaries |
+| [Workday Jobs Scraper](https://apify.com/viridian_layout_ea2/workday-jobs-scraper) | Every job on any `myworkdayjobs.com` site, past Workday's 2,000-result cap |
+| [Companies Hiring for Any Role](https://apify.com/viridian_layout_ea2/companies-hiring-leads) | One row per company hiring for a role: openings, new roles, hiring growth |
+| [Recently Funded Companies (SEC Form D)](https://apify.com/viridian_layout_ea2/sec-form-d-funding-tracker) | US companies that just raised private money, from SEC filings |
+| [Shopify Store Leads](https://apify.com/viridian_layout_ea2/shopify-store-leads) | 188,000+ live Shopify stores by niche, country, apps and theme, with published contacts |
+
+Free samples on Kaggle: [jobs](https://www.kaggle.com/datasets/dhughes6071/company-career-site-jobs-with-salaries-oct-2026),
+[hospital jobs](https://www.kaggle.com/datasets/dhughes6071/us-hospital-job-postings-with-pay-oct-2026),
+[funding rounds](https://www.kaggle.com/datasets/dhughes6071/us-private-funding-rounds-sec-form-d-oct-2026),
+[Shopify stores](https://www.kaggle.com/datasets/dhughes6071/shopify-stores-apps-themes-prices-oct-2026).
 
 ## Documentation
 
