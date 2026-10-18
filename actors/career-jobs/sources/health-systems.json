@@ -15,7 +15,9 @@
 "state": "IL",
 "hospitals": 145,
 "beds": 16679,
-"sources": []
+"sources": [
+"talentbrew:commonspirit"
+]
 },
 {
 "id": "HSI00000055",
@@ -68,7 +70,9 @@
 "state": "CA",
 "hospitals": 41,
 "beds": 9337,
-"sources": []
+"sources": [
+"talentbrew:kaiserpermanentejobs"
+]
 },
 {
 "id": "HSI00000852",
@@ -272,7 +276,9 @@
 "state": "GA",
 "hospitals": 19,
 "beds": 3643,
-"sources": []
+"sources": [
+"icims:careers-piedmont"
+]
 },
 {
 "id": "HSI00000654",
@@ -354,7 +360,9 @@
 "state": "TX",
 "hospitals": 21,
 "beds": 3165,
-"sources": []
+"sources": [
+"taleo:texashealth"
+]
 },
 {
 "id": "HSI00001123",
@@ -381,7 +389,9 @@
 "state": "NJ",
 "hospitals": 13,
 "beds": 3075,
-"sources": []
+"sources": [
+"talentbrew:hackensackmeridianhealth"
+]
 },
 {
 "id": "HSI00000011",
@@ -430,7 +440,9 @@
 "state": "MN",
 "hospitals": 26,
 "beds": 2792,
-"sources": []
+"sources": [
+"oracle:fa-euwp-saasfaprod1"
+]
 },
 {
 "id": "HSI00000813",
@@ -614,7 +626,9 @@
 "state": "GA",
 "hospitals": 9,
 "beds": 2250,
-"sources": []
+"sources": [
+"icims:ehccareers-emory"
+]
 },
 {
 "id": "HSI00000077",
@@ -1576,7 +1590,9 @@
 "state": "MO",
 "hospitals": 11,
 "beds": 964,
-"sources": []
+"sources": [
+"workday:saintlukes"
+]
 },
 {
 "id": "HSI00000585",
@@ -1612,7 +1628,9 @@
 "state": "IL",
 "hospitals": 2,
 "beds": 929,
-"sources": []
+"sources": [
+"oracle:fa-etnf-saasfaprod1"
+]
 },
 {
 "id": "HSI00000934",
@@ -3778,7 +3796,9 @@
 "state": "MS",
 "hospitals": 2,
 "beds": 285,
-"sources": []
+"sources": [
+"oracle:wearememorial-ibrkjb"
+]
 },
 {
 "id": "HSI00001137",

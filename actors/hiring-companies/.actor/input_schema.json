@@ -108,7 +108,9 @@
           "workable",
           "jobvite",
           "phenom",
-          "icims"
+          "icims",
+          "talentbrew",
+          "taleo"
         ],
         "enumTitles": [
           "Workday",
@@ -127,7 +129,9 @@
           "Workable",
           "Jobvite",
           "Phenom career sites",
-          "iCIMS (Jibe career sites)"
+          "iCIMS (Jibe career sites)",
+          "TalentBrew career sites (Radancy)",
+          "Taleo"
         ]
       },
       "default": []

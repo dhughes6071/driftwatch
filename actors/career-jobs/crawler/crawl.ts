@@ -322,7 +322,7 @@ export async function crawl() {
   const small: Record<string, { companies: number; jobs: number }> = {};
   for (const src of SMALL_SOURCES) {
     if (!wanted(src.ats)) continue;
-    const companies = readRegistry<{ id: string; name: string }>(`actors/career-jobs/sources/${src.ats}.json`);
+    const companies = readRegistry<{ id: string; name: string }>(`actors/career-jobs/sources/${src.registry ?? src.ats}.json`);
     if (!companies.length) continue;
     small[src.ats] = { companies: 0, jobs: 0 };
     log(`${src.ats}: ${companies.length} companies`);

@@ -12,6 +12,9 @@
  *   jobvite     https://jobs.jobvite.com/{co}/jobs (+ /job/{id})                 HTML only; the list page shows every job (added 29 Sep)
  *   phenom      POST https://{host}/widgets (+ /us/en/job/{id})                   JSON list, description in the job page (added 16 Oct)
  *   icims       https://{host}/api/jobs  -- Jibe career sites of iCIMS customers  JSON, includes descriptions (added 16 Oct)
+ *   icims       https://{host}/jobs/search?pr=N -- iCIMS portals, registry icims-portals  HTML list + JSON-LD job page (added 18 Oct)
+ *   talentbrew  https://{host}/search-jobs/results  -- Radancy career sites           JSON-wrapped HTML + JSON-LD job page (added 18 Oct)
+ *   taleo       POST https://{tenant}.taleo.net/careersection/rest/jobboard/searchjobs  JSON list, no description (added 18 Oct)
  *
  * Skipped: JazzHR serves HTML only on few companies; Paylocity's feed returned
  * no jobs for any sample.
@@ -29,6 +32,8 @@ export interface SmallSource<P> {
   id(company: string, p: P): string;
   /** The company part of job ids, when the registry id carries more (UKG: "tenant|board" -> tenant). */
   companyKey?(company: string): string;
+  /** The registry file under sources/, when it isn't `<ats>.json` (two adapters for one system). */
+  registry?: string;
   build(company: string, name: string, p: P, firstSeenAt: string): Promise<{ job: IndexJob; description: string | null } | null>;
 }
 
@@ -942,9 +947,304 @@ export const icims: SmallSource<JibeRow> = {
   },
 };
 
+// ------------------------------------------------------------------ job pages' structured data
+
+/** The schema.org JobPosting a job page embeds as JSON-LD (iCIMS and TalentBrew pages both do). */
+export function ldJobPosting(html: string): { title?: string; datePosted?: string; description?: string; employmentType?: unknown } | null {
+  for (const [, raw] of html.matchAll(/<script[^>]*application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
+    try {
+      const d = JSON.parse(raw.trim());
+      for (const x of Array.isArray(d) ? d : d["@graph"] ?? [d]) if (x?.["@type"] === "JobPosting") return x;
+    } catch {
+      // not JSON: try the next block
+    }
+  }
+  return null;
+}
+
+const ldType = (t: unknown) => (Array.isArray(t) ? t.join(", ") : typeof t === "string" ? t : null);
+/** "FULL_TIME" -> "Full time"; "Full Time" stays. */
+const tidyType = (t: string | null) => (t && /^[A-Z_]+$/.test(t) ? t.charAt(0) + t.slice(1).toLowerCase().replace(/_/g, " ") : t);
+
+// ------------------------------------------------------------------ TalentBrew (Radancy)
+
+/**
+ * Radancy's TalentBrew runs the career sites of many large employers, over
+ * whatever hiring system they use (CommonSpirit and Hackensack Meridian over
+ * iCIMS, Kaiser Permanente over Taleo). Verified 18 Oct 2026:
+ *
+ *   list:   GET https://{host}/search-jobs/results?CurrentPage=N&RecordsPerPage=100&SearchType=5&...
+ *           (X-Requested-With: XMLHttpRequest) -> JSON {results: "<html of the result list>"}
+ *   detail: the job's own page, whose JSON-LD JobPosting has the date and description
+ *
+ * Each site styles its list differently; the parts every one has are an
+ * anchor with data-job-id, a heading or title element and a job-location
+ * element. The registry id is the career-site host.
+ */
+export interface TalentBrewRow {
+  id: string;
+  path: string;
+  title: string;
+  location: string | null;
+  department: string | null;
+}
+
+const TB_PAGE = 100;
+const tbQuery = (page: number) =>
+  `CurrentPage=${page}&RecordsPerPage=${TB_PAGE}&ActiveFacetID=0&Distance=50&RadiusUnitType=0&Keywords=&Location=&ShowRadius=False` +
+  `&IsPagination=False&CustomFacetName=&FacetTerm=&FacetType=0&SearchResultsModuleName=Search+Results` +
+  `&SearchFiltersModuleName=Search+Filters&SortCriteria=0&SortDirection=0&SearchType=5&PostalCode=&ResultsType=0&fc=&fl=&fcf=&afc=&afl=&afcf=`;
+
+/**
+ * Some sites put work details after the place ("Oakland, CA, Onsite, Regular, Day shift"):
+ * keep "City, ST" when the text starts with one.
+ */
+export const tbPlace = (s: string | null) => s?.match(/^[^,]+, [A-Z]{2}\b/)?.[0] ?? s;
+
+/** The jobs in one page of a TalentBrew result list, and how many pages there are. */
+export function parseTalentBrew(html: string): { rows: TalentBrewRow[]; pages: number } {
+  const pages = Number(html.match(/data-total-pages="(\d+)"/)?.[1] ?? 1);
+  const rows = new Map<string, TalentBrewRow>();
+  for (const m of html.matchAll(/<a\b([^>]*\bdata-job-id="(\d+)"[^>]*)>([\s\S]*?)<\/a>/g)) {
+    const [, attrs, id, inner] = m;
+    if (rows.has(id)) continue;
+    const path = attrs.match(/href="([^"]+)"/)?.[1];
+    if (!path) continue;
+    const pick = (re: RegExp) => {
+      const v = inner.match(re)?.[1];
+      return v ? toText(v) || null : null;
+    };
+    const title =
+      pick(/<h[234][^>]*>([\s\S]*?)<\/h[234]>/) ??
+      pick(/<[^>]*class="[^"]*title[^"]*"[^>]*>([\s\S]*?)<\/[a-z0-9]+>/) ??
+      toText(inner.replace(/<span[\s\S]*?<\/span>/g, ""));
+    if (!title) continue;
+    rows.set(id, {
+      id,
+      path: path.replace(/&amp;/g, "&"),
+      title,
+      location: tbPlace(pick(/<[^>]*class="[^"]*job-location[^"]*"[^>]*>([\s\S]*?)<\/[a-z0-9]+>/)),
+      department: pick(/<[^>]*class="[^"]*job-(?:department|category)[^"]*"[^>]*>([\s\S]*?)<\/[a-z0-9]+>/),
+    });
+  }
+  return { rows: [...rows.values()], pages };
+}
+
+export const talentbrew: SmallSource<TalentBrewRow> = {
+  ats: "talentbrew",
+  companyKey: hostKey,
+  async list(host) {
+    const rows: TalentBrewRow[] = [];
+    for (let page = 1, pages = 1; page <= pages && page <= 300; page++) {
+      const r = await getJson<{ results?: string }>(`https://${host}/search-jobs/results?${tbQuery(page)}`, {
+        headers: { "x-requested-with": "XMLHttpRequest" },
+      });
+      // A page that fails makes the list unreliable (company-runs.ts keeps the company's roles instead).
+      if (typeof r?.results !== "string") return null;
+      const p = parseTalentBrew(r.results);
+      pages = p.pages;
+      rows.push(...p.rows);
+    }
+    return rows;
+  },
+  id: (_host, p) => p.id,
+  async build(host, name, p, now) {
+    const url = new URL(p.path, `https://${host}`).href;
+    const html = await getText(url);
+    const ld = html ? ldJobPosting(html) : null;
+    const j = job("talentbrew", hostKey(host), name, {
+      id: p.id,
+      title: p.title,
+      location: p.location,
+      department: p.department,
+      postedAt: ld?.datePosted ?? null,
+      url,
+      employmentType: tidyType(ldType(ld?.employmentType)),
+      firstSeenAt: now,
+    });
+    return j && { job: j, description: toText(ld?.description) || null };
+  },
+};
+
+// ------------------------------------------------------------------ iCIMS job portals
+
+/**
+ * An iCIMS customer's own job portal, read directly where its career site
+ * doesn't put Jibe or TalentBrew in front (Emory, Piedmont). Verified 18 Oct 2026:
+ *
+ *   list:   GET https://{host}/jobs/search?ss=1&in_iframe=1&pr=N   (N from 0; "Page 1 of M")
+ *   detail: the job's page (?in_iframe=1), whose JSON-LD JobPosting has the date and description
+ *
+ * Its jobs are "icims" like the Jibe ones, from a registry of their own.
+ * The registry id is the portal host; the company key is its first label.
+ */
+export interface IcimsRow {
+  id: string;
+  url: string;
+  title: string;
+  location: string | null;
+  category: string | null;
+  schedule: string | null;
+}
+
+/** "US-GA-Covington" -> "Covington, GA, US"; anything else stays. */
+const icimsPlace = (s: string | null) => {
+  const m = s?.match(/^([A-Z]{2})-([A-Z]{2})-(.+)$/);
+  return m ? `${m[3]}, ${m[2]}, ${m[1]}` : s;
+};
+
+export function parseIcimsPortal(html: string): { rows: IcimsRow[]; pages: number } {
+  const pages = Number(html.match(/Page \d+ of ([\d,]+)/)?.[1]?.replace(/,/g, "") ?? 1);
+  const rows: IcimsRow[] = [];
+  for (const [, card] of html.matchAll(/<li class="iCIMS_JobCardItem">([\s\S]*?)<\/li>/g)) {
+    const link = card.match(/<a href="([^"]*\/jobs\/(\d+)\/[^"]*)"/);
+    if (!link) continue;
+    const field = (label: string) => {
+      const v = card.match(new RegExp(`<dt class="iCIMS_JobHeaderField">${label}</dt>\\s*<dd[^>]*>([\\s\\S]*?)</dd>`))?.[1];
+      return v ? toText(v) || null : null;
+    };
+    const location = card.match(/field-label">Location<\/span>\s*<span[^>]*>([\s\S]*?)<\/span>/)?.[1];
+    const title = toText(card.match(/<h3[^>]*>([\s\S]*?)<\/h3>/)?.[1]);
+    if (!title) continue;
+    rows.push({
+      id: link[2],
+      url: link[1].replace(/&amp;/g, "&"),
+      title,
+      location: icimsPlace(location ? toText(location) || null : null) ?? field("Campus Location") ?? field("Location"),
+      category: field("Category") ?? field("Job Category"),
+      schedule: field("Schedule") ?? field("Job Type") ?? field("Position Type") ?? field("Employment Type"),
+    });
+  }
+  return { rows, pages };
+}
+
+const portalKey = (host: string) => host.toLowerCase().split(".")[0];
+
+export const icimsPortal: SmallSource<IcimsRow> = {
+  ats: "icims",
+  registry: "icims-portals",
+  companyKey: portalKey,
+  async list(host) {
+    const rows = new Map<string, IcimsRow>();
+    for (let pr = 0, pages = 1; pr < pages && pr < 500; pr++) {
+      const html = await getText(`https://${host}/jobs/search?ss=1&in_iframe=1&pr=${pr}`);
+      if (!html) return null;
+      const p = parseIcimsPortal(html);
+      pages = p.pages;
+      for (const r of p.rows) rows.set(r.id, r);
+    }
+    return [...rows.values()];
+  },
+  id: (_host, p) => p.id,
+  async build(host, name, p, now) {
+    const html = await getText(p.url);
+    const ld = html ? ldJobPosting(html) : null;
+    const j = job("icims", portalKey(host), name, {
+      id: p.id,
+      title: p.title,
+      location: p.location,
+      department: p.category,
+      postedAt: ld?.datePosted ?? null,
+      url: p.url.replace(/[?&]in_iframe=1/, "").replace(/\?$/, ""),
+      employmentType: p.schedule ?? tidyType(ldType(ld?.employmentType)),
+      firstSeenAt: now,
+    });
+    return j && { job: j, description: toText(ld?.description) || null };
+  },
+};
+
+// ------------------------------------------------------------------ Taleo
+
+/**
+ * Oracle Taleo career sections (Texas Health, McLaren). Verified 18 Oct 2026:
+ *
+ *   list: POST https://{tenant}.taleo.net/careersection/rest/jobboard/searchjobs?lang=en&portal={portal}
+ *         {"pageNo": N, ...} -> {requisitionList: [{jobId, contestNo, column: [...]}], pagingData: {totalCount, pageSize}}
+ *
+ * `column` follows the section's own list layout; `linkedColumn` is the
+ * title and `locationsColumns` the locations (a JSON list as text). The
+ * job page needs a browser, so these jobs carry no description.
+ * The registry id is "tenant|section|portal".
+ */
+export interface TaleoRow {
+  jobId: string;
+  contestNo: string;
+  column: string[];
+  linkedColumn?: number;
+  locationsColumns?: number[];
+}
+
+export const taleoParts = (co: string) => {
+  const [tenant, section, portal] = co.split("|");
+  return { tenant, section, portal };
+};
+
+const taleoBody = (pageNo: number) =>
+  JSON.stringify({
+    multilineEnabled: false,
+    sortingSelection: { sortBySelectionParam: "3", ascendingSortingOrder: "false" },
+    fieldData: { fields: { KEYWORD: "", LOCATION: "" }, valid: true },
+    filterSelectionParam: { searchFilterSelections: [] },
+    advancedSearchFiltersSelectionParam: { searchFilterSelections: [] },
+    pageNo,
+  });
+
+/** Locations column: '["Fort Worth"]' or plain text. */
+const taleoPlaces = (s: string | undefined): string[] => {
+  if (!s) return [];
+  try {
+    const v = JSON.parse(s);
+    return (Array.isArray(v) ? v : [v]).map(String).filter(Boolean);
+  } catch {
+    return [s];
+  }
+};
+
+export const taleo: SmallSource<TaleoRow> = {
+  ats: "taleo",
+  companyKey: (co) => taleoParts(co).tenant,
+  async list(co) {
+    const { tenant, portal } = taleoParts(co);
+    const rows: TaleoRow[] = [];
+    const seen = new Set<string>();
+    let listed = 0;
+    for (let pageNo = 1; pageNo <= 400; pageNo++) {
+      const r = await getJson<{ requisitionList?: TaleoRow[]; pagingData?: { totalCount?: number; pageSize?: number } }>(
+        `https://${tenant}.taleo.net/careersection/rest/jobboard/searchjobs?lang=en&portal=${portal}`,
+        { method: "POST", headers: { "content-type": "application/json", tz: "GMT-05:00" }, body: taleoBody(pageNo) },
+      );
+      if (!r?.requisitionList) return null;
+      // A job with several locations comes back once per location: keep one row per requisition.
+      for (const q of r.requisitionList) if (!seen.has(q.contestNo || q.jobId)) seen.add(q.contestNo || q.jobId), rows.push(q);
+      const total = r.pagingData?.totalCount ?? 0;
+      listed += r.requisitionList.length;
+      if (!r.requisitionList.length || listed >= total) break;
+    }
+    return rows;
+  },
+  id: (_co, p) => p.contestNo || p.jobId,
+  async build(co, name, p, now) {
+    const { tenant, section } = taleoParts(co);
+    const places = taleoPlaces(p.column[p.locationsColumns?.[0] ?? 1]);
+    // The section's last column is usually the posting date ("Oct 16, 2026").
+    const last = p.column.at(-1);
+    const posted = last && /\b\d{4}\b/.test(last) && !Number.isNaN(Date.parse(last)) ? last : null;
+    const j = job("taleo", tenant, name, {
+      id: p.contestNo || p.jobId,
+      title: toText(p.column[p.linkedColumn ?? 0]),
+      location: places[0] ?? null,
+      additional: places.slice(1),
+      postedAt: posted,
+      url: `https://${tenant}.taleo.net/careersection/${section}/jobdetail.ftl?job=${encodeURIComponent(p.contestNo || p.jobId)}`,
+      firstSeenAt: now,
+    });
+    return j && { job: j, description: null };
+  },
+};
+
 /** The index id of a small-source job -- used by the crawl before `build` runs, so it must match `job()`. */
 export const smallJobId = <P>(src: SmallSource<P>, co: string, p: P) =>
   `${src.ats}:${(src.companyKey?.(co) ?? co).toLowerCase()}:${src.id(co, p)}`;
 
 export { ukgParts };
-export const SMALL_SOURCES = [bamboohr, breezy, personio, rippling, teamtailor, recruitee, ukg, workable, jobvite, phenom, icims] as SmallSource<unknown>[];
+export const SMALL_SOURCES = [bamboohr, breezy, personio, rippling, teamtailor, recruitee, ukg, workable, jobvite, phenom, icims, icimsPortal, talentbrew, taleo] as SmallSource<unknown>[];

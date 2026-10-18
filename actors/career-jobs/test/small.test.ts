@@ -54,9 +54,13 @@ test("the crawl's pre-build id matches the id build() produces, for every small 
     jobvite: ["Acme", { id: "oAAA1", title: "Engineer", location: null, department: null }],
     phenom: ["jobs.bswhealth.com", { jobId: "26018737", jobSeqNo: "BSWHUS26018737EXTERNALENUS", title: "Engineer" }],
     icims: ["jobs.bjc.org", { slug: "28963", req_id: "28963", title: "Engineer" }],
+    talentbrew: ["www.commonspirit.careers", { id: "100818390656", path: "/job/x/y/35300/100818390656", title: "Engineer", location: null, department: null }],
+    taleo: ["texashealth|ex3|12100020897", { jobId: "708124", contestNo: "26010887", column: ["Engineer", "[\"Fort Worth\"]", "Oct 16, 2026"], linkedColumn: 0, locationsColumns: [1] }],
   };
   for (const src of SMALL_SOURCES) {
-    const s = samples[src.ats];
+    const s = src.registry === "icims-portals"
+      ? ["careers-piedmont.icims.com", { id: "30385", url: "https://careers-piedmont.icims.com/jobs/30385/x/job?in_iframe=1", title: "Engineer", location: null, category: null, schedule: null }]
+      : samples[src.ats];
     if (!s) continue; // rippling's build needs the network
     const realFetch = globalThis.fetch;
     globalThis.fetch = (async () => new Response("", { status: 404 })) as typeof fetch;

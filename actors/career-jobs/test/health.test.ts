@@ -25,6 +25,9 @@ test("every mapped career site is actually crawled", () => {
     ...read("../sources/jobvite.json").map((s: { id: string }) => `jobvite:${s.id.toLowerCase()}`),
     ...read("../sources/phenom.json").map((s: { id: string }) => `phenom:${hostKey(s.id)}`),
     ...read("../sources/icims.json").map((s: { id: string }) => `icims:${hostKey(s.id)}`),
+    ...read("../sources/icims-portals.json").map((s: { id: string }) => `icims:${s.id.split(".")[0]}`),
+    ...read("../sources/talentbrew.json").map((s: { id: string }) => `talentbrew:${hostKey(s.id)}`),
+    ...read("../sources/taleo.json").map((s: { id: string }) => `taleo:${s.id.split("|")[0]}`),
   ]);
   for (const k of HEALTH_SYSTEMS.flatMap((s) => s.sources)) assert.ok(crawled.has(k), `${k} is mapped but not in any crawl registry`);
 });
