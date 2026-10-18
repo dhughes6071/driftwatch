@@ -6,7 +6,7 @@ how recently it added products, its theme and apps, and the **emails, phones and
 profiles the store publishes**. Filter by niche, country, store size, price range,
 activity or apps. Or schedule it to get **only stores that are new since your last run**.
 
-It searches **our own index of STORE_COUNT live Shopify stores**, which is re-checked every
+It searches **our own index of 188,000+ live Shopify stores**, which is re-checked every
 two weeks, so a search returns in about a minute. You don't need any coding, logins or proxies.
 
 *Built and maintained by CMM Research.* Need a custom list or feed? Email us at
@@ -21,10 +21,67 @@ two weeks, so a search returns in about a minute. You don't need any coding, log
   and price point.
 - **Market research:** how many stores sell X, where, at what prices, on which apps.
 
-**A real result** (EXAMPLE_DATE):
+**A real result** (18 Oct 2026, a search for US coffee stores with an email address; `shipsToCountries` shortened from 28 countries):
 
 ```json
-EXAMPLE_JSON
+{
+  "domain": "andytownsf.com",
+  "url": "https://andytownsf.com",
+  "name": "Andytown Coffee Roasters",
+  "description": "Andytown is an artisan coffee roaster and bakery based in the Outer Sunset district of San Francisco. Enjoy expertly crafted coffee, fresh pastries, and a cozy atmosphere. Visit us in person or shop online!",
+  "city": "San Francisco",
+  "province": "California",
+  "country": "US",
+  "currency": "USD",
+  "shipsToCountries": [
+    "AE",
+    "AT",
+    "AU",
+    "BE",
+    "CA",
+    "CH"
+  ],
+  "language": "en",
+  "productCount": 33,
+  "collectionCount": 6,
+  "priceMin": 2.7,
+  "priceMedian": 17.25,
+  "priceMax": 60,
+  "productTypes": [
+    {
+      "name": "Merchandise",
+      "count": 23
+    },
+    {
+      "name": "coffee",
+      "count": 10
+    }
+  ],
+  "vendors": [
+    {
+      "name": "andytown-sf",
+      "count": 33
+    }
+  ],
+  "newestProductAt": "2026-10-05T17:49:12.000Z",
+  "productsAddedLast30Days": 1,
+  "emails": [
+    "orders@andytownsf.com"
+  ],
+  "phones": [],
+  "instagram": "https://www.instagram.com/andytownsf",
+  "facebook": "https://www.facebook.com/andytownsf",
+  "twitter": "https://x.com/andytownsf",
+  "theme": "PixelVerse",
+  "apps": [
+    "Klaviyo",
+    "Mailchimp",
+    "Judge.me",
+    "ReCharge",
+    "Google Analytics"
+  ],
+  "firstSeenAt": "2026-10-17T19:20:13.383Z"
+}
 ```
 
 ## Why this one
@@ -46,10 +103,11 @@ EXAMPLE_JSON
 
 ## Pricing
 
-**PRICE TO BE CONFIRMED** per 1,000 stores, plus Apify's standard $0.00005 run-start fee.
+**$5 per 1,000 stores** ($0.005 per store), plus Apify's standard $0.00005 run-start fee.
+On Apify's paid plans it's cheaper: $4.50 (Starter), $4 (Scale) or $3.50 (Business) per 1,000.
 Platform usage is included, so you are not billed for compute separately.
 
-- **`maxResults`** is a hard cap per run (default 500).
+- **`maxResults`** is a hard cap per run (default 500, at most $2.50).
 - **Apify's maximum cost per run** also works: if the limit is reached, the Actor stops
   cleanly and keeps everything delivered so far.
 

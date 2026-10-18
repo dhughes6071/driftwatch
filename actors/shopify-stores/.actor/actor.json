@@ -1,8 +1,8 @@
 {
   "actorSpecification": 1,
   "name": "shopify-store-leads",
-  "title": "Shopify Store Leads — Find Stores by Niche, Country & Apps",
-  "description": "Live Shopify stores, re-checked every 2 weeks: name, country, city, currency, product count and prices, newest products, theme, apps, and the emails, phones and socials each store publishes. Filter by niche, country, size, activity and apps, or get only new stores.",
+  "title": "Shopify Store Leads \u2014 Find Stores by Niche, Country & Apps",
+  "description": "188,000+ live Shopify stores, re-checked every 2 weeks: name, country, city, currency, product count and prices, newest products, theme, apps, and the emails, phones and socials each store publishes. Filter by niche, country, size, activity and apps, or get only new stores. $5 per 1,000.",
   "version": "0.1",
   "buildTag": "latest",
   "dockerfile": "./Dockerfile",
