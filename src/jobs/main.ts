@@ -15,6 +15,7 @@
  * one unreachable company never sinks a run.
  */
 import { Actor, log } from "apify";
+import { relatedTip } from "./related.ts";
 import { fetchCompany, REMOTE_RE, VERIFIED_ATS, type Ats, type Job, type Prefilter } from "./ats.ts";
 import { payFor, type PayFields } from "./pay.ts";
 import { parseCompanyEntry } from "./targets.ts";
@@ -330,6 +331,7 @@ try {
     companiesEmptyOrUnreachable: companiesFailed,
     stoppedBecause: budgetReached ? "charging_limit" : pushed >= maxJobs ? "maxJobs" : timeLimited ? "time_limit" : "completed",
     filters: { remoteOnly, titleKeywords, locationKeywords, postedWithinDays, onlyWithSalary, minAnnualSalary, salaryCurrencies },
+    tip: relatedTip(titleKeywords),
     finishedAt: new Date().toISOString(),
   });
 
@@ -337,6 +339,7 @@ try {
     `Done. ${pushed} jobs from ${companiesOk} companies ` +
       `(${companiesFailed} empty or unreachable).`,
   );
+  log.info(`Tip: ${relatedTip(titleKeywords)}`);
   await Actor.exit(
     timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout to search every company.` : undefined,
   );

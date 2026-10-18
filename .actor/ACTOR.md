@@ -46,9 +46,13 @@ Every job also comes with its description (plain text, up to 8,000 characters) a
 > directly.
 >
 > **Want everything in one search?** Our [Career Site Jobs API](https://apify.com/viridian_layout_ea2/career-site-jobs-api)
-> searches more than 1.7 million jobs from 19,000+ companies across 15 hiring systems at once
+> searches more than 1.8 million jobs from 19,000+ companies across 17 hiring systems at once
 > (Workday, Oracle, Greenhouse, Lever, Ashby and more). The jobs are collected daily, so
 > results come back in seconds.
+>
+> **Hiring in healthcare?** [US Hospital & Nurse Jobs](https://apify.com/viridian_layout_ea2/us-hospital-jobs)
+> covers 113,000+ openings at 68 large US health systems, with unit, shift, per diem / travel
+> and sign-on bonus filters.
 
 ## Why this one
 
