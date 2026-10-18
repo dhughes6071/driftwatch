@@ -88,7 +88,7 @@ test("record: job, system and tags in one flat row; internals left out", () => {
 });
 
 test("shared files are exact copies of the Career API's (edit them there, then copy)", () => {
-  for (const f of ["src/format.ts", "src/search.ts", "src/health.ts", "src/clinical.ts", "sources/health-systems.json"]) {
+  for (const f of ["src/format.ts", "src/search.ts", "src/health.ts", "src/clinical.ts", "src/standby.ts", "sources/health-systems.json"]) {
     const ours = readFileSync(new URL(`../${f}`, import.meta.url), "utf8");
     const theirs = readFileSync(new URL(`../../career-jobs/${f}`, import.meta.url), "utf8");
     assert.equal(ours, theirs, `${f} differs from actors/career-jobs/${f}`);

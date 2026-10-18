@@ -17,5 +17,6 @@
   },
   "minMemoryMbytes": 512,
   "maxMemoryMbytes": 4096,
-  "defaultMemoryMbytes": 1024
+  "defaultMemoryMbytes": 1024,
+  "usesStandbyMode": true
 }

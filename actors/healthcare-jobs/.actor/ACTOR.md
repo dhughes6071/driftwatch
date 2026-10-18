@@ -108,6 +108,25 @@ new per diem RN role nationwide (about 330 a week in October 2026) costs about $
 { "healthSystems": ["Ascension", "SSM"], "roleFamilies": ["Physician", "Advanced practice provider"] }
 ```
 
+## Instant API (Standby mode)
+
+Need results inside your own app, in a second or two, without starting a run? This Actor also runs in **Standby mode**: it stays warm as a web API, and each request is one search.
+
+```bash
+curl "https://viridian-layout-ea2--us-hospital-jobs.apify.actor/?roleFamilies=Registered%20nurse&shifts=nights&employment=per%20diem&maxJobs=50" \
+  -H "Authorization: Bearer YOUR_APIFY_TOKEN"
+```
+
+Every input field works as a URL parameter, with the same choices as the input form (`roleFamilies=Registered nurse`, `shifts=nights`); list fields take comma-separated values. A value that is not one of the choices gets an error listing them. Or POST the same JSON input you would give a run:
+
+```bash
+curl -X POST "https://viridian-layout-ea2--us-hospital-jobs.apify.actor/" \
+  -H "Authorization: Bearer YOUR_APIFY_TOKEN" -H "Content-Type: application/json" \
+  -d '{"healthSystems": ["Baylor Scott"], "roleFamilies": ["Registered nurse"], "onlySignOnBonus": true, "maxJobs": 100}'
+```
+
+The answer is JSON: `{"count", "stoppedBecause", "indexedAt", "jobs": [...]}`, with each job in the same format as a run's output. Same price as a run: you pay only for the jobs returned, and your spending limit trims the answer. Answers come back in well under a second. Up to 5,000 jobs per request; for daily "only new jobs" feeds, schedule a normal run with `onlyNewSinceLastRun`.
+
 ## Use it from Claude, Cursor or any AI agent (MCP)
 
 Apify's hosted MCP server lets an AI assistant run this Actor as a tool. Add this to your

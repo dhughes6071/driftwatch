@@ -12,6 +12,8 @@
 import { Actor, log } from "apify";
 import type { IndexJob, Manifest } from "./format.ts";
 import { descriptionsFor, httpFetcher, search, type Query } from "./search.ts";
+import { readFile } from "node:fs/promises";
+import { BadRequest, fieldEnums, fieldKinds, serveStandby } from "./standby.ts";
 import { MONITOR_STORE, monitorKey, type MonitorState } from "./monitor.ts";
 
 interface Input extends Partial<Query> {
@@ -27,9 +29,22 @@ const EVENT_JOB = "job";
 
 await Actor.init();
 
-try {
-  const input = (await Actor.getInput<Input>()) ?? {};
-  const q: Query = {
+if (Actor.config.get("metaOrigin") === "STANDBY") {
+  await startStandby();
+} else {
+  try {
+    await batchRun((await Actor.getInput<Input>()) ?? {});
+  } catch (err) {
+    // Actor.fail marks the run FAILED with the reason; exiting normally here
+    // used to report crashed runs as SUCCEEDED (found 3 Oct 2026).
+    const msg = err instanceof Error ? err.message : String(err);
+    log.error(`Actor failed: ${msg}`);
+    await Actor.fail(msg);
+  }
+}
+
+function toQuery(input: Input): Query {
+  return {
     titleKeywords: input.titleKeywords ?? [],
     titleExcludeKeywords: input.titleExcludeKeywords ?? [],
     locationKeywords: input.locationKeywords ?? [],
@@ -43,13 +58,21 @@ try {
     maxJobs: input.maxJobs ?? 1000,
     maxJobsPerCompany: input.maxJobsPerCompany,
   };
-  const includeDescription = input.includeDescription ?? true;
+}
 
+async function loadManifest(): Promise<Manifest> {
   // Signed read-only link to the index, injected as an encrypted Actor secret
   // (never in source: this repository is public, and the link unlocks the index).
   const manifestUrl = process.env.CAREER_MANIFEST_URL;
   if (!manifestUrl) throw new Error("CAREER_MANIFEST_URL is not configured.");
-  const manifest = JSON.parse(new TextDecoder().decode(await httpFetcher(manifestUrl))) as Manifest;
+  return JSON.parse(new TextDecoder().decode(await httpFetcher(manifestUrl))) as Manifest;
+}
+
+async function batchRun(input: Input) {
+  const q = toQuery(input);
+  const includeDescription = input.includeDescription ?? true;
+
+  const manifest = await loadManifest();
   const ageHours = (Date.now() - Date.parse(manifest.indexedAt)) / 3_600_000;
   log.info(
     `Index: ${manifest.totalJobs.toLocaleString()} jobs from ${manifest.companies.toLocaleString()} companies, ` +
@@ -111,14 +134,47 @@ try {
   });
   log.info(`Done. ${pushed} jobs delivered.`);
   await Actor.exit(timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout for complete results.` : undefined);
-} catch (err) {
-  // Actor.fail marks the run FAILED with the reason; exiting normally here
-  // used to report crashed runs as SUCCEEDED (found 3 Oct 2026).
-  const msg = err instanceof Error ? err.message : String(err);
-  log.error(`Actor failed: ${msg}`);
-  await Actor.fail(msg);
 }
 
+/**
+ * Standby mode (src/standby.ts): each HTTP request is one search, answered as
+ * JSON. Same filters and price as a run; a request is charged for the jobs it
+ * returns, and a caller's charging limit trims the answer.
+ */
+async function startStandby() {
+  const schema = JSON.parse(await readFile(new URL("../.actor/input_schema.json", import.meta.url), "utf8"));
+  const kinds = fieldKinds(schema.properties);
+  let cached: { manifest: Manifest; at: number } | null = null;
+  const manifest = async () => {
+    // The index is rebuilt once a night; re-read its manifest at most every 15 minutes.
+    if (!cached || Date.now() - cached.at > 15 * 60_000) cached = { manifest: await loadManifest(), at: Date.now() };
+    return cached.manifest;
+  };
+  await manifest(); // fail fast if the index link is broken
+
+  serveStandby(Actor.config.get("containerPort"), kinds, fieldEnums(schema.properties), async (raw) => {
+    const input = raw as Input;
+    if (input.onlyNewSinceLastRun) throw new BadRequest("onlyNewSinceLastRun needs a normal (scheduled) run; Standby requests do not keep a history.");
+    const q = toQuery(input);
+    if (!(q.maxJobs >= 1)) throw new BadRequest("maxJobs must be at least 1");
+    q.maxJobs = Math.min(q.maxJobs, 5000); // one HTTP answer; larger pulls belong in a run
+    const includeDescription = input.includeDescription ?? false; // descriptions make answers ~20x larger
+    const m = await manifest();
+    const { jobs, shardsRead, timeLimited } = await search(m, q, httpFetcher, Date.now(), Date.now() + 120_000);
+    const charged = jobs.length ? await Actor.charge({ eventName: EVENT_JOB, count: jobs.length }) : null;
+    const n = charged ? Math.min(jobs.length, charged.chargedCount) : 0;
+    const delivered = jobs.slice(0, n);
+    const descriptions = includeDescription && n ? await descriptionsFor(m, delivered) : new Map<string, string>();
+    log.info(`Standby request: ${n} jobs returned (read ${shardsRead} of ${m.shards.length} shards)`);
+    return {
+      count: n,
+      stoppedBecause: charged?.eventChargeLimitReached && n < jobs.length ? "charging_limit" : n >= q.maxJobs ? "maxJobs" : timeLimited ? "time_limit" : "completed",
+      indexedAt: m.indexedAt,
+      jobs: delivered.map((j) => toRecord(j, m.indexedAt, includeDescription ? (descriptions.get(j.id) ?? "") : undefined)),
+    };
+  }, (msg) => log.error(msg));
+  log.info(`Standby: listening on port ${Actor.config.get("containerPort")}`);
+}
 /** Public record: the index row minus internals, plus freshness. */
 function toRecord(j: IndexJob, indexedAt: string, description: string | undefined) {
   const { d: _d, ...rest } = j;

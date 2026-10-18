@@ -180,6 +180,25 @@ Actors, which fetch a company's jobs live when you need the very latest.
 { "companyKeywords": ["Morgan Stanley", "Stripe"], "maxJobs": 10000 }
 ```
 
+## Instant API (Standby mode)
+
+Need results inside your own app, in a second or two, without starting a run? This Actor also runs in **Standby mode**: it stays warm as a web API, and each request is one search.
+
+```bash
+curl "https://viridian-layout-ea2--career-site-jobs-api.apify.actor/?titleKeywords=data%20engineer&locationKeywords=Remote&postedWithinDays=7&maxJobs=50" \
+  -H "Authorization: Bearer YOUR_APIFY_TOKEN"
+```
+
+Every input field works as a URL parameter; list fields take comma-separated values (`titleKeywords=nurse,rn`). Or POST the same JSON input you would give a run:
+
+```bash
+curl -X POST "https://viridian-layout-ea2--career-site-jobs-api.apify.actor/" \
+  -H "Authorization: Bearer YOUR_APIFY_TOKEN" -H "Content-Type: application/json" \
+  -d '{"titleKeywords": ["product manager"], "minAnnualSalary": 150000, "salaryCurrencies": ["USD"], "maxJobs": 100}'
+```
+
+The answer is JSON: `{"count", "stoppedBecause", "indexedAt", "jobs": [...]}`, with each job in the same format as a run's output. Same price as a run: you pay only for the jobs returned, and your spending limit trims the answer. Up to 5,000 jobs per request; descriptions are left out unless you add `includeDescription=true`. For daily "only new jobs" feeds, schedule a normal run with `onlyNewSinceLastRun`.
+
 ## Use it from Claude, Cursor or any AI agent (MCP)
 
 Apify's hosted MCP server lets an AI assistant run this Actor as a tool. It writes the
