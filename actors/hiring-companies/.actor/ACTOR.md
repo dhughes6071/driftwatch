@@ -6,8 +6,8 @@ any title. You get back each company with how many matching roles it has open, h
 new this week and this month, its total openings and hiring growth, top departments and
 locations, the pay it advertises, and links to the roles.
 
-It searches a **daily index of 1.7M+ open jobs on 19,000+ companies' own career sites**
-(Workday, Greenhouse, Lever, Ashby, SmartRecruiters, Oracle and 11 more hiring systems), so a
+It searches a **daily index of 1.8M+ open jobs on 19,000+ companies' own career sites**
+(Workday, Greenhouse, Lever, Ashby, SmartRecruiters, Oracle and 13 more hiring systems), so a
 search across all of them takes about a minute. You don't need any coding, logins or proxies.
 
 *Built and maintained by CMM Research.* Need a custom feed? Email us at
@@ -185,7 +185,7 @@ Runs started by an agent are billed exactly like any other run, at $20 per 1,000
 ## Notes
 
 - **Coverage.** The index covers companies that post jobs on their own career site through
-  one of 17 hiring systems: 19,000+ companies, from startups to the Fortune 500. Companies
+  one of 19 hiring systems: 19,000+ companies, from startups to the Fortune 500. Companies
   that only post on LinkedIn or Indeed aren't included. It is refreshed daily.
 - **Company names.** Most come from the career site. For Lever and Ashby, which only expose
   an id, the name is made readable from it ("cullen-jewellery" → "Cullen Jewellery").

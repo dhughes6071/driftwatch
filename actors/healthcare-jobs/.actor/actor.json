@@ -2,7 +2,7 @@
   "actorSpecification": 1,
   "name": "us-hospital-jobs",
   "title": "US Hospital, Nurse & Healthcare Jobs — Per Diem, Sign-On Bonus",
-  "description": "113,000+ open jobs at 68 of the largest US health systems (Ascension, SSM, Sutter, Baylor Scott & White, BJC, MedStar…), straight from their career sites and refreshed daily. Filter by role, unit, shift, per diem or travel, and sign-on bonus.",
+  "description": "128,000+ open jobs at 78 of the largest US health systems (Ascension, SSM, Sutter, Baylor Scott & White, BJC, MedStar…), straight from their career sites and refreshed daily. Filter by role, unit, shift, per diem or travel, and sign-on bonus.",
   "version": "0.1",
   "buildTag": "latest",
   "dockerfile": "./Dockerfile",

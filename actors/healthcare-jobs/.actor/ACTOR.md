@@ -1,9 +1,9 @@
 # US Hospital, Nurse & Healthcare Jobs — Per Diem, Sign-On Bonus
 
-Every open job at **68 of the largest US health systems**, read straight from their own career
+Every open job at **78 of the largest US health systems**, read straight from their own career
 sites and refreshed every night: Ascension, Trinity Health, Advocate, AdventHealth, SSM Health,
 Sutter, Baylor Scott & White, BJC, MedStar, Tenet, Providence, Cleveland Clinic and more.
-**113,000+ open roles**, each tagged with what a recruiter needs: role type, unit or specialty,
+**128,000+ open roles**, each tagged with what a recruiter needs: role type, unit or specialty,
 shift, per diem / travel / locum, sign-on bonus amount, required licenses, and pay where it's
 stated (a third of all roles).
 
@@ -153,5 +153,5 @@ Then ask, for example: *"Find night-shift ICU nurse jobs in Missouri with a sign
 - The index is rebuilt once a day. Every job's `indexedAt` says when.
 - `onlyNewSinceLastRun` remembers each search in a key-value store named
   `healthcare-jobs-monitor` in your own Apify account.
-- Coverage grows as we add health systems. 68 of the largest US systems are covered today;
+- Coverage grows as we add health systems. 78 of the largest US systems are covered today;
   email us if you need one that isn't.
