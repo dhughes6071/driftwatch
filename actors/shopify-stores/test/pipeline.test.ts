@@ -4,7 +4,7 @@ import { mkdtempSync, writeFileSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
-import { openDb } from "../crawler/db.ts";
+import { openDb, startRun } from "../crawler/db.ts";
 import { discover, domainFromLine } from "../crawler/discover.ts";
 import { Throttle, checkStore, enrich, type Http } from "../crawler/enrich.ts";
 import type { Manifest } from "../src/format.ts";
@@ -152,4 +152,11 @@ test("search keeps only the top results for non-default sorts", async () => {
 
 test("monitor key ignores order and case", () => {
   assert.equal(monitorKey({ countries: ["US", "gb"] }, undefined), monitorKey({ countries: ["GB", "us"] }, undefined));
+});
+
+test("two runs starting in the same millisecond get different ids", () => {
+  const db = openDb(join(tmp(), "runs.db"));
+  const ids = Array.from({ length: 5 }, (_, i) => startRun(db, i % 2 ? "enrich" : "discover"));
+  assert.equal(new Set(ids).size, 5);
+  db.close();
 });

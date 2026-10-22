@@ -65,10 +65,20 @@ export function openDb(path = DB_PATH) {
 
 export type Db = ReturnType<typeof openDb>;
 
+/**
+ * Record a run's start and return its id (the start time). Discovery and
+ * enrichment are launched together by run-daily.sh and can start in the same
+ * millisecond; the second one then takes the next free millisecond instead of
+ * crashing on the primary key (every daily discovery from 21 Oct 2026 died this way).
+ */
 export function startRun(db: Db, kind: string): string {
-  const at = new Date().toISOString();
-  db.prepare("INSERT INTO runs (started_at, kind) VALUES (?, ?)").run(at, kind);
-  return at;
+  const insert = db.prepare("INSERT OR IGNORE INTO runs (started_at, kind) VALUES (?, ?)");
+  let t = Date.now();
+  for (;;) {
+    const at = new Date(t).toISOString();
+    if (insert.run(at, kind).changes) return at;
+    t++;
+  }
 }
 
 export function finishRun(db: Db, startedAt: string, stats: unknown) {
