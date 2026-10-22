@@ -164,9 +164,9 @@ export async function crawl() {
         refreshDescription(j.id, j.description || null);
       }
       loaded.mark(ats, slug, true);
-    } catch {
+    } catch (err) {
       stats.errors++;
-      loaded.mark(ats, slug, false);
+      loaded.mark(ats, slug, false, err);
     }
     if (stats.atsCompanies % 500 === 0) log(`  ATS ${stats.atsCompanies}/${companies.length}, ${stats.atsJobs} jobs`);
   });
@@ -234,10 +234,10 @@ export async function crawl() {
       });
       stats.workdaySites++;
       if (pageFailed) stats.errors++;
-      loaded.mark("workday", site.tenant, !pageFailed);
-    } catch {
+      loaded.mark("workday", site.tenant, !pageFailed, pageFailed ? "a page did not load after retries" : undefined);
+    } catch (err) {
       stats.errors++;
-      loaded.mark("workday", site.tenant, false);
+      loaded.mark("workday", site.tenant, false, err);
     }
     if (stats.workdaySites % 200 === 0) {
       log(`  Workday ${stats.workdaySites}/${sites.length} sites, ${stats.workdayJobs} jobs, ${stats.newJobs} new`);
@@ -258,7 +258,7 @@ export async function crawl() {
     const company = Oracle.tenantOf(site);
     try {
       const postings = await Oracle.listAll(site);
-      loaded.mark("oracle", company, !!postings);
+      loaded.mark("oracle", company, !!postings, postings ? undefined : "no answer after retries");
       if (!postings) return void stats.errors++;
       stats.oracleSites++;
       const fresh = postings.filter((p) => {
@@ -278,9 +278,9 @@ export async function crawl() {
           stats.errors++;
         }
       });
-    } catch {
+    } catch (err) {
       stats.errors++;
-      loaded.mark("oracle", company, false);
+      loaded.mark("oracle", company, false, err);
     }
   });
 
@@ -290,7 +290,7 @@ export async function crawl() {
   await pool(srCompanies, 6, async ({ id: company }) => {
     try {
       const postings = await SmartR.listAll(company);
-      loaded.mark("smartrecruiters", company.toLowerCase(), !!postings);
+      loaded.mark("smartrecruiters", company.toLowerCase(), !!postings, postings ? undefined : "no answer after retries");
       if (!postings) return void stats.errors++;
       stats.srCompanies++;
       const fresh = postings.filter((p) => {
@@ -310,9 +310,9 @@ export async function crawl() {
           stats.errors++;
         }
       });
-    } catch {
+    } catch (err) {
       stats.errors++;
-      loaded.mark("smartrecruiters", company.toLowerCase(), false);
+      loaded.mark("smartrecruiters", company.toLowerCase(), false, err);
     }
   });
 
@@ -330,7 +330,7 @@ export async function crawl() {
       const company = (src.companyKey?.(co) ?? co).toLowerCase();
       try {
         const rows = await src.list(co);
-        loaded.mark(src.ats, company, !!rows);
+        loaded.mark(src.ats, company, !!rows, rows ? undefined : "no answer after retries");
         if (!rows) return void stats.errors++;
         small[src.ats].companies++;
         const fresh = rows.filter((p) => {
@@ -348,9 +348,9 @@ export async function crawl() {
             stats.errors++;
           }
         });
-      } catch {
+      } catch (err) {
         stats.errors++;
-        loaded.mark(src.ats, company, false);
+        loaded.mark(src.ats, company, false, err);
       }
     });
   }
@@ -366,8 +366,12 @@ export async function crawl() {
     dropsAccepted: results.filter((r) => r.note === "drop accepted").length,
   };
   for (const r of failed.sort((a, b) => b.expected - a.expected).slice(0, 15)) {
-    log(`  not loaded (${r.note}): ${r.ats}:${r.company} -- ${r.open} of ${r.expected} roles seen; the rest kept`);
+    log(`  not loaded (${r.note}): ${r.ats}:${r.company} -- ${r.open} of ${r.expected} roles seen; the rest kept${r.error ? ` [${r.error}]` : ""}`);
   }
+  // Why companies failed, most common first, so a bad night explains itself.
+  const reasons = new Map<string, number>();
+  for (const r of failed) if (r.error) reasons.set(`${r.ats}: ${r.error}`, (reasons.get(`${r.ats}: ${r.error}`) ?? 0) + 1);
+  for (const [why, n] of [...reasons].sort((a, b) => b[1] - a[1]).slice(0, 10)) log(`  failure reason x${n}: ${why}`);
 
   // Roles gone for 3+ days are closed -- but only at companies whose list
   // loaded; a failing company keeps its roles (company-runs.ts).

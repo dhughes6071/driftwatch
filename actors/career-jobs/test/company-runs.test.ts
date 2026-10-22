@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { openDb } from "../crawler/crawl.ts";
-import { CompanyRuns, LIVE_WHERE, liveParams, loadFailing, purgeClosed } from "../crawler/company-runs.ts";
+import { CompanyRuns, LIVE_WHERE, describeError, liveParams, loadFailing, purgeClosed } from "../crawler/company-runs.ts";
 import { WorkdayClient } from "../../workday-jobs/src/workday.ts";
 import { fetchCompany } from "../../../src/jobs/ats.ts";
 
@@ -241,4 +241,27 @@ test("Workday: a list page that fails is reported, so the site does not count as
   );
   assert.equal(failed, 1);
   assert.equal(seen, 30);
+});
+
+// ------------------------------------------------------------------ 22 Oct: say why a company failed
+
+test("a failed company's error is recorded, so a bad night can be explained", () => {
+  withDb((db) => {
+    const runAt = at(22);
+    db.prepare("INSERT INTO runs (started_at) VALUES (?)").run(runAt);
+    const loaded = new CompanyRuns();
+    const offline = Object.assign(new TypeError("fetch failed"), { cause: { code: "ENOTFOUND", message: "getaddrinfo ENOTFOUND boards-api.greenhouse.io" } });
+    loaded.mark("greenhouse", "stripe", false, offline);
+    loaded.mark("workday", "nvidia", true);
+    loaded.mark("workday", "nvidia", false, "a page did not load after retries"); // second site of the same company
+    loaded.mark("oracle", "acme", false); // no reason given
+    const r = Object.fromEntries(loaded.finish(db, runAt).map((x) => [`${x.ats}:${x.company}`, x]));
+    assert.equal(r["greenhouse:stripe"].error, "TypeError: fetch failed (ENOTFOUND)");
+    assert.equal(r["workday:nvidia"].error, "a page did not load after retries");
+    assert.equal(r["oracle:acme"].error, null);
+    const row = db.prepare("SELECT note, error FROM company_runs WHERE ats = 'greenhouse' AND company = 'stripe'").get() as { note: string; error: string };
+    assert.deepEqual([row.note, row.error], ["error", "TypeError: fetch failed (ENOTFOUND)"]);
+  });
+  assert.equal(describeError(null), "unknown error");
+  assert.equal(describeError("plain"), "plain");
 });

@@ -21,7 +21,23 @@ notify() {
   osascript -e "display notification \"Nightly run: $1. See $LOG\" with title \"Career Jobs index needs attention\" sound name \"Basso\"" 2>/dev/null
 }
 
+# Wait for the internet before crawling. On 22 Oct 2026 the connection was down
+# from about 03:30 to 06:25: every Greenhouse, Workday, Oracle and SmartRecruiters
+# company failed, and only the small systems crawled after 06:25 got through.
+online() {
+  curl -sf -m 15 -o /dev/null "https://boards-api.greenhouse.io/v1/boards/stripe/jobs" &&
+  curl -sf -m 15 -o /dev/null -X POST -H "Content-Type: application/json" -H "Accept-Language: en-US" \
+    -d '{"limit":1,"offset":0,"searchText":"","appliedFacets":{}}' \
+    "https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite/jobs"
+}
+
 {
+  if ! online; then
+    echo "=== $(date) not online (Greenhouse/Workday unreachable); waiting up to 3 h"
+    for i in {1..36}; do sleep 300; online && break; done
+    if ! online; then echo "STILL OFFLINE"; notify "no internet for 3 hours, so the crawl did not run (the published index is unchanged)"; exit 1; fi
+    echo "=== $(date) back online"
+  fi
   echo "=== $(date) crawl"
   "$NODE" --experimental-strip-types actors/career-jobs/crawler/crawl.ts || { echo "CRAWL FAILED"; notify "the crawl failed"; exit 1; }
   # A source far below its usual count (17 Oct 2026: Workday 44k of ~780k) is worth a look,

@@ -52,11 +52,25 @@ export function companyRunsSchema(db: Database.Database) {
       closed   INTEGER,
       expected INTEGER NOT NULL,
       note     TEXT,
+      error    TEXT,               -- why a company did not load (first error message), when known
       PRIMARY KEY (ats, company, day)
     );
     -- Per-company counts without reading the 11 GB of descriptions.
     CREATE INDEX IF NOT EXISTS jobs_company ON jobs(ats, company, last_seen, first_seen);
   `);
+  // Added 22 Oct 2026, after the table was created.
+  const cols = new Set((db.prepare("PRAGMA table_info(company_runs)").all() as Array<{ name: string }>).map((c) => c.name));
+  if (!cols.has("error")) db.exec("ALTER TABLE company_runs ADD COLUMN error TEXT");
+}
+
+/** One short line for why a fetch failed: "TypeError: fetch failed (ENOTFOUND)". */
+export function describeError(err: unknown): string {
+  if (err == null) return "unknown error";
+  if (typeof err !== "object") return String(err).slice(0, 200);
+  const e = err as { name?: string; message?: string; cause?: { code?: string; message?: string } };
+  const code = e.cause?.code ?? (e as { code?: string }).code;
+  const msg = `${e.name ?? "Error"}: ${e.message ?? String(err)}`.slice(0, 160);
+  return code ? `${msg} (${code})` : msg;
 }
 
 /**
@@ -114,6 +128,8 @@ export interface CompanyResult {
   closed: number | null;
   expected: number;
   note: string | null;
+  /** Why it did not load, when the fetcher said. */
+  error: string | null;
 }
 
 /**
@@ -122,13 +138,17 @@ export interface CompanyResult {
  * tenants have more than one): it is ok only if all of them loaded.
  */
 export class CompanyRuns {
-  private readonly loaded = new Map<string, { ats: string; company: string; ok: boolean }>();
+  private readonly loaded = new Map<string, { ats: string; company: string; ok: boolean; error: string | null }>();
 
-  /** Record one fetch for a company. `company` must be the jobs.company value its roles are stored under. */
-  mark(ats: string, company: string, ok: boolean) {
+  /**
+   * Record one fetch for a company. `company` must be the jobs.company value its roles are stored under.
+   * `error` (the thrown error, or a short reason) is kept for failed fetches so a bad night can be explained.
+   */
+  mark(ats: string, company: string, ok: boolean, error?: unknown) {
     const key = `${ats}\u0000${company}`;
     const prev = this.loaded.get(key);
-    this.loaded.set(key, { ats, company, ok: (prev?.ok ?? true) && ok });
+    const why = ok ? null : error === undefined ? null : describeError(error);
+    this.loaded.set(key, { ats, company, ok: (prev?.ok ?? true) && ok, error: prev?.error ?? why });
   }
 
   get size() {
@@ -174,8 +194,8 @@ export class CompanyRuns {
 
     const recent = db.prepare("SELECT note FROM company_runs WHERE ats = ? AND company = ? AND day < ? ORDER BY day DESC LIMIT ?");
     const put = db.prepare(
-      `INSERT OR REPLACE INTO company_runs (ats, company, day, run_at, ok, open, opened, closed, expected, note)
-       VALUES (@ats, @company, @day, @runAt, @ok, @open, @opened, @closed, @expected, @note)`,
+      `INSERT OR REPLACE INTO company_runs (ats, company, day, run_at, ok, open, opened, closed, expected, note, error)
+       VALUES (@ats, @company, @day, @runAt, @ok, @open, @opened, @closed, @expected, @note, @error)`,
     );
 
     const out: CompanyResult[] = [];
@@ -200,6 +220,7 @@ export class CompanyRuns {
           closed: ok ? c.closed : null,
           expected: c.expected,
           note,
+          error: l.ok ? null : l.error,
         };
         put.run({ ...r, ok: ok ? 1 : 0, day, runAt });
         out.push(r);
