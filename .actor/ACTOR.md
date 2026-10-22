@@ -1,8 +1,9 @@
-# Greenhouse, Lever & Ashby Jobs Scraper — with Salaries
+# Greenhouse, Lever, Ashby & Workday Jobs Scraper — with Salaries
 
 Get **every open job at Stripe, SpaceX, Ramp, Figma and 3,500+ other startups and tech
 companies**, read from the Greenhouse, Lever and Ashby job boards they publish themselves,
-so it doesn't break when a page changes. Get job titles, locations, posting dates,
+**plus any big employer's Workday career site** (NVIDIA, Salesforce, CVS, Morgan Stanley and
+4,100+ more you can name), so it doesn't break when a page changes. Get job titles, locations, posting dates,
 descriptions, and salaries where the posting states them (nearly half of all jobs), as
 clean JSON, CSV or Excel. You don't need any coding, proxies or servers.
 
@@ -12,7 +13,8 @@ Email us at [chazmichael_michaels@icloud.com](mailto:chazmichael_michaels@icloud
 **Who uses it**
 
 - **Tech job boards.** Startup and engineering roles from the source, with pay.
-- **Recruiters.** Every open role at a list of target companies in one run.
+- **Recruiters.** Every open role at a list of target companies in one run, startups and
+  Fortune 500 alike.
 - **Salary benchmarking.** Stated pay ranges, including each company's own structured pay
   data where it publishes it.
 
@@ -39,11 +41,8 @@ Email us at [chazmichael_michaels@icloud.com](mailto:chazmichael_michaels@icloud
 
 Every job also comes with its description (plain text, up to 8,000 characters) and the fields listed under **Output** below.
 
-> **Need big employers too?** Greenhouse, Ashby and Lever are mostly startups and
-> scale-ups. Most of the Fortune 500 (NVIDIA, Salesforce, CVS, Lowe's) hire through
-> Workday. Our [Workday Jobs Scraper](https://apify.com/viridian_layout_ea2/workday-jobs-scraper)
-> covers 1,785 of them, with the **same output fields**, so the two datasets combine
-> directly.
+> **Want every Workday employer at once?** This Actor reads the Workday companies you name.
+> To search all of them in one go, use the Career Site Jobs API below: it already holds their jobs.
 >
 > **Want everything in one search?** Our [Career Site Jobs API](https://apify.com/viridian_layout_ea2/career-site-jobs-api)
 > searches more than 1.8 million jobs from 19,000+ companies across 17 hiring systems at once
@@ -63,7 +62,9 @@ This reads **documented JSON APIs**. There is no markup to change, no anti-bot
 arms race, and no proxy bill. When a company posts a role, it appears here.
 
 - **Straight from the source** — the company's own board, not a third-party aggregator
-- **One schema across three ATSs** — Greenhouse, Ashby, and Lever normalized identically
+- **One schema across four ATSs** — Greenhouse, Ashby, Lever and Workday normalized identically
+- **Workday done properly** — Workday quietly stops counting at 2,000 jobs and repeats page one
+  after that; this splits big sites (NVIDIA, Lowe's, TJX) by job category so you get every role
 - **Pay ranges as data** — Ashby's own pay data where the company publishes it, otherwise the
   range stated in the description, as `salaryMin` / `salaryMax` / `salaryCurrency` /
   `salaryPeriod`, annualised, and filterable with `onlyWithSalary`, `minAnnualSalary` and
@@ -71,7 +72,8 @@ arms race, and no proxy bill. When a company posts a role, it appears here.
 - **Only what's new, on a schedule** — turn on `onlyNewSinceLastRun` and schedule the run:
   each run skips every job that search has already delivered, so you track new openings
   without paying twice for the same job
-- **Curated registry included** — 3,500+ verified companies, 120,000+ open roles, or name your own
+- **Curated registry included** — 3,500+ verified Greenhouse, Lever and Ashby companies, 120,000+
+  open roles, or name your own, including 4,100+ Workday employers we know by name
 - **Simple pricing** — $1.50 per 1,000 jobs delivered, no platform usage on top; `maxJobs` caps the cost per run
 
 ## Pricing
@@ -96,7 +98,7 @@ run before charging, so filtered-out roles are never billed.
 |---|---|
 | `id` | Stable identifier: `{ats}:{company}:{nativeId}` |
 | `title` | Role title |
-| `company` / `companySlug` | Company |
+| `company` / `companySlug` | Company (for Workday, `company` is the name, e.g. "Morgan Stanley", and `companySlug` Workday's id, "ms") |
 | `location` | Location as published |
 | `remote` | The location text itself says remote — precise |
 | `remoteEligible` | The company's own ATS flag — broader, less precise (see note) |
@@ -110,6 +112,7 @@ run before charging, so filtered-out roles are never billed.
 | `salaryAnnualMin` / `salaryAnnualMax` | The same pay per year (hour × 2,080, week × 52, month × 12) |
 | `salaryText` | Exactly what the pay was read from, so you can check it |
 | `salarySource` | `structured` (the company's own Ashby pay data) or `description` (read from the text) |
+| `companyName`, `additionalLocations`, `country`, `workplaceType` | Workday jobs only: the company's name, every location the role lists, the country, and the company's own Remote / Hybrid / On-site label |
 
 ## Examples
 
@@ -126,6 +129,11 @@ run before charging, so filtered-out roles are never billed.
 **Engineering roles paying $180k+ a year**
 ```json
 { "useCuratedList": true, "titleKeywords": ["engineer"], "minAnnualSalary": 180000, "salaryCurrencies": ["USD"], "maxJobs": 1000 }
+```
+
+**Big employers on Workday, by name or link**
+```json
+{ "companies": ["NVIDIA", "Morgan Stanley", "https://wd1.myworkdaysite.com/recruiting/tjx/TJX_EXTERNAL"], "titleKeywords": ["engineer"], "postedWithinDays": 7 }
 ```
 
 **Daily alert: new jobs at your target companies (schedule it once a day)**
@@ -169,6 +177,7 @@ Then ask in plain English, for example:
 - *"Get every open role at Stripe, Ramp and Figma posted in the last 7 days, with salaries."*
 - *"Which startups on the curated list have remote engineering roles paying over $180k? Make a table."*
 - *"List Anthropic's open roles by department, titles and links only."*
+- *"Find NVIDIA's and Salesforce's new data engineering roles this week, with pay."*
 
 Runs started by an agent are billed exactly like any other run, at $1.50 per 1,000 jobs.
 Ask it to set `maxJobs` if you want a hard cap.
@@ -192,7 +201,14 @@ genuinely location-independent roles.
 Name companies however is easiest: `"stripe"`, a job-board link such as
 `"https://jobs.lever.co/veeva"`, or `{"slug": "ramp", "ats": "ashby"}`. Slugs are usually
 just the company name in lowercase. Leave `ats` blank and we'll work out which system a
-company uses. If a company has no public Greenhouse, Lever or Ashby board, the run log says so.
+company uses. If a company has no public board we can read, the run log says so.
+
+For Workday, a name works when the company is in our list of 4,100+ Workday employers
+(`"NVIDIA"`, `"Morgan Stanley"`, or `{"slug": "nvidia", "ats": "workday"}`). Otherwise paste any
+page of its career site, e.g. `https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite`.
+Workday sends 20 jobs at a time and each description separately, so a very large employer
+takes a few minutes; title, location and date filters are applied first, so only matching
+jobs are downloaded. Workday's pay comes from the description; there's no structured pay field.
 
 `onlyNewSinceLastRun` remembers each search's delivered jobs for 180 days in a key-value store
 named `company-career-site-jobs-monitor` in your own Apify account. Jobs cut off by `maxJobs`

@@ -8,6 +8,7 @@
  * is skipped with a reason.
  */
 import type { Ats } from "./ats.ts";
+import { parseCareerSiteUrl, workdaySitesNamed, type Site } from "./workday-source.ts";
 
 const KNOWN_ATS = new Set<Ats>(["greenhouse", "lever", "ashby"]);
 
@@ -18,16 +19,16 @@ const BOARD_HOSTS: Array<[RegExp, Ats]> = [
   [/(^|\.)ashbyhq\.com$/, "ashby"], // jobs.ashbyhq.com
 ];
 
-export interface Target {
-  ats?: Ats;
-  slug: string;
-}
+export type Target =
+  | { ats?: Ats; slug: string }
+  /** A Workday company: its career site(s), from a pasted link or the built-in registry. */
+  | { ats: "workday"; slug: string; sites: Site[] };
 
 /** One entry -> a target, or a reason it can't be used. */
 export function parseCompanyEntry(entry: unknown): Target | { skip: string } {
   if (entry == null) return { skip: "empty entry" };
   let raw: string;
-  let ats: Ats | undefined;
+  let ats: Ats | "workday" | undefined;
   if (typeof entry === "string") raw = entry;
   else if (typeof entry === "object") {
     const e = entry as { slug?: unknown; ats?: unknown; name?: unknown; url?: unknown };
@@ -35,11 +36,22 @@ export function parseCompanyEntry(entry: unknown): Target | { skip: string } {
     if (typeof s !== "string") return { skip: `no "slug" in ${JSON.stringify(entry).slice(0, 80)}` };
     raw = s;
     if (typeof e.ats === "string" && e.ats.trim()) {
-      const a = e.ats.trim().toLowerCase() as Ats;
-      if (!KNOWN_ATS.has(a)) return { skip: `unknown "ats" ${JSON.stringify(e.ats)} (use greenhouse, lever or ashby)` };
-      ats = a;
+      const a = e.ats.trim().toLowerCase();
+      if (a !== "workday" && !KNOWN_ATS.has(a as Ats)) {
+        return { skip: `unknown "ats" ${JSON.stringify(e.ats)} (use greenhouse, lever, ashby or workday)` };
+      }
+      ats = a as Ats | "workday";
     }
   } else return { skip: `not a company: ${JSON.stringify(entry).slice(0, 80)}` };
+
+  // A Workday career-site link (any page on the site, even a single job).
+  const site = /myworkday(jobs|site)\.com/i.test(raw) ? parseCareerSiteUrl(raw) : null;
+  if (site) return { ats: "workday", slug: site.tenant, sites: [site] };
+  if (ats === "workday") {
+    const sites = workdaySitesNamed(raw);
+    if (sites.length) return { ats: "workday", slug: sites[0].tenant, sites };
+    return { skip: `${JSON.stringify(raw).slice(0, 80)} is not in our Workday list: paste its career-site link (…myworkdayjobs.com/…) instead` };
+  }
 
   const fromUrl = slugFromUrl(raw.trim());
   if (fromUrl) return { ats: ats ?? fromUrl.ats, slug: fromUrl.slug };

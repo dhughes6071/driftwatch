@@ -2,8 +2,8 @@
  * Apify Actor entry point -- "Company Career Site Jobs".
  *
  * Pulls open roles directly from companies' own applicant tracking systems via
- * their public JSON job-board APIs, normalizes everything into one schema, and
- * pushes results to the dataset.
+ * their public JSON job-board APIs (Greenhouse, Lever, Ashby and Workday),
+ * normalizes everything into one schema, and pushes results to the dataset.
  *
  * MONETIZATION: pay-per-event. We charge per job returned, and only for jobs
  * we actually deliver. Charging is checked against the caller's budget BEFORE
@@ -20,6 +20,7 @@ import { fetchCompany, REMOTE_RE, VERIFIED_ATS, type Ats, type Job, type Prefilt
 import { payFor, type PayFields } from "./pay.ts";
 import { parseCompanyEntry } from "./targets.ts";
 import { MONITOR_STORE, SeenJobs, monitorKey, type MonitorState } from "./monitor.ts";
+import { WorkdayClient, fetchWorkdaySite, workdaySitesNamed, type Site, type WorkdayJob } from "./workday-source.ts";
 
 interface Input {
   /**
@@ -81,7 +82,7 @@ try {
 
   // ---------------------------------------------------------------- targets
 
-  let targets: Array<{ ats: Ats; slug: string }> = [];
+  let targets: Target[] = [];
 
   /** The named companies, normalised, for the "new since last run" key. */
   const companyKeys: string[] = [];
@@ -93,9 +94,16 @@ try {
         skipped.push(t.skip);
         continue;
       }
+      if ("sites" in t) {
+        companyKeys.push(...t.sites.map((s) => `workday:${s.host}/${s.site.toLowerCase()}`));
+        targets.push(...t.sites.map((site) => ({ ats: "workday" as const, site })));
+        continue;
+      }
       companyKeys.push(`${t.ats ?? "*"}:${t.slug}`);
       // A caller may name the ATS (or paste a link that does) or leave it to us to work out.
       targets.push(...(t.ats ? [{ ats: t.ats, slug: t.slug }] : VERIFIED_ATS.map((ats) => ({ ats, slug: t.slug }))));
+      // A plain name ("nvidia", "Morgan Stanley") also finds the company's Workday site, if it has one.
+      if (!t.ats) targets.push(...workdaySitesNamed(t.slug).map((site) => ({ ats: "workday" as const, site })));
     }
     if (skipped.length) {
       log.warning(
@@ -243,6 +251,36 @@ try {
       new Promise<never>((_, rej) => setTimeout(() => rej(new Error(`${what} took over ${ms / 1000} s`)), ms).unref()),
     ]);
 
+  /** Run one job through the filters and queue it for delivery. True when it was taken. */
+  function consider(job: Job | WorkdayJob): boolean {
+    if (full()) return false;
+
+    // A slug probed across several ATSs can yield the same role twice.
+    if (seen.has(job.id)) return false;
+    seen.add(job.id);
+
+    if (!matches(job, filters)) return false;
+
+    // Pay is read from the list response (description + structured pay data), so it costs no extra request.
+    // Workday's is read from the description already fetched, using the job's country.
+    const pay = "pay" in job ? job.pay : payFor(job);
+    if (needSalary && !payMatches(pay, minAnnualSalary, currencies)) return false;
+    // Delivered by an earlier run of this search.
+    if (monitor && history.has(job.id)) {
+      alreadyDelivered++;
+      return false;
+    }
+
+    const { compensation: _internal, pay: _pay, ...pub } = job as Job & { pay?: unknown };
+    pending.push(includeDescription ? { ...pub, ...pay } : { ...pub, description: undefined, ...pay });
+    accepted++;
+    return true;
+  }
+
+  // One client for every Workday site, so the whole run keeps to Workday's per-IP rate limit.
+  const workday = new WorkdayClient();
+  const workdayFilters = { titleKeywords, locationKeywords, remoteOnly, postedWithinDays, needSalary, includeDescription };
+
   async function worker() {
     while (!full()) {
       if (Date.now() > softStop) {
@@ -251,6 +289,33 @@ try {
       }
       const t = targets[next++];
       if (!t) return;
+
+      if ("site" in t) {
+        // No per-site timeout: a big Workday site legitimately takes minutes, every request has its
+        // own 30 s timeout and retry limit, and the run's soft and hard stops end it in time.
+        const key = `workday/${t.site.tenant}/${t.site.site}`;
+        inflight.set(key, Date.now());
+        let listed = 0;
+        try {
+          listed = await fetchWorkdaySite(workday, t.site, workdayFilters, {
+            wanted: () => maxJobs - accepted,
+            stopped: full,
+            deliver: consider,
+            afterBatch: async () => {
+              if (pending.length >= PUSH_BATCH) await flush();
+            },
+          });
+        } catch (err) {
+          log.warning(`${key} failed: ${err instanceof Error ? err.message : String(err)}`);
+        } finally {
+          inflight.delete(key);
+        }
+        searched++;
+        if (listed) companiesOk++;
+        else companiesFailed++;
+        continue;
+      }
+
       let jobs: Job[] = [];
       const key = `${t.ats}/${t.slug}`;
       inflight.set(key, Date.now());
@@ -271,25 +336,7 @@ try {
 
       for (const job of jobs) {
         if (full()) break;
-
-        // A slug probed across several ATSs can yield the same role twice.
-        if (seen.has(job.id)) continue;
-        seen.add(job.id);
-
-        if (!matches(job, filters)) continue;
-
-        // Pay is read from the list response (description + structured pay data), so it costs no extra request.
-        const pay = payFor(job);
-        if (needSalary && !payMatches(pay, minAnnualSalary, currencies)) continue;
-        // Delivered by an earlier run of this search.
-        if (monitor && history.has(job.id)) {
-          alreadyDelivered++;
-          continue;
-        }
-
-        const { compensation: _internal, ...pub } = job;
-        pending.push(includeDescription ? { ...pub, ...pay } : { ...pub, description: undefined, ...pay });
-        accepted++;
+        consider(job);
       }
       if (pending.length >= PUSH_BATCH) await flush();
       if (searched % 200 === 0) log.info(`progress: ${accepted}/${maxJobs} jobs, ${searched}/${targets.length} boards searched`);
@@ -313,10 +360,10 @@ try {
   }
 
   if (companies?.length && companiesOk === 0 && targets.length) {
-    const slugs = [...new Set(targets.map((t) => t.slug))].slice(0, 10).join(", ");
+    const slugs = [...new Set(targets.map((t) => ("site" in t ? t.site.tenant : t.slug)))].slice(0, 10).join(", ");
     log.warning(
-      `None of these companies has a public Greenhouse, Lever or Ashby job board: ${slugs}. ` +
-        `Check the slug on the company's careers page (e.g. jobs.lever.co/{slug}), or paste that link instead.`,
+      `None of these companies has a public Greenhouse, Lever, Ashby or Workday job board we could read: ${slugs}. ` +
+        `Check the company's careers page and paste the job-board link instead (e.g. jobs.lever.co/{slug} or {company}.wd5.myworkdayjobs.com/{site}).`,
     );
   }
 
@@ -353,8 +400,11 @@ try {
 
 // ------------------------------------------------------------------ helpers
 
+/** What a run fetches: a Greenhouse / Lever / Ashby board, or one Workday career site. */
+type Target = { ats: Ats; slug: string } | { ats: "workday"; site: Site };
+
 function matches(
-  job: Job,
+  job: Job | WorkdayJob,
   f: {
     remoteOnly: boolean;
     titleKeywords: string[];
@@ -376,14 +426,17 @@ function matches(
   }
 
   if (f.locationKeywords.length) {
-    const l = (job.location ?? "").toLowerCase();
+    // Workday jobs can list several locations; any of them counts.
+    const l = [job.location ?? "", ...("additionalLocations" in job ? job.additionalLocations : [])].join(" | ").toLowerCase();
     if (!locationMatcher(f.locationKeywords)(l)) return false;
   }
 
   if (f.cutoff && job.postedAt) {
     const ts = Date.parse(job.postedAt);
-    // Keep undated roles rather than silently dropping them.
-    if (Number.isFinite(ts) && ts < f.cutoff) return false;
+    // Keep undated roles rather than silently dropping them. A date with no time
+    // (Workday's) gets a day's grace, or a role posted on the cutoff day is dropped.
+    const grace = /^\d{4}-\d{2}-\d{2}$/.test(job.postedAt) ? 86_400_000 : 0;
+    if (Number.isFinite(ts) && ts < f.cutoff - grace) return false;
   }
 
   return true;

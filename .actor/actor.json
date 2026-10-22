@@ -1,9 +1,9 @@
 {
   "actorSpecification": 1,
   "name": "company-career-site-jobs",
-  "title": "Greenhouse, Lever & Ashby Jobs Scraper — with Salaries",
-  "description": "Jobs from 3,500+ companies on Greenhouse, Lever and Ashby, read from their public JSON APIs so it doesn't break. Pay on nearly half of all roles, pay and remote filters, job descriptions. 125,000+ open roles.",
-  "version": "0.5",
+  "title": "Greenhouse, Lever, Ashby & Workday Jobs Scraper — with Salaries",
+  "description": "Jobs from 3,500+ companies on Greenhouse, Lever and Ashby, plus any Workday career site (NVIDIA, Salesforce, CVS and 4,100+ more by name), read from their public JSON APIs so it doesn't break. Salaries, pay and remote filters, only-new-jobs mode.",
+  "version": "0.6",
   "buildTag": "latest",
   "dockerfile": "./Dockerfile",
   "readme": "./ACTOR.md",

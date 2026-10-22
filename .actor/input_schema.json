@@ -6,13 +6,13 @@
     "useCuratedList": {
       "title": "Use the curated company list",
       "type": "boolean",
-      "description": "Fetch every company in our verified registry (166+ companies, ~14,000 open roles). Turn this off if you want to name specific companies below.",
+      "description": "Fetch every company in our verified Greenhouse, Lever and Ashby registry (3,500+ companies, 120,000+ open roles). Workday employers are fetched when you name them below. Turn this off if you only want the companies you name.",
       "default": true
     },
     "companies": {
       "title": "Specific companies (optional)",
       "type": "array",
-      "description": "Companies to fetch, in any of these forms: names (\"stripe\"), job-board links (\"https://jobs.lever.co/veeva\"), or objects ({\"slug\": \"ramp\", \"ats\": \"ashby\"}). Leave the ATS out and we'll work out which system each company uses. Overrides the curated list.",
+      "description": "Companies to fetch, in any of these forms: names (\"stripe\", \"NVIDIA\", \"Morgan Stanley\"), job-board or Workday career-site links (\"https://jobs.lever.co/veeva\", \"https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite\"), or objects ({\"slug\": \"ramp\", \"ats\": \"ashby\"}). Leave the ATS out and we'll work out which system each company uses; names also match our list of 4,100+ Workday employers. For a Workday company we don't know by name, paste its career-site link. Overrides the curated list.",
       "editor": "json",
       "prefill": [
         {
@@ -21,7 +21,8 @@
         {
           "slug": "ramp",
           "ats": "ashby"
-        }
+        },
+        "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite"
       ]
     },
     "maxJobs": {
