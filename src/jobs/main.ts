@@ -19,7 +19,7 @@ import { REVIEW_ASK, relatedTip } from "./related.ts";
 import { fetchCompany, REMOTE_RE, VERIFIED_ATS, type Ats, type Job, type Prefilter } from "./ats.ts";
 import { payFor, type PayFields } from "./pay.ts";
 import { FREE_PLAN_NOTE, jobLimit } from "./plan.ts";
-import { parseCompanyEntry } from "./targets.ts";
+import { companyList, parseCompanyEntry, textList } from "./targets.ts";
 import { MONITOR_STORE, SeenJobs, monitorKey, type MonitorState } from "./monitor.ts";
 import { WorkdayClient, fetchWorkdaySite, workdaySitesNamed, type Site, type WorkdayJob } from "./workday-source.ts";
 
@@ -64,20 +64,25 @@ try {
   const input = (await Actor.getInput<Input>()) ?? {};
 
   const {
-    companies,
     useCuratedList = true,
     maxJobs: requestedMaxJobs = 1000,
     remoteOnly = false,
-    titleKeywords = [],
-    locationKeywords = [],
     postedWithinDays,
     includeDescription = true,
     onlyWithSalary = false,
     minAnnualSalary,
-    salaryCurrencies = [],
     onlyNewSinceLastRun = false,
     monitorName,
   } = input;
+  // Blank / null entries dropped and single strings accepted (see targets.ts): both used to fail the run or return 0 jobs.
+  const companies = companyList(input.companies);
+  const titleKeywords = textList(input.titleKeywords);
+  const locationKeywords = textList(input.locationKeywords);
+  const salaryCurrencies = textList(input.salaryCurrencies);
+  const rawCompanies = typeof input.companies === "string" ? 1 : Array.isArray(input.companies) ? input.companies.length : 0;
+  if (rawCompanies && !companies.length) {
+    log.warning(`\`companies\` has no usable entries${useCuratedList ? ", so the built-in company list is used" : ""}.`);
+  }
   const { limit: maxJobs, freePlanCapped } = jobLimit(requestedMaxJobs, {
     atHome: Actor.isAtHome(),
     userIsPaying: Actor.getEnv().userIsPaying,
@@ -365,13 +370,31 @@ try {
     );
   }
 
-  if (companies?.length && companiesOk === 0 && targets.length) {
+  // Greenhouse and Workday apply filters while fetching, so with filters on, a board with no matches looks
+  // exactly like a missing one: only blame the boards when nothing was filtered.
+  const filtered = remoteOnly || titleKeywords.length > 0 || locationKeywords.length > 0 || !!cutoff || needSalary;
+  const noBoards = companies.length > 0 && companiesOk === 0 && targets.length > 0 && !filtered;
+  if (noBoards) {
     const slugs = [...new Set(targets.map((t) => ("site" in t ? t.site.tenant : t.slug)))].slice(0, 10).join(", ");
     log.warning(
       `None of these companies has a public Greenhouse, Lever, Ashby or Workday job board we could read: ${slugs}. ` +
         `Check the company's careers page and paste the job-board link instead (e.g. jobs.lever.co/{slug} or {company}.wd5.myworkdayjobs.com/{site}).`,
     );
   }
+
+  // A run that delivers nothing says why, in the log and its status message, instead of a bare "0 jobs".
+  const nothingNew = !!monitor && alreadyDelivered > 0;
+  const noResults =
+    pushed > 0 || budgetReached || timeLimited
+      ? null
+      : noBoards
+        ? "0 jobs: none of the companies you named has a job board we could read. The log lists them and how to paste a job-board link instead."
+        : nothingNew
+          ? `0 jobs: nothing new since this search last ran (${alreadyDelivered} current matches were delivered before).`
+          : "0 jobs matched your filters. Try fewer or broader title / location keywords, a longer postedWithinDays, or no salary filter" +
+            (companies.length ? ", and check each company you named has a Greenhouse, Lever, Ashby or Workday job board." : ".");
+  if (noResults && nothingNew) log.info(noResults);
+  else if (noResults && !noBoards) log.warning(noResults); // noBoards already warned with the company list
 
   // ---------------------------------------------------------------- summary
 
@@ -391,6 +414,7 @@ try {
     filters: { remoteOnly, titleKeywords, locationKeywords, postedWithinDays, onlyWithSalary, minAnnualSalary, salaryCurrencies },
     tip: relatedTip(titleKeywords),
     ...(pushed > 0 ? { review: REVIEW_ASK } : {}),
+    ...(noResults ? { noResults } : {}),
     finishedAt: new Date().toISOString(),
   });
 
@@ -407,7 +431,7 @@ try {
       ? FREE_PLAN_NOTE
       : timeLimited
         ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout to search every company.`
-        : pushed > 0 ? `${pushed} jobs delivered. ${REVIEW_ASK}` : undefined,
+        : pushed > 0 ? `${pushed} jobs delivered. ${REVIEW_ASK}` : (noResults ?? undefined),
   );
 } catch (err) {
   // Actor.fail marks the run FAILED with the reason; exiting normally here

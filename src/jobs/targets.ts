@@ -24,6 +24,32 @@ export type Target =
   /** A Workday company: its career site(s), from a pasted link or the built-in registry. */
   | { ats: "workday"; slug: string; sites: Site[] };
 
+/**
+ * `companies` as a list, with blank and null entries dropped. A single string
+ * ("stripe, ramp") is split on commas and new lines; it used to be read one
+ * letter at a time and return 0 jobs. An empty row left in the Console's list
+ * editor ([""]) failed the run with "No companies to fetch".
+ */
+export function companyList(value: unknown): unknown[] {
+  const list = typeof value === "string" ? value.split(/[,\n]/) : Array.isArray(value) ? value : [];
+  return list.filter((e) => e != null && !(typeof e === "string" && !e.trim()));
+}
+
+/**
+ * A keyword / currency field as clean strings. A single string becomes a
+ * one-item list (not split on commas: "Washington, DC" is one location), and
+ * blank or null entries are dropped. A null keyword made the title / location
+ * filter throw on every board, so the run returned 0 jobs with every company
+ * counted as unreachable.
+ */
+export function textList(value: unknown): string[] {
+  const list = typeof value === "string" ? [value] : Array.isArray(value) ? value : [];
+  return list
+    .filter((v) => typeof v === "string" || typeof v === "number")
+    .map((v) => String(v).trim())
+    .filter(Boolean);
+}
+
 /** One entry -> a target, or a reason it can't be used. */
 export function parseCompanyEntry(entry: unknown): Target | { skip: string } {
   if (entry == null) return { skip: "empty entry" };

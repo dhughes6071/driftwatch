@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseCompanyEntry } from "../src/jobs/targets.ts";
+import { companyList, parseCompanyEntry, textList } from "../src/jobs/targets.ts";
 
 test("company entries: objects, plain names and job-board links all work", () => {
   assert.deepEqual(parseCompanyEntry({ slug: "stripe" }), { slug: "stripe" });
@@ -47,4 +47,15 @@ test("Greenhouse with a prefilter: light list first, details only for matches", 
   } finally {
     globalThis.fetch = real;
   }
+});
+
+test("list inputs: blank and null entries dropped, single strings accepted", () => {
+  assert.deepEqual(companyList([""]), []);
+  assert.deepEqual(companyList([null, "  ", "stripe", { slug: "ramp" }]), ["stripe", { slug: "ramp" }]);
+  assert.deepEqual(companyList("stripe, ramp\nfigma").map((s) => String(s).trim()), ["stripe", "ramp", "figma"]);
+  assert.deepEqual(companyList(undefined), []);
+  assert.deepEqual(textList("engineer"), ["engineer"]);
+  assert.deepEqual(textList("Washington, DC"), ["Washington, DC"]); // locations keep their commas
+  assert.deepEqual(textList([null, " RN ", "", 3]), ["RN", "3"]);
+  assert.deepEqual(textList({}), []);
 });
