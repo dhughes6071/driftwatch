@@ -18,6 +18,7 @@ import { Actor, log } from "apify";
 import { relatedTip } from "./related.ts";
 import { fetchCompany, REMOTE_RE, VERIFIED_ATS, type Ats, type Job, type Prefilter } from "./ats.ts";
 import { payFor, type PayFields } from "./pay.ts";
+import { FREE_PLAN_NOTE, jobLimit } from "./plan.ts";
 import { parseCompanyEntry } from "./targets.ts";
 import { MONITOR_STORE, SeenJobs, monitorKey, type MonitorState } from "./monitor.ts";
 import { WorkdayClient, fetchWorkdaySite, workdaySitesNamed, type Site, type WorkdayJob } from "./workday-source.ts";
@@ -65,7 +66,7 @@ try {
   const {
     companies,
     useCuratedList = true,
-    maxJobs = 1000,
+    maxJobs: requestedMaxJobs = 1000,
     remoteOnly = false,
     titleKeywords = [],
     locationKeywords = [],
@@ -77,6 +78,11 @@ try {
     onlyNewSinceLastRun = false,
     monitorName,
   } = input;
+  const { limit: maxJobs, freePlanCapped } = jobLimit(requestedMaxJobs, {
+    atHome: Actor.isAtHome(),
+    userIsPaying: Actor.getEnv().userIsPaying,
+  });
+  if (freePlanCapped) log.warning(FREE_PLAN_NOTE);
   const currencies = new Set(salaryCurrencies.map((c) => c.trim().toUpperCase()).filter(Boolean));
   const needSalary = onlyWithSalary || !!minAnnualSalary || currencies.size > 0;
 
@@ -376,7 +382,12 @@ try {
     ...(monitor ? { newSinceLastRun: { monitorKey: mKey, firstRun: !prevState, alreadyDeliveredSkipped: alreadyDelivered } } : {}),
     companiesWithJobs: companiesOk,
     companiesEmptyOrUnreachable: companiesFailed,
-    stoppedBecause: budgetReached ? "charging_limit" : pushed >= maxJobs ? "maxJobs" : timeLimited ? "time_limit" : "completed",
+    stoppedBecause: budgetReached
+      ? "charging_limit"
+      : pushed >= maxJobs
+        ? (freePlanCapped ? "free_plan_limit" : "maxJobs")
+        : timeLimited ? "time_limit" : "completed",
+    ...(freePlanCapped && pushed >= maxJobs ? { freePlan: FREE_PLAN_NOTE } : {}),
     filters: { remoteOnly, titleKeywords, locationKeywords, postedWithinDays, onlyWithSalary, minAnnualSalary, salaryCurrencies },
     tip: relatedTip(titleKeywords),
     finishedAt: new Date().toISOString(),
@@ -387,8 +398,12 @@ try {
       `(${companiesFailed} empty or unreachable).`,
   );
   log.info(`Tip: ${relatedTip(titleKeywords)}`);
+  const hitFreeCap = freePlanCapped && pushed >= maxJobs;
+  if (hitFreeCap) log.warning(FREE_PLAN_NOTE);
   await Actor.exit(
-    timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout to search every company.` : undefined,
+    hitFreeCap
+      ? FREE_PLAN_NOTE
+      : timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout to search every company.` : undefined,
   );
 } catch (err) {
   // Actor.fail marks the run FAILED with the reason; exiting normally here

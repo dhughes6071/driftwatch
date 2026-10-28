@@ -86,6 +86,8 @@ You pay only for jobs actually delivered to your dataset. Two ways to control
 spend:
 
 - **`maxJobs`** — hard cap on results per run. The default of 1,000 costs at most $1.50.
+- **Apify free plan:** runs by users on Apify's free plan return up to 200 jobs each.
+  Any paid Apify plan removes that cap, at the same $1.50 per 1,000 jobs.
 - **Apify's maximum cost per run** — if your limit is reached mid-run, the
   Actor stops cleanly and keeps everything delivered so far.
 

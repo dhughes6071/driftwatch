@@ -7,7 +7,7 @@ const CLINICAL = /\b(nurse|nursing|rn|lpn|lvn|cna|physician|hospital|clinical|me
 
 export function relatedTip(titleKeywords: string[] = []): string {
   if (titleKeywords.some((k) => CLINICAL.test(k))) {
-    return "For hospital roles, US Hospital & Nurse Jobs covers 113,000+ openings at 68 large US health systems, with unit, shift, per diem and sign-on bonus filters: https://apify.com/viridian_layout_ea2/us-hospital-jobs";
+    return "For hospital roles, US Hospital & Nurse Jobs covers 128,000+ openings at 78 large US health systems, with unit, shift, per diem and sign-on bonus filters: https://apify.com/viridian_layout_ea2/us-hospital-jobs";
   }
-  return "To search 1.8M jobs from 19,000+ companies (Workday, Oracle and 15 more systems) in one run, try the Career Site Jobs API: https://apify.com/viridian_layout_ea2/career-site-jobs-api";
+  return "To search 1.8M jobs from 19,000+ companies (Workday, Oracle and 17 more systems) in one run, try the Career Site Jobs API: https://apify.com/viridian_layout_ea2/career-site-jobs-api";
 }
