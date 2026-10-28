@@ -106,8 +106,10 @@ output fields.
 
 ## Pricing
 
-**$2 per 1,000 jobs**, plus Apify's standard run-start fee. Platform usage is
-included, so you are not billed for compute separately.
+From **11 November 2026**: **$4 per 1,000 jobs** on Apify's Free and Starter plans,
+**$3.50** on Scale and **$3** on Business, plus Apify's standard run-start fee. Until then
+it is $2 per 1,000 ($1.40–$1.80 on paid plans). Platform usage is included, so you are not
+billed for compute separately.
 
 - **`maxJobs`** is a hard cap per run.
 - **Apify's maximum cost per run** also works: if the limit is reached mid-run, the Actor
@@ -234,7 +236,7 @@ Then ask in plain English, for example:
 - *"Which companies posted remote data engineer roles paying over $150k this week? Make a table."*
 - *"List every open role at Morgan Stanley and Stripe, with titles and links only."*
 
-Runs started by an agent are billed exactly like any other run, at $2 per 1,000 jobs.
+Runs started by an agent are billed exactly like any other run, per job returned.
 Ask it to set `maxJobs` if you want a hard cap.
 
 ## Notes
