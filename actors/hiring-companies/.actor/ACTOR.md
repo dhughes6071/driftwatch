@@ -52,6 +52,18 @@ Here, all 12 Salesforce roles were posted this month, and 64% of ICF's 397 openi
 > **Want the jobs themselves?** Our [Career Site Jobs API](https://apify.com/viridian_layout_ea2/career-site-jobs-api)
 > searches the same index and returns one row per job, with descriptions and salaries.
 
+## Run it on a schedule
+
+It works best as a weekly feed of new companies rather than a one-off pull:
+
+1. Set your filters, turn on **`onlyNewSinceLastRun`**, and save the input as a task.
+2. In Apify Console, go to **Schedules**, create a schedule, add the task and pick **weekly**.
+3. On the task's **Integrations** tab, send each run's results to email, Slack, Google Sheets,
+   Zapier, Make or a webhook.
+
+The first run returns everything that matches. Every run after that returns only companies with matching roles added since this search last ran, so each row is a fresh hiring signal.
+A weekly run that finds 50 newly hiring companies costs about $1.00.
+
 ## Why this one
 
 - **Companies, not job ads.** Most hiring-signal tools either check a list of companies you

@@ -84,6 +84,18 @@ two weeks, so a search returns in about a minute. You don't need any coding, log
 }
 ```
 
+## Run it on a schedule
+
+It works best as a weekly feed of new stores rather than a one-off pull:
+
+1. Set your filters, turn on **`onlyNewSinceLastRun`**, and save the input as a task.
+2. In Apify Console, go to **Schedules**, create a schedule, add the task and pick **weekly**.
+3. On the task's **Integrations** tab, send each run's results to email, Slack, Google Sheets,
+   Zapier, Make or a webhook.
+
+The first run returns everything that matches. Every run after that returns only stores this search hasn't delivered before, so you never pay twice for the same store.
+A weekly run that finds 500 new stores costs about $2.50.
+
 ## Why this one
 
 - **Re-checked every two weeks, not a stale list.** Every store in the index was open at

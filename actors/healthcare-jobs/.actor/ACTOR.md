@@ -20,6 +20,18 @@ Email us at [chazmichael_michaels@icloud.com](mailto:chazmichael_michaels@icloud
   hospital's own apply link.
 - **Workforce and pay research.** What health systems pay nurses, by state, unit and shift.
 
+## Run it on a schedule
+
+It works best as a daily feed of new roles rather than a one-off pull:
+
+1. Set your filters, turn on **`onlyNewSinceLastRun`**, and save the input as a task.
+2. In Apify Console, go to **Schedules**, create a schedule, add the task and pick **daily**.
+3. On the task's **Integrations** tab, send each run's results to email, Slack, Google Sheets,
+   Zapier, Make or a webhook.
+
+The first run returns everything that matches. Every run after that returns only roles added since this search last ran, so you never pay twice for the same role.
+A daily run that finds 100 new roles costs about $0.50.
+
 ## Why this one
 
 - **The hospitals' own career sites, not job boards.** Workday, Oracle, Phenom, iCIMS and

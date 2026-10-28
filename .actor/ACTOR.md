@@ -53,6 +53,18 @@ Every job also comes with its description (plain text, up to 8,000 characters) a
 > covers 128,000+ openings at 78 large US health systems, with unit, shift, per diem / travel
 > and sign-on bonus filters.
 
+## Run it on a schedule
+
+It works best as a daily feed of new jobs rather than a one-off pull:
+
+1. Set your filters, turn on **`onlyNewSinceLastRun`**, and save the input as a task.
+2. In Apify Console, go to **Schedules**, create a schedule, add the task and pick **daily**.
+3. On the task's **Integrations** tab, send each run's results to email, Slack, Google Sheets,
+   Zapier, Make or a webhook.
+
+The first run returns everything that matches. Every run after that returns only jobs this search hasn't delivered before, so you never pay twice for the same job.
+A daily run that finds 100 new jobs costs about $0.15.
+
 ## Why this one
 
 Most job scrapers parse HTML from job boards. HTML changes, so they break — which

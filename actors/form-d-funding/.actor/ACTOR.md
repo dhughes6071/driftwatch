@@ -56,6 +56,18 @@ Email us at [chazmichael_michaels@icloud.com](mailto:chazmichael_michaels@icloud
 Each record also has the street address and ZIP, the round's remaining amount, minimum
 investment, brokers paid, and links to the filing. See **Output** below.
 
+## Run it on a schedule
+
+It works best as a weekly feed of new filings rather than a one-off pull:
+
+1. Set your filters, turn on **`onlyNewSinceLastRun`**, and save the input as a task.
+2. In Apify Console, go to **Schedules**, create a schedule, add the task and pick **weekly**.
+3. On the task's **Integrations** tab, send each run's results to email, Slack, Google Sheets,
+   Zapier, Make or a webhook.
+
+The first run returns everything that matches. Every run after that returns only filings this search hasn't delivered before, so you never pay twice for the same raise.
+A weekly run that returns 50 new filings costs about $1.00.
+
 ## Why this one
 
 - **Operating companies only, by default.** About 6 in 10 Form D filings are investment
