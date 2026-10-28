@@ -15,7 +15,7 @@
  * one unreachable company never sinks a run.
  */
 import { Actor, log } from "apify";
-import { relatedTip } from "./related.ts";
+import { REVIEW_ASK, relatedTip } from "./related.ts";
 import { fetchCompany, REMOTE_RE, VERIFIED_ATS, type Ats, type Job, type Prefilter } from "./ats.ts";
 import { payFor, type PayFields } from "./pay.ts";
 import { FREE_PLAN_NOTE, jobLimit } from "./plan.ts";
@@ -390,6 +390,7 @@ try {
     ...(freePlanCapped && pushed >= maxJobs ? { freePlan: FREE_PLAN_NOTE } : {}),
     filters: { remoteOnly, titleKeywords, locationKeywords, postedWithinDays, onlyWithSalary, minAnnualSalary, salaryCurrencies },
     tip: relatedTip(titleKeywords),
+    ...(pushed > 0 ? { review: REVIEW_ASK } : {}),
     finishedAt: new Date().toISOString(),
   });
 
@@ -398,12 +399,15 @@ try {
       `(${companiesFailed} empty or unreachable).`,
   );
   log.info(`Tip: ${relatedTip(titleKeywords)}`);
+  if (pushed > 0) log.info(REVIEW_ASK);
   const hitFreeCap = freePlanCapped && pushed >= maxJobs;
   if (hitFreeCap) log.warning(FREE_PLAN_NOTE);
   await Actor.exit(
     hitFreeCap
       ? FREE_PLAN_NOTE
-      : timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout to search every company.` : undefined,
+      : timeLimited
+        ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout to search every company.`
+        : pushed > 0 ? `${pushed} jobs delivered. ${REVIEW_ASK}` : undefined,
   );
 } catch (err) {
   // Actor.fail marks the run FAILED with the reason; exiting normally here

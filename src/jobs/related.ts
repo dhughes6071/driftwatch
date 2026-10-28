@@ -11,3 +11,7 @@ export function relatedTip(titleKeywords: string[] = []): string {
   }
   return "To search 1.8M jobs from 19,000+ companies (Workday, Oracle and 17 more systems) in one run, try the Career Site Jobs API: https://apify.com/viridian_layout_ea2/career-site-jobs-api";
 }
+
+/** Asked only after a run that delivered jobs. The Store has no reviews link until the first review exists, so this points to the listing. */
+export const REVIEW_ASK =
+  "Found this useful? A short review on the Store page helps others find it: https://apify.com/viridian_layout_ea2/company-career-site-jobs";
