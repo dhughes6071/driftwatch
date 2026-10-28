@@ -12,6 +12,7 @@
  * cleanly.
  */
 import { Actor, log } from "apify";
+import { cleanLists, noResultsNote } from "./input.ts";
 import type { IndexJob, Manifest } from "./format.ts";
 import { httpFetcher, makeMatcher, unzipText, type Query } from "./search.ts";
 import { CompanyRollup, type SortBy } from "./companies.ts";
@@ -46,7 +47,7 @@ const PUSH_BATCH = 100;
 await Actor.init();
 
 try {
-  const input = (await Actor.getInput<Input>()) ?? {};
+  const input = cleanLists((await Actor.getInput<Input>()) ?? {});
   const q: Query = {
     titleKeywords: input.titleKeywords ?? [],
     titleExcludeKeywords: input.titleExcludeKeywords ?? [],
@@ -155,7 +156,9 @@ try {
     finishedAt: new Date().toISOString(),
   });
   log.info(`Done. ${pushed} companies delivered.`);
-  await Actor.exit(timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} companies delivered from partial counts. Use a longer timeout.` : undefined);
+  const noResults = pushed === 0 && !budgetReached && !timeLimited ? noResultsNote("companies", !!monitor && !!prev) : null;
+  if (noResults) log.warning(noResults);
+  await Actor.exit(timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} companies delivered from partial counts. Use a longer timeout.` : (noResults ?? undefined));
 } catch (err) {
   // Actor.fail marks the run FAILED with the reason, instead of a misleading SUCCEEDED.
   const msg = err instanceof Error ? err.message : String(err);

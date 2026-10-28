@@ -11,6 +11,7 @@
  * run before charging, and a caller's charging limit stops the run cleanly.
  */
 import { Actor, log } from "apify";
+import { cleanLists, noResultsNote } from "./input.ts";
 import type { Manifest } from "./format.ts";
 import { httpFetcher, search, type Query } from "./search.ts";
 import { MONITOR_STORE, monitorKey, type MonitorState } from "./monitor.ts";
@@ -27,7 +28,7 @@ const PUSH_BATCH = 200;
 await Actor.init();
 
 try {
-  const input = (await Actor.getInput<Input>()) ?? {};
+  const input = cleanLists((await Actor.getInput<Input>()) ?? {});
   const { onlyNewSinceLastRun, monitorName, ...rest } = input;
   const q: Query = { ...rest, maxResults: input.maxResults ?? 500 };
 
@@ -92,7 +93,9 @@ try {
     finishedAt: new Date().toISOString(),
   });
   log.info(`Done. ${pushed} stores delivered.`);
-  await Actor.exit(timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} stores delivered.` : undefined);
+  const noResults = pushed === 0 && !budgetReached && !timeLimited ? noResultsNote("stores", !!monitor && !!prev) : null;
+  if (noResults) log.warning(noResults);
+  await Actor.exit(timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} stores delivered.` : (noResults ?? undefined));
 } catch (err) {
   // Actor.fail marks the run FAILED with the reason, instead of a misleading SUCCEEDED.
   const msg = err instanceof Error ? err.message : String(err);

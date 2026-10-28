@@ -15,6 +15,7 @@
  * going to deliver.
  */
 import { Actor, log } from "apify";
+import { cleanLists, noResultsNote } from "./input.ts";
 import {
   WorkdayClient,
   companyName,
@@ -63,7 +64,7 @@ const DETAIL_CONCURRENCY = 8;
 await Actor.init();
 
 try {
-  const input = (await Actor.getInput<Input>()) ?? {};
+  const input = cleanLists((await Actor.getInput<Input>()) ?? {});
   const {
     careerSiteUrls = [],
     useCuratedList = false,
@@ -316,7 +317,9 @@ try {
   if (timeLimited) {
     log.warning(`Stopped early to finish inside this run's time limit (${perSite.length} of ${unique.length} career sites). Give the run a longer timeout for complete results.`);
   }
-  await Actor.exit(timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout for complete results.` : undefined);
+  const noResults = pushed === 0 && !budgetReached && !timeLimited ? noResultsNote("jobs", !!monitor && !!prevState) : null;
+  if (noResults) log.warning(noResults);
+  await Actor.exit(timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout for complete results.` : (noResults ?? undefined));
 } catch (err) {
   // Actor.fail marks the run FAILED with the reason; exiting normally here
   // used to report crashed runs as SUCCEEDED (found 3 Oct 2026).

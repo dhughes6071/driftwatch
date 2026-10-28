@@ -15,6 +15,7 @@
  * download. Sector, fund and amount filters need the XML.
  */
 import { Actor, log } from "apify";
+import { cleanLists, noResultsNote } from "./input.ts";
 import { EdgarClient, addDays, isoDay, type Hit } from "./edgar.ts";
 import { SECTORS, parseFiling, type Filing } from "./formd.ts";
 import { MONITOR_STORE, SeenFilings, monitorKey, type MonitorState } from "./monitor.ts";
@@ -53,7 +54,7 @@ const BATCH = 16;
 await Actor.init();
 
 try {
-  const input = (await Actor.getInput<Input>()) ?? {};
+  const input = cleanLists((await Actor.getInput<Input>()) ?? {});
   const {
     daysBack = 7,
     filedFrom,
@@ -255,7 +256,9 @@ try {
   if (timeLimited) {
     log.warning("Stopped early to finish inside this run's time limit. Give the run a longer timeout, or a shorter date range, for complete results.");
   }
-  await Actor.exit(timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} filings delivered.` : undefined);
+  const noResults = pushed === 0 && !budgetReached && !timeLimited ? noResultsNote("filings", !!monitor && !!prevState) : null;
+  if (noResults) log.warning(noResults);
+  await Actor.exit(timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} filings delivered.` : (noResults ?? undefined));
 } catch (err) {
   // Actor.fail marks the run FAILED with the reason, instead of a misleading SUCCEEDED.
   const msg = err instanceof Error ? err.message : String(err);

@@ -10,6 +10,7 @@
  * before charging, and a caller's charging limit stops the run cleanly.
  */
 import { Actor, log } from "apify";
+import { cleanLists, noResultsNote } from "./input.ts";
 import type { IndexJob, Manifest } from "./format.ts";
 import { descriptionsFor, httpFetcher, search, type Query } from "./search.ts";
 import { readFile } from "node:fs/promises";
@@ -43,7 +44,8 @@ if (Actor.config.get("metaOrigin") === "STANDBY") {
   }
 }
 
-function toQuery(input: Input): Query {
+function toQuery(raw: Input): Query {
+  const input = cleanLists(raw);
   return {
     titleKeywords: input.titleKeywords ?? [],
     titleExcludeKeywords: input.titleExcludeKeywords ?? [],
@@ -133,7 +135,9 @@ async function batchRun(input: Input) {
     finishedAt: new Date().toISOString(),
   });
   log.info(`Done. ${pushed} jobs delivered.`);
-  await Actor.exit(timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout for complete results.` : undefined);
+  const noResults = pushed === 0 && !budgetReached && !timeLimited ? noResultsNote("jobs", !!monitor && !!prev) : null;
+  if (noResults) log.warning(noResults);
+  await Actor.exit(timeLimited ? `Stopped early to stay inside the run's time limit: ${pushed} jobs delivered. Use a longer timeout for complete results.` : (noResults ?? undefined));
 }
 
 /**
