@@ -33,12 +33,13 @@ S=actors/shopify-stores/crawler
     "$NODE" --experimental-strip-types $S/discover.ts --cc "$CC" --hours 15 &
     DISCOVER_PID=$!
   fi
-  # 10:00 + 16 h = 02:00, clear of the 03:30 career-jobs crawl. 8 requests/s is
-  # the sustained rate Shopify tolerated on 14 Oct 2026 (25/s was refused).
+  # 10:00 + 16 h = 02:00, clear of the 03:30 career-jobs crawl. 6 requests/s:
+  # 8/s held on most days from 14 Oct 2026, but Shopify refused it hard enough to
+  # stop the run on 29 and 30 Oct, so the pace was lowered on 1 Nov.
   echo "=== $(date) enrich (up to 16 h)"
   # --follow: keep checking stores as discovery finds them, for the whole window.
   if [ -n "${DISCOVER_PID:-}" ]; then FOLLOW=--follow; else FOLLOW=; fi
-  "$NODE" --experimental-strip-types $S/enrich.ts --hours 16 --rps 8 $FOLLOW
+  "$NODE" --experimental-strip-types $S/enrich.ts --hours 16 --rps 6 $FOLLOW
   rc=$?
   if [ $rc -eq 3 ]; then notify "Shopify refused too many requests; enrichment stopped early"; elif [ $rc -ne 0 ]; then notify "enrichment failed"; fi
   if [ -n "${DISCOVER_PID:-}" ]; then wait $DISCOVER_PID || notify "discovery failed"; fi
