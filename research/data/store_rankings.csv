@@ -389,3 +389,29 @@ date,query,results,rank,actor
 2026-11-01,shopify stores,1910,,
 2026-11-01,shopify leads,1391,47,shopify-store-leads
 2026-11-01,ecommerce leads,2516,,
+2026-11-02,jobs,18163,,
+2026-11-02,job scraper,14109,,
+2026-11-02,jobs api,6889,,
+2026-11-02,job listings,9061,,
+2026-11-02,greenhouse,2040,27,company-career-site-jobs
+2026-11-02,lever jobs,7854,,
+2026-11-02,ashby,1711,16,company-career-site-jobs
+2026-11-02,workday,942,18,company-career-site-jobs
+2026-11-02,workday jobs,930,9,company-career-site-jobs
+2026-11-02,salary,7701,,
+2026-11-02,career site,2797,,
+2026-11-02,hiring,8914,,
+2026-11-02,companies hiring,7432,,
+2026-11-02,hiring signals,3507,,
+2026-11-02,sales leads,13717,17,companies-hiring-leads
+2026-11-02,funding,7244,,
+2026-11-02,form d,104863,82,sec-form-d-funding-tracker
+2026-11-02,startups funding,2955,38,sec-form-d-funding-tracker
+2026-11-02,nurse jobs,65,3,us-hospital-jobs
+2026-11-02,hospital jobs,46,2,us-hospital-jobs
+2026-11-02,hospital jobs,46,12,workday-jobs-scraper
+2026-11-02,healthcare jobs,191,3,us-hospital-jobs
+2026-11-02,shopify,2408,,
+2026-11-02,shopify stores,1930,,
+2026-11-02,shopify leads,1420,47,shopify-store-leads
+2026-11-02,ecommerce leads,2546,,
