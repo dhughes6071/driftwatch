@@ -110,7 +110,7 @@ C.append(md("""**Two checks before using the pay columns.** This is worth doing 
 
 - A few Cleveland Clinic jobs are in London and paid in pounds, so we keep USD only.
 - Sharp Healthcare's figures are wrong in this file. Its postings give hourly pay with three decimals
-  (`$26.320 - $32.890 - $36.830`, as minimum, midpoint and maximum), and the collector read that as $26,320 a year, with
+  (`$26.320 - $32.890 - $36.830`, as minimum, midpoint and maximum), and the collector read that as \\$26,320 a year, with
   the midpoint in `salary_max`. The tell is below: its registered nurses appear to earn far less a year than those at
   other systems. We set those rows aside rather than try to repair them, because the true maximum isn't in the file."""))
 
@@ -144,9 +144,9 @@ contract = rn["title"].str.contains(r"(?i)\\bcontract\\b|\\btravel(?:er|ing)?\\b
 display(pay_table(rn.assign(kind=contract.map({True: "Contract / travel", False: "Staff"})), "kind", at_least=1))
 pay_table(rn, "health_system", at_least=20)"""))
 
-C.append(md("""The typical hourly registered nurse range is $38.20 to $57.30. Contract and travel roles start much higher
-(about $63), though that rests on only 51 postings from three employers. Between systems the gap is wide: the
-median starting rate runs from $32.00 at Sanford Health to $78.31 at Sutter Health. Local cost of living probably explains
+C.append(md("""The typical hourly registered nurse range is \\$38.20 to \\$57.30. Contract and travel roles start much higher
+(about \\$63), though that rests on only 51 postings from three employers. Between systems the gap is wide: the
+median starting rate runs from \\$32.00 at Sanford Health to \\$78.31 at Sutter Health. Local cost of living probably explains
 much of that, as Sutter is in California. Sharp Healthcare is missing here because of the check above."""))
 
 C.append(md("""## 4. Full time, part time or per diem?
