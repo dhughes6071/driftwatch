@@ -1,6 +1,6 @@
 # US hospital jobs: Kaggle sample and Reddit posts (drafts, 17 Oct 2026)
 
-Numbers are from the 17 Oct 2026 index. Re-check them on the day you post. Post one at a time,
+Numbers are from the 17 Oct 2026 index, with Sharp HealthCare's pay corrected on 4 Nov 2026. Re-check them on the day you post. Post one at a time,
 a few days apart, and read each subreddit's rules first: most allow a post that shares free data
 or asks for feedback, but not a plain ad.
 
@@ -13,9 +13,9 @@ or asks for feedback, but not a plain ad.
 - 113,000+ open jobs at 68 large US health systems (Trinity Health, Advocate, AdventHealth, Sanford,
   Ascension, Tenet, SSM, Sutter, Baylor Scott & White, BJC, MedStar and more), refreshed nightly
 - About 39,000 nursing roles and 10,600 per diem / PRN roles
-- 33% state their pay. Median stated range for hourly Registered Nurse roles posted this week: $38–$57 an hour
+- 32% state their pay. Median stated range for hourly Registered Nurse roles posted this week: $38–$57 an hour
 - Every job comes straight from the hospital's own career site, with its apply link
-- Free sample: 17,557 jobs posted 10–17 Oct 2026, 67 systems in 28 states, 5,757 with pay
+- Free sample: 17,557 jobs posted 10–17 Oct 2026, 67 systems in 28 states, 5,644 with pay
 
 ---
 
@@ -25,7 +25,7 @@ or asks for feedback, but not a plain ad.
 > US Hospital Job Postings with Pay (Oct 2026)
 
 **Subtitle** (limit 80)
-> 17,557 jobs posted in one week at 67 US health systems, 5,757 with stated pay
+> 17,557 jobs posted in one week at 67 US health systems, 5,644 with stated pay
 
 **URL slug**
 > us-hospital-job-postings-with-pay
@@ -45,7 +45,7 @@ systems, collected straight from each hospital system's own site, not from job b
 - **17,557 jobs** at **67 health systems** in **28 states**: Trinity Health, Advocate Health,
   AdventHealth, Sanford Health, Ascension, Tenet, SSM Health, Sutter Health, Baylor Scott & White,
   BJC HealthCare, MedStar Health and more
-- **5,757 jobs (33%) with stated pay**, as min / max / currency / period. The median stated range
+- **5,644 jobs (32%) with stated pay**, as min / max / currency / period. The median stated range
   for hourly Registered Nurse roles is $38–$57 an hour
 - **1,407 per diem / PRN roles**
 - Each health system is identified by its name, state and bed count from AHRQ's Compendium of U.S.
@@ -56,6 +56,11 @@ CMM Research. The full, daily-updated data is the
 [US Hospital & Nurse Jobs](https://apify.com/viridian_layout_ea2/us-hospital-jobs) Actor on Apify,
 filterable by role, unit, shift, per diem / travel, sign-on bonus, state and pay, with only-new
 results for scheduled feeds.
+
+**Correction, 4 Nov 2026:** the first version of this file misread Sharp HealthCare's pay. Its postings
+state hourly pay to three decimals, which was stored as yearly pay 1,000 times too high, with the
+midpoint as the maximum. 193 of those rows are now correct. The other 113 had closed, so their true
+maximum can't be confirmed and their pay is blank. No other employer's rows changed.
 
 ### Columns
 
@@ -86,7 +91,7 @@ results for scheduled feeds.
 ## 2. r/datasets
 
 **Title**
-> [Dataset] 17,557 US hospital job postings from one week, from 67 health systems' own career sites (33% with pay)
+> [Dataset] 17,557 US hospital job postings from one week, from 67 health systems' own career sites (32% with pay)
 
 **Body**
 > I run a daily crawl of company career sites, and this month I added the big US hospital
@@ -96,7 +101,7 @@ results for scheduled feeds.
 >
 > - 17,557 jobs posted 10–17 Oct 2026 at 67 health systems in 28 states (Trinity, Advocate,
 >   AdventHealth, Ascension, Tenet, SSM, Sutter, Baylor Scott & White, BJC, MedStar…)
-> - 33% state their pay. Median hourly range for RN roles: $38–$57
+> - 32% state their pay. Median hourly range for RN roles: $38–$57
 > - Each system is tagged with its AHRQ Compendium name, state and bed count, so it joins to
 >   public hospital data
 > - Straight from each system's own career site, with the apply link, not scraped from job boards

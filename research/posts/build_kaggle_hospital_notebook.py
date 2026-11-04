@@ -106,19 +106,10 @@ plt.show()"""))
 C.append(md("""25 of the 67 systems state no pay at all, so every pay figure below describes the employers that publish it,
 not all hospitals."""))
 
-C.append(md("""**Two checks before using the pay columns.** This is worth doing with any scraped pay data.
+C.append(md("""**One check before using the pay columns:** a few Cleveland Clinic jobs are in London and paid in pounds, so we
+keep USD only."""))
 
-- A few Cleveland Clinic jobs are in London and paid in pounds, so we keep USD only.
-- Sharp Healthcare's figures are wrong in this file. Its postings give hourly pay with three decimals
-  (`$26.320 - $32.890 - $36.830`, as minimum, midpoint and maximum), and the collector read that as \\$26,320 a year, with
-  the midpoint in `salary_max`. The tell is below: its registered nurses appear to earn far less a year than those at
-  other systems. We set those rows aside rather than try to repair them, because the true maximum isn't in the file."""))
-
-C.append(code("""rn_yearly = jobs[(jobs["role_family"] == "Registered nurse") & (jobs["salary_period"] == "year") & (jobs["salary_currency"] == "USD")]
-display(rn_yearly.groupby(rn_yearly["health_system"] == "Sharp Healthcare")[["salary_min", "salary_max"]].median()
-        .rename_axis("Sharp Healthcare?").round(0))
-
-pay = jobs[(jobs["salary_currency"] == "USD") & (jobs["health_system"] != "Sharp Healthcare")].copy()
+C.append(code("""pay = jobs[jobs["salary_currency"] == "USD"].copy()
 print(f"{len(pay):,} jobs with usable USD pay, from {pay['health_system'].nunique()} systems")
 pay.groupby("salary_period").agg(jobs=("url", "size"), median_min=("salary_min", "median"), median_max=("salary_max", "median")).round(2)"""))
 
@@ -147,7 +138,7 @@ pay_table(rn, "health_system", at_least=20)"""))
 C.append(md("""The typical hourly registered nurse range is \\$38.20 to \\$57.30. Contract and travel roles start much higher
 (about \\$63), though that rests on only 51 postings from three employers. Between systems the gap is wide: the
 median starting rate runs from \\$32.00 at Sanford Health to \\$78.31 at Sutter Health. Local cost of living probably explains
-much of that, as Sutter is in California. Sharp Healthcare is missing here because of the check above."""))
+much of that, as Sutter is in California."""))
 
 C.append(md("""## 4. Full time, part time or per diem?
 
