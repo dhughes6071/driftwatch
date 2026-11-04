@@ -50,8 +50,10 @@ const CURRENCY_TOKENS: Array<[RegExp, string | null]> = [
 ];
 const CUR = String.raw`(?:US\$|CA\$|C\$|AU\$|A\$|NZ\$|S\$|HK\$|MX\$|\$|£|€|₹|(?:USD|CAD|GBP|EUR|AUD|INR|CHF|SGD|NZD|HKD|MXN|JPY|SEK|NOK|DKK|PLN|ZAR|AED)\s?)`;
 const CODE_AFTER = String.raw`(?:\s?(?:USD|CAD|GBP|EUR|AUD|INR|CHF|SGD|NZD|HKD|MXN|JPY|SEK|NOK|DKK|PLN|ZAR|AED)\b)?`;
-// US "120,000.00", European "61.500" / "79.104,00", or plain "20.50".
-const NUM = String.raw`\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?|\d+(?:[.,]\d{1,2})?`;
+// US "120,000.00", European "61.500" / "79.104,00" / "56.867.20", plain "20.50",
+// or a rate to four or five decimals "16.7106" (MGM Resorts, 4 Nov). "61.500" may also be a rate to
+// three decimals: see threeDecimals().
+const NUM = String.raw`\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d{1,3}(?:\.\d{3})+(?:[.,]\d{1,2})?(?!\d)|\d+\.\d{4,5}(?!\d)|\d+(?:[.,]\d{1,2})?`;
 const K = String.raw`(?:\s?[kK]\b)?`;
 const SEP = String.raw`\s*(?:-|–|—|to|and)\s*`;
 
@@ -63,6 +65,12 @@ const RANGE_RE = new RegExp(`(${CUR})\\s?(${NUM})(${K})${CODE_AFTER}${SEP}(${CUR
  */
 const CODES = "USD|CAD|GBP|EUR|AUD|INR|CHF|SGD|NZD|HKD|MXN|JPY|SEK|NOK|DKK|PLN|ZAR|AED";
 const RANGE_CODE_AFTER_RE = new RegExp(`(?<![\\d.,$£€₹])(${NUM})(${K})\\s?(${CODES})\\b${SEP}(${NUM})(${K})\\s?(${CODES})?\\b`, "gi");
+/**
+ * The third number of "Minimum - Midpoint - Maximum: $26.320 - $32.890 - $36.830"
+ * (Sharp HealthCare, Baystate Health, 4 Nov). Without a currency it needs a
+ * separator too, so "$34,880 - $40,980 - 401(k)" and "- 30 hours" are not read.
+ */
+const THIRD_RE = new RegExp(`^${SEP}(${CUR})?\\s?(${NUM})(${K})${CODE_AFTER}`, "i");
 /** Single value only right after a pay word: "Hourly Base Pay: $20.50". */
 const SINGLE_RE = new RegExp(
   String.raw`\b(?:pay(?: rate)?|salary|wage|compensation|hourly rate|base pay|starting (?:pay|rate|at))\s*(?:is|of|:)?\s*(${CUR})\s?(${NUM})(${K})${CODE_AFTER}`,
@@ -122,13 +130,46 @@ export function normaliseText(s: string): string {
     .replace(/[ \t]+/g, " ");
 }
 
-function toNumber(raw: string, k: string): number {
+function toNumber(raw: string, k: string, decimalPoint = false): number {
   let t = raw;
-  if (/^\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?$/.test(t)) t = t.replace(/\./g, "").replace(",", "."); // 61.500 / 79.104,00
+  if (decimalPoint) return Number(t);
+  const dotted = t.match(/^(\d{1,3}(?:\.\d{3})+)(?:[.,](\d{1,2}))?$/); // 61.500 / 79.104,00 / 56.867.20
+  if (dotted) t = dotted[1].replace(/\./g, "") + (dotted[2] ? `.${dotted[2]}` : "");
   else if (/^\d+,\d{1,2}$/.test(t)) t = t.replace(",", "."); // 20,50
   else t = t.replace(/,/g, "");
   const n = Number(t);
   return k.trim() ? n * 1000 : n;
+}
+
+/** Currencies that write a decimal point, so "$26.320" is not 26 thousand. */
+const DECIMAL_POINT = new Set(["USD", "CAD", "AUD", "NZD", "SGD", "HKD"]);
+const ONE_DOT_GROUP = /^\d{1,3}\.\d{3}$/;
+const HOURLY_BEFORE = /\b(hourly|per hour)\b[^.]{0,60}$/i;
+const YEARLY_BEFORE = /\b(annual|annually|yearly|per year)\b[^.]{0,60}$/i;
+
+/**
+ * Whether "$26.320" is a rate to three decimals rather than a typed-European
+ * 26,320. Both are real: "$36.160 to $38.720" is a Canadian nurse's hourly band
+ * and "$165.000 - $185.000" is a New York salary (samples of our index, 4 Nov),
+ * so a stated period decides first, then the shape of the numbers.
+ */
+function threeDecimals(nums: string[], k: string, currency: string, before: string, after: string): boolean {
+  if (k.trim() || !DECIMAL_POINT.has(currency)) return false;
+  const dotted = nums.filter((n) => ONE_DOT_GROUP.test(n));
+  if (!dotted.length) return false;
+  // The other end shows how this posting writes numbers: "$176,800 - $239.200".
+  if (nums.some((n) => !ONE_DOT_GROUP.test(n) && toNumber(n, "") >= 1000)) return false;
+  const low = Math.min(...nums.map((n) => toNumber(n, "", ONE_DOT_GROUP.test(n))));
+  if (low < 5 || low >= 200) return false;
+  if (PERIOD_AFTER[0][0].test(after)) return true;
+  if (PERIOD_AFTER[4][0].test(after)) return false;
+  if (HOURLY_BEFORE.test(before)) return true;
+  if (YEARLY_BEFORE.test(before)) return false;
+  // No stated period. Nobody writes a whole rate as $90.000, though the top of a
+  // band can be round ("$27.990 to $30.000"), and rates rarely end in 00 at both ends.
+  if (dotted.every((n) => n.endsWith("000"))) return false;
+  if (low >= 30 && (dotted.some((n) => n.endsWith("000")) || dotted.every((n) => n.endsWith("00")))) return false;
+  return low < 100;
 }
 
 function currencyOf(token: string | undefined, countryHint: string | null): string | null {
@@ -207,15 +248,35 @@ export function extractSalary(description: string | null | undefined, countryHin
 
   const considerRange = (whole: string, index: number, cur1: string | undefined, n1: string, k1: string, cur2: string | undefined, n2: string, k2: string) => {
     const before = text.slice(Math.max(0, index - 250), index);
-    const after = text.slice(index + whole.length, index + whole.length + 60);
+    let after = text.slice(index + whole.length, index + whole.length + 60);
     // An hourly rate right after the range outweighs a stray word before it
     // ("Retail Sales Associate ... $15.00 – $18.00 per hour", 29 Sep).
     if ((vetoedBefore(before) && !PERIOD_AFTER[0][0].test(after)) || NOT_PAY_AFTER.test(after)) return;
     // "$120-150k": the k on the high end applies to both.
     const kk1 = k1 || (!k1 && k2 && Number(n1.replace(/,/g, "")) < 1000 ? k2 : "");
-    const min = toNumber(n1, kk1);
-    const max = toNumber(n2, k2);
     const currency = currencyOf(cur1, countryHint) ?? currencyOf(cur2, countryHint) ?? dollarFor(countryHint);
+    // Min - midpoint - max: the top of the range is the third number. It has to
+    // look like one, or it is the next bullet ("$65,000 - $70,000 - $2,000 Sign-On Bonus").
+    const third = after.match(THIRD_RE);
+    let high = n2;
+    if (third && (third[1] || /[.,]/.test(third[2]))) {
+      const afterThird = after.slice(third[0].length);
+      const candidate = third[2];
+      const usesPoint = threeDecimals([n1, n2, candidate], kk1 + k2 + third[3], currency, before, afterThird);
+      const value = (n: string) => toNumber(n, third[3], usesPoint && ONE_DOT_GROUP.test(n));
+      const middle = toNumber(n2, k2, usesPoint && ONE_DOT_GROUP.test(n2));
+      if (value(candidate) > middle && value(candidate) <= middle * 1.8 && !NOT_PAY_AFTER.test(afterThird) && afterThird.slice(0, 30).search(NOT_PAY_WORDS) < 0) {
+        high = candidate;
+        whole += third[0];
+        k2 = third[3];
+        after = afterThird;
+      }
+    }
+    const nums = high === n2 ? [n1, n2] : [n1, n2, high];
+    const usesPoint = threeDecimals(nums, kk1 + k2, currency, before, after);
+    const read = (n: string, k: string) => toNumber(n, k, usesPoint && ONE_DOT_GROUP.test(n));
+    const min = read(n1, kk1);
+    const max = read(high, k2);
     const trailingCode = whole.match(/(USD|CAD|GBP|EUR|AUD|INR|CHF|SGD|NZD|HKD|MXN|JPY|SEK|NOK|DKK|PLN|ZAR|AED)\s*$/i)?.[1];
     const cur = trailingCode && currency === dollarFor(countryHint) ? trailingCode.toUpperCase() : currency;
     const hasContext = PAY_CONTEXT.test(before) || PERIOD_AFTER.some(([re]) => re.test(after)) || /\/\s?(hr|hour|yr|year)/i.test(whole);
@@ -240,9 +301,10 @@ export function extractSalary(description: string | null | undefined, countryHin
     const numStart = index + whole.length;
     const after = text.slice(numStart, numStart + 60);
     // A range starting here was already considered above.
-    if (/^\s*(?:-|–|—|to)\s*\S?\d/.test(after) || NOT_PAY_AFTER.test(after)) continue;
-    const value = toNumber(n1, k1);
+    if (/^\s*(?:-|–|—|to)\s*\S?\d/i.test(after) || NOT_PAY_AFTER.test(after)) continue;
     const currency = currencyOf(cur1, countryHint) ?? dollarFor(countryHint);
+    const beforeNumber = text.slice(Math.max(0, index - 60), index + whole.lastIndexOf(n1));
+    const value = toNumber(n1, k1, threeDecimals([n1], k1, currency, beforeNumber, after) && ONE_DOT_GROUP.test(n1));
     const period = periodFor(text.slice(Math.max(0, index - 60), index + whole.length), after, value, value, currency);
     if (!period) continue;
     candidates.push({ index, s: build(value, value, currency, period, whole.trim()) });
@@ -254,9 +316,10 @@ export function extractSalary(description: string | null | undefined, countryHin
     const before = text.slice(Math.max(0, index - 250), index);
     const after = text.slice(index + whole.length, index + whole.length + 60);
     if (vetoedBefore(before) || NOT_PAY_AFTER.test(after)) continue;
-    const min = toNumber(n1, k1);
-    const max = toNumber(n2, k2);
     const currency = currencyOf(cur1, countryHint) ?? currencyOf(cur2, countryHint) ?? dollarFor(countryHint);
+    const usesPoint = threeDecimals([n1, n2], k1 + k2, currency, before + whole.slice(0, whole.indexOf(n1)), after);
+    const min = toNumber(n1, k1, usesPoint && ONE_DOT_GROUP.test(n1));
+    const max = toNumber(n2, k2, usesPoint && ONE_DOT_GROUP.test(n2));
     const period = periodFor(before + whole, after, max, min, currency);
     if (!period) continue;
     candidates.push({ index, s: build(min, max, currency, period, whole.replace(/\s+/g, " ").trim()) });

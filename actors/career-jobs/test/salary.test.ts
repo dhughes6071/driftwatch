@@ -143,3 +143,64 @@ test("Lever salaryRange", async () => {
   assert.equal(fromLeverSalaryRange({ leverSalaryRange: { min: 1, max: 2, currency: "USD", interval: "per-year-salary" } }), null, "implausible");
   assert.equal(fromLeverSalaryRange({ leverSalaryRange: { min: 100, max: 200, currency: "USD", interval: "one-time" } }), null);
 });
+
+test("hourly pay written to three or four decimals is not thousands (Sharp and others, 4 Nov)", () => {
+  assert.deepEqual(pick("Hourly Pay Range (Minimum - Midpoint - Maximum): $26.320 - $32.890 - $36.830 The stated pay scale"), { min: 26.32, max: 36.83, currency: "USD", period: "hour" });
+  assert.deepEqual(pick("Hourly Pay Range (Minimum - Midpoint - Maximum): $80.440 - $103.790 - $116.240"), { min: 80.44, max: 116.24, currency: "USD", period: "hour" });
+  assert.deepEqual(pick("Salary or Pay Band: Pay Band 16 $36.160 to $38.720 (3 step range)", "CA"), { min: 36.16, max: 38.72, currency: "CAD", period: "hour" });
+  assert.deepEqual(pick("Salary: $40.911 to $57.695 per hour", "CA"), { min: 40.91, max: 57.7, currency: "CAD", period: "hour" });
+  assert.deepEqual(pick("Pay Rate: $36.706 - $37.967 per hour Eligible for"), { min: 36.71, max: 37.97, currency: "USD", period: "hour" });
+  assert.deepEqual(pick("Salary Range: $23.331-$23.755. Click here"), { min: 23.33, max: 23.76, currency: "USD", period: "hour" });
+  assert.deepEqual(pick("The compensation for the position is: $29.64 - $34.873 Cushman"), { min: 29.64, max: 34.87, currency: "USD", period: "hour" });
+  assert.deepEqual(pick("THE STARTING RATE: $26.683 + tips"), { min: 26.68, max: 26.68, currency: "USD", period: "hour" });
+  assert.deepEqual(pick("Starting wage $50.000/hour. Additional $3/hour"), { min: 50, max: 50, currency: "USD", period: "hour" });
+  assert.deepEqual(pick("Compensation: Salary: $51.4543 an hour What we Offer"), { min: 51.45, max: 51.45, currency: "USD", period: "hour" });
+  assert.deepEqual(pick("Hourly Rate:$31.0584"), { min: 31.06, max: 31.06, currency: "USD", period: "hour" });
+  assert.deepEqual(pick("Our consultants earn between $16.9375 - $20.825 per hour plus commissions"), { min: 16.94, max: 20.83, currency: "USD", period: "hour" });
+  assert.deepEqual(pick("Pay Band 13 $27.990 to $30.000 (3 step range)", "CA"), { min: 27.99, max: 30, currency: "CAD", period: "hour" });
+  assert.deepEqual(pick("Job Types: Full-time Salary: $15.000 TO $18.00 /hour"), { min: 15, max: 18, currency: "USD", period: "hour" });
+  assert.deepEqual(pick("Compensation $22.81875/hour Why"), { min: 22.82, max: 22.82, currency: "USD", period: "hour" });
+  const s = extractSalary("Hourly Pay Range (Minimum - Midpoint - Maximum): $26.320 - $32.890 - $36.830");
+  assert.equal(s?.annualMin, 54746);
+  assert.equal(s?.annualMax, 76606);
+});
+
+test("a dollar salary typed with dots stays a salary", () => {
+  const year = (min: number, max: number) => ({ min, max, currency: "USD", period: "year" });
+  assert.deepEqual(pick("What We Offer Salary: $165.000 - $185.000 + Bonus"), year(165000, 185000));
+  assert.deepEqual(pick("The base salary range for this role is $120.000 - $140.000 per year."), year(120000, 140000));
+  assert.deepEqual(pick("The pay range is $176,800 - $239.200 based on experience"), year(176800, 239200));
+  assert.deepEqual(pick("The salary range for this role is $65.000 to $85,000"), year(65000, 85000));
+  assert.deepEqual(pick("salary range for the Account Manager opportunity in the U.S. is $ 145.311 to $ 196.597. This range"), year(145311, 196597));
+  assert.deepEqual(pick("SALARY RANGE IS FROM $93.150 TO $155.250 (ANNUAL) At Diageo"), year(93150, 155250));
+  assert.deepEqual(pick("The anticipated range is $74.600,00 - $124.700,00 base salary"), year(74600, 124700));
+  assert.deepEqual(pick("Annual Salary: $72.404 = base + commission"), year(72404, 72404));
+  assert.deepEqual(pick("Salary: $144.633/yr. Standard company benefits"), year(144633, 144633));
+  assert.deepEqual(pick("Grade: 25 Salary: $56.867.20 - $79.747.20/Annually Location"), year(56867.2, 79747.2));
+  assert.deepEqual(pick("Annual Salary: $40.934.40 Position Summary"), year(40934.4, 40934.4));
+  assert.deepEqual(pick("Salary: $3,657.33 - $5.250.00 per month commensurate"), { min: 3657.33, max: 5250, currency: "USD", period: "month" });
+  assert.deepEqual(pick("40 hour position. Salary: $85.000 - $95.000 plus benefits"), year(85000, 95000));
+});
+
+test("European amounts in other currencies still read as thousands", () => {
+  assert.deepEqual(pick("Salary: €26.320 - €36.830 per year"), { min: 26320, max: 36830, currency: "EUR", period: "year" });
+  assert.deepEqual(pick("La fascia retributiva: €30.560 - €46.310 annual"), { min: 30560, max: 46310, currency: "EUR", period: "year" });
+  assert.deepEqual(pick("Salary: 45.320 EUR - 65.840 EUR brutto pro Jahr"), { min: 45320, max: 65840, currency: "EUR", period: "year" });
+  assert.deepEqual(pick("role based in United Kingdom compensation is GBP 63.800 - 95.600."), { min: 63800, max: 95600, currency: "GBP", period: "year" });
+  assert.deepEqual(pick("Salary: 45.320 CHF - 65.840 CHF per year"), { min: 45320, max: 65840, currency: "CHF", period: "year" });
+});
+
+test("minimum, midpoint and maximum: the top of the range is the third number", () => {
+  const year = (min: number, max: number) => ({ min, max, currency: "USD", period: "year" });
+  assert.deepEqual(pick("Hiring Range: $83,400 - $116,800 - $150,000- USD/ Austin, TX"), year(83400, 150000));
+  assert.deepEqual(pick("Base Salary Range: $124,500.00 – $155,500.00 – $186,000.00 annually"), year(124500, 186000));
+  assert.deepEqual(pick("expected to range between: $225,400.00 - 322,000.00 - 418,600.00 USD Annual"), year(225400, 418600));
+  assert.deepEqual(pick("The expected base pay for this position at hiring is $22.40 - $29.86 - $37.33. Please note"), { min: 22.4, max: 37.33, currency: "USD", period: "hour" });
+  assert.deepEqual(pick("Pay range is $56,539 - 73,501 - 90,462.00 CAD Annual"), { min: 56539, max: 90462, currency: "CAD", period: "year" });
+  // the next bullet is not the top of the range
+  assert.deepEqual(pick("Base Salary: $65,000 - $70,000 - 5% Annual Incentive"), year(65000, 70000));
+  assert.deepEqual(pick("Competitive base salary $34,880 - $40,980 - 401(k) retirement"), year(34880, 40980));
+  assert.deepEqual(pick("Pay Range $25.51 to $30.39 - $2,500 Stay Bonus"), { min: 25.51, max: 30.39, currency: "USD", period: "hour" });
+  assert.deepEqual(pick("The salary range is $65,000 - $70,000 - $75,000 sign-on bonus available"), year(65000, 70000));
+  assert.deepEqual(pick("Hourly Compensation Range $29.00-$36.00 - 30 hours"), { min: 29, max: 36, currency: "USD", period: "hour" });
+});
