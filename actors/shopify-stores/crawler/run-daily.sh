@@ -9,16 +9,30 @@ mkdir -p data/logs
 LOG="data/logs/shopify-stores-$(date +%Y-%m-%d).log"
 
 LOCK="data/shopify-stores.lock"
-if ! mkdir "$LOCK" 2>/dev/null; then
-  echo "$(date) previous run still in progress; skipping" >> "$LOG"
-  exit 0
-fi
-trap 'rmdir "$LOCK"' EXIT
 NODE="$(command -v node || echo /opt/homebrew/bin/node)"
 notify() {
   echo "$(date '+%Y-%m-%d %H:%M') ALERT: shopify run: $1 (see $LOG)" >> data/logs/alerts.log
   osascript -e "display notification \"Shopify run: $1. See $LOG\" with title \"Shopify store index needs attention\" sound name \"Basso\"" 2>/dev/null
 }
+
+# One run at a time. The lock records who holds it, because a restart kills a
+# run before it can clean up: on 1 Nov 2026 a leftover lock made the next three
+# daily runs skip without telling anyone. A lock whose owner is gone is ignored,
+# and a real overlap is abnormal, so it alerts.
+if ! mkdir "$LOCK" 2>/dev/null; then
+  HOLDER="$(cat "$LOCK/pid" 2>/dev/null)"
+  if [[ -n "$HOLDER" ]] && ps -p "$HOLDER" -o command= 2>/dev/null | grep -q "run-daily.sh"; then
+    echo "$(date) previous run (pid $HOLDER) still in progress; skipping" >> "$LOG"
+    notify "skipped because the previous run (pid $HOLDER) is still going"
+    exit 0
+  fi
+  echo "$(date) removing a stale lock left by a run that no longer exists (pid ${HOLDER:-unknown})" >> "$LOG"
+  rm -rf "$LOCK"
+  mkdir "$LOCK" || { notify "could not take the lock"; exit 1; }
+fi
+echo $$ > "$LOCK/pid"
+trap 'rm -rf "$LOCK"' EXIT
+
 S=actors/shopify-stores/crawler
 
 {

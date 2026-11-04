@@ -7,19 +7,31 @@ cd "$ROOT"
 mkdir -p data/logs
 LOG="data/logs/career-jobs-$(date +%Y-%m-%d).log"
 
-# One crawl at a time: a run that overlaps the previous one would double the load on every site.
 LOCK="data/career-jobs.lock"
-if ! mkdir "$LOCK" 2>/dev/null; then
-  echo "$(date) previous run still in progress; skipping" >> "$LOG"
-  exit 0
-fi
-trap 'rmdir "$LOCK"' EXIT
 NODE="$(command -v node || echo /opt/homebrew/bin/node)"
 # Tell the owner straight away; check-index.sh repeats it at 09:00 if still broken.
 notify() {
   echo "$(date '+%Y-%m-%d %H:%M') ALERT: nightly run: $1 (see $LOG)" >> data/logs/alerts.log
   osascript -e "display notification \"Nightly run: $1. See $LOG\" with title \"Career Jobs index needs attention\" sound name \"Basso\"" 2>/dev/null
 }
+
+# One run at a time. The lock records who holds it, because a restart kills a
+# run before it can clean up: on 1 Nov 2026 a leftover lock made the next three
+# daily runs skip without telling anyone. A lock whose owner is gone is ignored,
+# and a real overlap is abnormal, so it alerts.
+if ! mkdir "$LOCK" 2>/dev/null; then
+  HOLDER="$(cat "$LOCK/pid" 2>/dev/null)"
+  if [[ -n "$HOLDER" ]] && ps -p "$HOLDER" -o command= 2>/dev/null | grep -q "run-daily.sh"; then
+    echo "$(date) previous run (pid $HOLDER) still in progress; skipping" >> "$LOG"
+    notify "skipped because the previous run (pid $HOLDER) is still going"
+    exit 0
+  fi
+  echo "$(date) removing a stale lock left by a run that no longer exists (pid ${HOLDER:-unknown})" >> "$LOG"
+  rm -rf "$LOCK"
+  mkdir "$LOCK" || { notify "could not take the lock"; exit 1; }
+fi
+echo $$ > "$LOCK/pid"
+trap 'rm -rf "$LOCK"' EXIT
 
 # Wait for the internet before crawling. On 22 Oct 2026 the connection was down
 # from about 03:30 to 06:25: every Greenhouse, Workday, Oracle and SmartRecruiters
