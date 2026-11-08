@@ -519,29 +519,55 @@ date,query,results,rank,actor
 2026-11-06,shopify stores,2021,78,shopify-store-leads
 2026-11-06,shopify leads,1487,19,shopify-store-leads
 2026-11-06,ecommerce leads,2398,,
-2026-11-07,jobs,18785,,
-2026-11-07,job scraper,14987,,
-2026-11-07,jobs api,7324,,
-2026-11-07,job listings,9555,,
+2026-11-07,jobs,18794,,
+2026-11-07,job scraper,14988,,
+2026-11-07,jobs api,7325,,
+2026-11-07,job listings,9559,,
 2026-11-07,greenhouse,2231,27,company-career-site-jobs
-2026-11-07,lever jobs,8425,,
+2026-11-07,lever jobs,8426,,
 2026-11-07,ashby,1885,15,company-career-site-jobs
 2026-11-07,workday,1043,18,company-career-site-jobs
 2026-11-07,workday jobs,1031,9,company-career-site-jobs
 2026-11-07,salary,8246,,
-2026-11-07,career site,3035,32,career-site-jobs-api
+2026-11-07,career site,3036,32,career-site-jobs-api
 2026-11-07,hiring,9515,,
 2026-11-07,companies hiring,7961,,
 2026-11-07,hiring signals,3780,,
-2026-11-07,sales leads,14530,18,companies-hiring-leads
-2026-11-07,funding,7744,,
-2026-11-07,form d,110732,61,sec-form-d-funding-tracker
-2026-11-07,startups funding,3173,30,sec-form-d-funding-tracker
+2026-11-07,sales leads,14531,18,companies-hiring-leads
+2026-11-07,funding,7746,,
+2026-11-07,form d,110765,,
+2026-11-07,startups funding,3174,30,sec-form-d-funding-tracker
 2026-11-07,nurse jobs,68,3,us-hospital-jobs
 2026-11-07,hospital jobs,52,2,us-hospital-jobs
 2026-11-07,hospital jobs,52,12,workday-jobs-scraper
 2026-11-07,healthcare jobs,188,6,us-hospital-jobs
-2026-11-07,shopify,2564,,
-2026-11-07,shopify stores,2037,80,shopify-store-leads
+2026-11-07,shopify,2565,,
+2026-11-07,shopify stores,2038,80,shopify-store-leads
 2026-11-07,shopify leads,1509,19,shopify-store-leads
 2026-11-07,ecommerce leads,2419,,
+2026-11-08,jobs,19248,,
+2026-11-08,job scraper,15099,,
+2026-11-08,jobs api,7416,,
+2026-11-08,job listings,9595,,
+2026-11-08,greenhouse,2252,26,company-career-site-jobs
+2026-11-08,lever jobs,8488,,
+2026-11-08,ashby,1905,15,company-career-site-jobs
+2026-11-08,workday,1057,18,company-career-site-jobs
+2026-11-08,workday jobs,1045,9,company-career-site-jobs
+2026-11-08,salary,8312,,
+2026-11-08,career site,3069,32,career-site-jobs-api
+2026-11-08,hiring,9586,,
+2026-11-08,companies hiring,8022,,
+2026-11-08,hiring signals,3803,,
+2026-11-08,sales leads,14693,18,companies-hiring-leads
+2026-11-08,funding,7809,,
+2026-11-08,form d,111343,,
+2026-11-08,startups funding,3193,35,sec-form-d-funding-tracker
+2026-11-08,nurse jobs,68,3,us-hospital-jobs
+2026-11-08,hospital jobs,52,2,us-hospital-jobs
+2026-11-08,hospital jobs,52,12,workday-jobs-scraper
+2026-11-08,healthcare jobs,189,5,us-hospital-jobs
+2026-11-08,shopify,2583,,
+2026-11-08,shopify stores,2050,69,shopify-store-leads
+2026-11-08,shopify leads,1522,18,shopify-store-leads
+2026-11-08,ecommerce leads,2453,,
