@@ -175,7 +175,14 @@ try {
     const batch = pending.splice(0);
     const results = await Promise.all(
       batch.map(async (h) => {
-        const xml = await client.filingXml(h);
+        // One filing SEC won't serve after retries is skipped, not fatal to the run.
+        let xml: string | null;
+        try {
+          xml = await client.filingXml(h);
+        } catch (err) {
+          log.warning(`Skipped filing ${h.accessionNumber}: ${String(err)}`);
+          return null;
+        }
         if (xml == null) return null;
         downloaded++;
         try {
