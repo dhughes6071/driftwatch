@@ -241,7 +241,7 @@ export async function enrich(db: Db, o: EnrichOptions) {
   const throttle = new Throttle(o.concurrency);
   const due = db.prepare(`
     SELECT domain, first_seen, fails, CASE WHEN robots_at >= ? THEN robots END AS robots FROM stores
-    WHERE next_check <= ? ORDER BY status = 'new' DESC, next_check ASC LIMIT ?
+    WHERE next_check <= ? ORDER BY (status = 'new' AND fails = 0) DESC, next_check ASC LIMIT ?
   `);
   const save = db.prepare(`
     UPDATE stores SET status = ?, checked_at = ?, next_check = ?, fails = ?, shop_id = COALESCE(?, shop_id),
@@ -282,6 +282,10 @@ export async function enrich(db: Db, o: EnrichOptions) {
         continue;
       }
       const r = await checkStore(s.domain, s.first_seen, http, (st) => {
+        // A store that refused us before has its own bot protection; its refusals say
+        // nothing about Shopify's limit. From 7 Nov 2026 ~2,500 such stores, queued
+        // first as "new", stopped every run within minutes while normal stores got 200s.
+        if (s.fails > 0) return;
         const msg = throttle.record(st);
         // The request rate follows the throttle both ways: down when refused, back up as it recovers.
         limiter.perSecond = Math.max(1, (o.requestsPerSecond * throttle.limit) / o.concurrency);
