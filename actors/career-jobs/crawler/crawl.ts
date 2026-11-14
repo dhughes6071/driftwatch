@@ -28,7 +28,8 @@ import { fromStructuredPay } from "../src/salary.ts";
 import * as Oracle from "../sources/oracle.ts";
 import * as SmartR from "../sources/smartrecruiters.ts";
 import { SMALL_SOURCES, smallJobId } from "../sources/small.ts";
-import { CompanyRuns, companyRunsSchema, purgeClosed } from "./company-runs.ts";
+import { CompanyRuns, companyRunsSchema, describeError, purgeClosed } from "./company-runs.ts";
+import { archiveClosedHospitalRoles, recordHealthDay } from "./health-history.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
@@ -375,12 +376,27 @@ export async function crawl() {
 
   // Roles gone for 3+ days are closed -- but only at companies whose list
   // loaded; a failing company keeps its roles (company-runs.ts).
-  const purged = purgeClosed(db, new Date().toISOString());
+  // Hospital roles are copied to health_closed first (Stage 2 history, health-history.ts).
+  const purgeAt = new Date().toISOString();
+  const health: Record<string, unknown> = {};
+  const purged = purgeClosed(db, purgeAt, (where, params) => {
+    try {
+      health.archived = archiveClosedHospitalRoles(db, where, params, purgeAt);
+    } catch (err) {
+      health.archiveError = describeError(err); // history is a bonus; it must never stop the purge
+    }
+  });
+  try {
+    Object.assign(health, recordHealthDay(db, startedAt));
+  } catch (err) {
+    health.dayError = describeError(err);
+  }
+  log(`hospital history: ${JSON.stringify(health)}`);
 
   db.prepare("UPDATE runs SET finished_at = ?, stats = ? WHERE started_at = ?").run(
     new Date().toISOString(),
     // `only` and `limit` let source-drops.ts tell a full nightly run from a catch-up or trial run.
-    JSON.stringify({ ...stats, workdayHttp: client.counts, small, companies: companyStats, purged, only: ONLY ? [...ONLY] : null, limit: Number.isFinite(LIMIT) ? LIMIT : null }),
+    JSON.stringify({ ...stats, workdayHttp: client.counts, small, companies: companyStats, purged, health, only: ONLY ? [...ONLY] : null, limit: Number.isFinite(LIMIT) ? LIMIT : null }),
     startedAt,
   );
   log(`Done: ${JSON.stringify({ ...stats, small, companies: companyStats, purged })}`);

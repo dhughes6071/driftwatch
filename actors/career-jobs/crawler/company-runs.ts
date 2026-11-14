@@ -109,15 +109,19 @@ export function liveParams(lastRunAt: string) {
  * Delete closed roles: unseen for PURGE_DAYS, unless their company is failing
  * (then they are kept while seen since its last good load, up to KEEP_STORED_DAYS).
  */
-export function purgeClosed(db: Database.Database, now: string) {
+export function purgeClosed(db: Database.Database, now: string, beforeDelete?: (where: string, params: ClosedParams) => void) {
   loadFailing(db);
-  return db
-    .prepare(
-      `DELETE FROM jobs WHERE last_seen < @cutoff AND NOT EXISTS (
-         SELECT 1 FROM failing f WHERE f.ats = jobs.ats AND f.company = jobs.company AND jobs.last_seen >= MAX(f.since, @hard))`,
-    )
-    .run({ cutoff: daysBefore(now, PURGE_DAYS), hard: daysBefore(now, KEEP_STORED_DAYS) }).changes;
+  const params = closedParams(now);
+  beforeDelete?.(CLOSED_WHERE, params);
+  return db.prepare(`DELETE FROM jobs WHERE ${CLOSED_WHERE}`).run(params).changes;
 }
+
+/** SQL condition (on `jobs`) for "closed, about to be purged". Needs loadFailing() first. */
+export const CLOSED_WHERE = `jobs.last_seen < @cutoff AND NOT EXISTS (
+  SELECT 1 FROM failing f WHERE f.ats = jobs.ats AND f.company = jobs.company AND jobs.last_seen >= MAX(f.since, @hard))`;
+
+export type ClosedParams = { cutoff: string; hard: string };
+const closedParams = (now: string): ClosedParams => ({ cutoff: daysBefore(now, PURGE_DAYS), hard: daysBefore(now, KEEP_STORED_DAYS) });
 
 export interface CompanyResult {
   ats: string;
