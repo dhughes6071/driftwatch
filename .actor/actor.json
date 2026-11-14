@@ -2,7 +2,7 @@
   "actorSpecification": 1,
   "name": "company-career-site-jobs",
   "title": "Greenhouse, Lever, Ashby & Workday Jobs Scraper — with Salaries",
-  "description": "Jobs from 3,500+ companies on Greenhouse, Lever and Ashby, plus any Workday career site (NVIDIA, Salesforce, CVS and 4,100+ more by name), read from their public JSON APIs so it doesn't break. Salaries, pay and remote filters, only-new-jobs mode.",
+  "description": "Every open job from 5,300+ companies on Greenhouse, Lever, Ashby and Workday (Stripe, NVIDIA, CVS and more), read from their public JSON APIs so it doesn't break. Salaries on nearly half of jobs, pay and remote filters, only-new-jobs mode. $1.50 per 1,000 jobs.",
   "version": "0.6",
   "buildTag": "latest",
   "dockerfile": "./Dockerfile",
